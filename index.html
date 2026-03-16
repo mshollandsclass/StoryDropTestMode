@@ -1985,57 +1985,122 @@ async function leaveGroup() {
 // ── TEST MODE ──
 let testBots = [];
 
-
-
 async function addTestBot() {
+  // Find first group in waiting state
   const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
   if (!codes.length) { toast('Create a session first'); return; }
-  const code = codes[0]; // Add to first group
-  const botName = 'Bot_' + Math.random().toString(36).slice(2,5).toUpperCase();
 
-  const g = await sget(`sd_group_${code}`);
-  if (!g) { toast('Group not found'); return; }
-  if (!g.players.includes(botName)) {
-    g.players.push(botName);
-    await sset(`sd_group_${code}`, g);
+  let added = false;
+  for (const code of codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g || g.status !== 'waiting') continue;
+    const botName = 'Bot_' + Math.random().toString(36).slice(2,5).toUpperCase();
+    if (!g.players.includes(botName)) {
+      g.players.push(botName);
+      await sset(`sd_group_${code}`, g);
+      testBots.push({ name: botName, code });
+      toast(`Added ${botName} to group ${code}`);
+      added = true;
+      break;
+    }
   }
-  testBots.push({ name: botName, code });
-  toast(`Added ${botName} to group ${code}`);
+  if (!added) toast('No waiting groups found — create a session first');
 }
 
 async function runTestBots() {
-  for (const bot of testBots) {
-    const g = await sget(`sd_group_${bot.code}`);
-    if (!g || g.phase !== 'write') continue;
+  // Get all active group codes from the dashboard
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  if (!codes.length) { toast('No active groups found'); return; }
 
-    const wordObj = g.vocab && g.vocab[Math.floor(Math.random() * g.vocab.length)];
-    const word = wordObj ? wordObj.word : 'interesting';
-    const sentences = [
-      `The ${word} situation became clear as the story unfolded.`,
-      `She felt ${word} about the whole experience.`,
-      `It was a truly ${word} moment for everyone involved.`,
-    ];
-    const txt = sentences[Math.floor(Math.random() * sentences.length)];
-    const appearsInText = txt.toLowerCase().includes(word.toLowerCase());
+  let actioned = 0;
 
-    g.roundContribs = g.roundContribs || [];
-    g.roundContribs.push({
-      playerName: bot.name,
-      text: txt,
-      word: wordObj || { word },
-      appearsInText,
-      round: g.currentRound,
-      idx: g.roundContribs.length
-    });
+  for (const code of codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g || g.status !== 'playing') continue;
 
-    const allDone = g.players.every(p => (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound));
-    if (allDone) {
-      g.phase = 'vote';
-      g.votes = {};
+    // ── WRITE PHASE: submit sentences for any player who hasn't written yet ──
+    if (g.phase === 'write') {
+      const submitted = (g.roundContribs || [])
+        .filter(c => c.round === g.currentRound)
+        .map(c => c.playerName);
+      const pending = (g.players || []).filter(p => !submitted.includes(p));
+
+      for (const playerName of pending) {
+        const usedIndices = new Set(g.usedWordIndices || []);
+        const pool = (g.vocab || []).filter((_,i) => !usedIndices.has(i));
+        const available = pool.length > 0 ? pool : (g.vocab || []);
+        const wordObj = available[Math.floor(Math.random() * available.length)] || { word: 'interesting', definition: '' };
+        const word = wordObj.word;
+
+        const templates = [
+          `The concept of ${word} was evident throughout the entire situation.`,
+          `Everyone agreed that being ${word} was important in this moment.`,
+          `She demonstrated ${word} in a way that surprised the whole group.`,
+          `The ${word} nature of the event left everyone speechless.`,
+          `It became clear that ${word} played a key role in what happened next.`,
+        ];
+        const txt = templates[Math.floor(Math.random() * templates.length)];
+        const appearsInText = txt.toLowerCase().includes(word.toLowerCase());
+
+        g.roundContribs = g.roundContribs || [];
+        g.roundContribs.push({
+          playerName,
+          text: txt,
+          word: wordObj,
+          appearsInText,
+          round: g.currentRound,
+          idx: g.roundContribs.length
+        });
+        actioned++;
+      }
+
+      // Check if all players have now submitted
+      const allSubmitted = (g.players || []).every(p =>
+        (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound)
+      );
+      if (allSubmitted) {
+        g.phase = 'vote';
+        g.votes = {};
+        g.wordVotes = {};
+      }
+
+      await sset(`sd_group_${code}`, g);
     }
 
-    await sset(`sd_group_${bot.code}`, g);
-    toast(`${bot.name} submitted a sentence`);
+    // ── VOTE PHASE: submit votes for any player who hasn't voted yet ──
+    else if (g.phase === 'vote') {
+      const pending = (g.players || []).filter(p => !g.votes?.[p]);
+
+      for (const playerName of pending) {
+        g.votes = g.votes || {};
+        g.votes[playerName] = 'done';
+
+        // Vote on other players' word usage (randomly yes/no, weighted toward correct)
+        const others = (g.roundContribs || []).filter(c =>
+          c.playerName !== playerName && c.round === g.currentRound
+        );
+        g.wordVotes = g.wordVotes || {};
+        others.forEach(c => {
+          if (!g.wordVotes[c.playerName]) g.wordVotes[c.playerName] = [];
+          g.wordVotes[c.playerName].push(c.appearsInText ? true : Math.random() > 0.5);
+        });
+        actioned++;
+      }
+
+      // Check if all players have voted
+      const allVoted = (g.players || []).every(p => g.votes?.[p]);
+      if (allVoted) {
+        g.phase = 'ai';
+      }
+
+      await sset(`sd_group_${code}`, g);
+    }
+  }
+
+  if (actioned > 0) {
+    toast(`Bots completed ${actioned} action${actioned > 1 ? 's' : ''}`);
+  } else {
+    toast('Nothing to do — start a group first, then click Run Bots during the write or vote phase');
   }
 }
 
