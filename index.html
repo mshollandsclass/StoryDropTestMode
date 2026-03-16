@@ -813,6 +813,7 @@ async function createSession() {
 
   me.role = 'teacher';
   document.getElementById('dash-session-name').textContent = sessionName;
+  localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
   startTeacherDash(teacherSessionId, codes);
   showView('v-teacher-dash');
 }
@@ -1968,6 +1969,42 @@ function deactivateLicense() {
 
 // Run on load
 updateLicenseLandingUI();
+
+// Restore teacher session if one was active
+(async function restoreSession() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  if (!saved) return;
+  try {
+    const { id, codes } = JSON.parse(saved);
+    if (!id || !codes) return;
+    // Verify session still exists in database
+    const session = await sget(`sd_session_${id}`);
+    if (!session) { localStorage.removeItem('sd_teacher_session'); return; }
+    teacherSessionId = id;
+    // Show restore banner on landing page
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:var(--card);border:1px solid var(--accent);padding:12px 18px;margin-top:20px;font-size:.82rem;line-height:1.8;max-width:400px;width:100%';
+    banner.innerHTML = `<span style="color:var(--accent);font-family:'Bebas Neue',sans-serif;letter-spacing:.08em">Active Session Found</span><br>
+      <span style="color:var(--muted)">Session: ${session.name || id}</span><br>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="restoreTeacherDash()">Return to Dashboard →</button>
+      <button class="btn btn-secondary btn-sm" style="margin-top:10px;margin-left:8px" onclick="clearSavedSession()">Clear</button>`;
+    const landing = document.getElementById('v-landing');
+    if (landing) landing.querySelector('.view-inner').appendChild(banner);
+  } catch { localStorage.removeItem('sd_teacher_session'); }
+})();
+
+async function restoreTeacherDash() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  if (!saved) return;
+  const { id, codes } = JSON.parse(saved);
+  teacherSessionId = id;
+  startTeacherDash(id, codes);
+}
+
+function clearSavedSession() {
+  localStorage.removeItem('sd_teacher_session');
+  location.reload();
+}
 
 
 async function leaveGroup() {
