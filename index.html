@@ -33,9 +33,14 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);m
 .flag-dismiss{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:4px 8px;border:1px solid var(--border);margin-top:6px;display:inline-block}
 .flag-dismiss:hover{color:var(--text);border-color:var(--text)}
 
-/* ── THEME TOGGLE ── */
-.theme-toggle{position:fixed;top:16px;right:16px;z-index:1000;background:var(--surface);border:1px solid var(--border-hi);color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;padding:6px 12px;cursor:pointer;transition:all .2s}
-.theme-toggle:hover{color:var(--text);border-color:var(--text)}
+
+/* ── SETTINGS ── */
+.settings-btn{position:fixed;top:14px;right:16px;z-index:1000;background:var(--surface);border:1px solid var(--border-hi);color:var(--muted);font-size:1.1rem;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.settings-btn:hover{color:var(--text);border-color:var(--text)}
+.toggle-switch{width:40px;height:22px;border-radius:11px;border:none;background:var(--border-hi);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--text);top:3px;left:3px;transition:transform .2s}
+.toggle-switch.on{background:var(--accent)}
+.toggle-switch.on::after{transform:translateX(18px);background:var(--btn-fg)}
 
 /* ── SCREENS ── */
 .view{display:none;min-height:100vh}
@@ -350,7 +355,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="label">Live Groups</div>
     <div id="flag-notifications"></div>
     <div id="flag-alerts" style="margin-bottom:12px"></div>
-    <div id="test-mode-bar" style="display:none;background:var(--card);border:1px solid var(--accent);padding:10px 16px;margin-bottom:12px;font-size:.78rem;color:var(--accent);display:flex;align-items:center;gap:12px"><span>🤖 Test Mode Active</span><button class="btn btn-secondary btn-sm" onclick="addTestBot()">Add Bot Student</button><button class="btn btn-secondary btn-sm" onclick="runTestBots()">Run All Bots</button></div>
+    <div id="test-mode-bar" style="display:none;background:var(--card);border:1px solid var(--accent);padding:10px 16px;margin-bottom:12px;font-size:.78rem;color:var(--accent);gap:12px;align-items:center"><span>🤖 Test Mode Active</span> <button class="btn btn-secondary btn-sm" onclick="addTestBot()">Add Bot</button> <button class="btn btn-secondary btn-sm" onclick="runTestBots()">Run Bots</button></div>
     <div class="dash-grid" id="dash-grid"></div>
     <div id="dash-results"></div>
     <div id="export-wrap" style="display:none;margin-top:16px">
@@ -569,7 +574,36 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
 </div>
 
-<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">☀ Light</button>
+<button class="settings-btn" id="settings-btn" onclick="toggleSettings()" aria-label="Settings">⚙</button>
+
+<!-- ══════════ SETTINGS PANEL ══════════ -->
+<div id="settings-panel" style="display:none;position:fixed;top:48px;right:16px;z-index:999;background:var(--card);border:1px solid var(--border-hi);padding:20px 24px;min-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:var(--text);margin-bottom:16px">Settings</div>
+
+  <div style="margin-bottom:16px">
+    <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Appearance</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:.82rem;color:var(--text)">Dark mode</span>
+      <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+    </div>
+  </div>
+
+  <div id="teacher-settings" style="display:none">
+    <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
+    <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Teacher Options</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:.82rem;color:var(--text)">Test mode</span>
+      <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
+    </div>
+    <div id="test-mode-bar" style="display:none;margin-top:8px;gap:8px;flex-direction:column">
+      <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
+      <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
+    </div>
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+    <button class="btn btn-secondary btn-sm" style="width:100%;font-size:.72rem" onclick="clearLicense()">Clear License Key</button>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1951,10 +1985,7 @@ async function leaveGroup() {
 // ── TEST MODE ──
 let testBots = [];
 
-function enableTestMode() {
-  document.getElementById('test-mode-bar').style.display = 'flex';
-  toast('Test mode enabled — add bot students to your groups');
-}
+
 
 async function addTestBot() {
   const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
@@ -2008,6 +2039,55 @@ async function runTestBots() {
   }
 }
 
+
+// ── SETTINGS PANEL ──
+let settingsOpen = false;
+
+function toggleSettings() {
+  settingsOpen = !settingsOpen;
+  const panel = document.getElementById('settings-panel');
+  const btn = document.getElementById('settings-btn');
+  panel.style.display = settingsOpen ? 'block' : 'none';
+  btn.style.color = settingsOpen ? 'var(--text)' : '';
+
+  // Show teacher options only on teacher views
+  const teacherViews = ['v-teacher-dash', 'v-teacher-setup'];
+  const currentView = document.querySelector('.view.active')?.id;
+  const teacherSettings = document.getElementById('teacher-settings');
+  if (teacherSettings) {
+    teacherSettings.style.display = teacherViews.includes(currentView) ? 'block' : 'none';
+  }
+}
+
+// Close settings when clicking outside
+document.addEventListener('click', function(e) {
+  if (settingsOpen && !e.target.closest('#settings-panel') && !e.target.closest('#settings-btn')) {
+    settingsOpen = false;
+    document.getElementById('settings-panel').style.display = 'none';
+  }
+});
+
+let testModeActive = false;
+
+function toggleTestMode() {
+  testModeActive = !testModeActive;
+  const sw = document.getElementById('testmode-switch');
+  const bar = document.getElementById('test-mode-bar');
+  if (sw) sw.className = 'toggle-switch' + (testModeActive ? ' on' : '');
+  if (bar) bar.style.display = testModeActive ? 'flex' : 'none';
+  if (testModeActive) toast('Test mode on — add bot students to your groups');
+}
+
+function clearLicense() {
+  if (confirm('Clear your license key? You will need to re-enter it next time.')) {
+    localStorage.removeItem('storydrop_license');
+    toast('License cleared');
+    settingsOpen = false;
+    document.getElementById('settings-panel').style.display = 'none';
+  }
+}
+
+
 // ── THEME ──
 function initTheme() {
   const saved = localStorage.getItem('storydrop_theme') || 'dark';
@@ -2015,8 +2095,8 @@ function initTheme() {
 }
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : '');
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = t === 'light' ? '☽ Dark' : '☀ Light';
+  const sw = document.getElementById('theme-switch');
+  if (sw) sw.className = 'toggle-switch' + (t === 'dark' ? ' on' : '');
   localStorage.setItem('storydrop_theme', t);
 }
 function toggleTheme() {
