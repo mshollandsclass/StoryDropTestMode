@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STORY DROP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Text:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#181818;--card:#202020;
+  --text:#f0ede6;--accent:#c8f135;--muted:#888888;
+  --red:#f04040;--border:#2a2a2a;--border-hi:#444444;
+  --btn-fg:#0a0a0a;
+}
+[data-theme="light"]{
+  --bg:#f5f2eb;--surface:#edeae2;--card:#e4e1d9;
+  --text:#0f0f0f;--accent:#4a7a00;--muted:#555555;
+  --red:#cc2200;--border:#c8c4bb;--border-hi:#aaa49a;
+  --btn-fg:#f5f2eb;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh}
+
+
+/* ── FLAG NOTIFICATIONS ── */
+.flag-alert{background:var(--card);border:1px solid var(--red);padding:14px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px}
+.flag-alert-icon{font-size:1.4rem;flex-shrink:0}
+.flag-alert-body{flex:1;font-size:.78rem;line-height:1.7}
+.flag-alert-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--red);letter-spacing:.08em}
+.flag-alert-text{color:var(--muted);margin-top:2px}
+.flag-alert-reason{color:var(--text);margin-top:4px;font-style:italic}
+.flag-dismiss{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:4px 8px;border:1px solid var(--border);margin-top:6px;display:inline-block}
+.flag-dismiss:hover{color:var(--text);border-color:var(--text)}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:1000;background:var(--surface);border:1px solid var(--border-hi);color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;padding:6px 12px;cursor:pointer;transition:all .2s}
+.theme-toggle:hover{color:var(--text);border-color:var(--text)}
+
+/* ── SCREENS ── */
+.view{display:none;min-height:100vh}
+.view.active{display:flex;flex-direction:column;align-items:center;padding:0 16px 48px}
+
+/* ── HEADER ── */
+.hdr{width:100%;max-width:780px;border-bottom:3px solid var(--text);padding:24px 0 14px;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:8px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,8vw,4.2rem);line-height:.88;color:var(--text);letter-spacing:.02em}
+.logo span{color:var(--accent)}
+.hdr-meta{font-size:.65rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;text-align:right;line-height:1.7}
+.hdr-meta strong{color:var(--accent)}
+.content{width:100%;max-width:780px}
+
+/* ── TYPE ── */
+.label{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:700}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;margin-bottom:6px}
+.intro{font-family:'DM Serif Text',serif;font-style:italic;font-size:1.1rem;line-height:1.7;color:#bbb;margin-bottom:24px;border-left:3px solid var(--accent);padding-left:16px}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Bebas Neue',sans-serif;letter-spacing:.1em;border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-xl{font-size:1.5rem;padding:14px 36px}
+.btn-lg{font-size:1.2rem;padding:11px 28px}
+.btn-md{font-size:.95rem;padding:9px 20px}
+.btn-sm{font-size:.8rem;padding:7px 14px}
+.btn-primary{background:var(--accent);color:var(--btn-fg)}.btn-primary:hover{background:var(--text);transform:translateY(-2px)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border-hi)}.btn-secondary:hover{border-color:var(--text)}
+.btn-danger{background:var(--red);color:var(--text)}.btn-danger:hover{background:#ff4a40}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text);border-color:var(--border-hi)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ── INPUTS ── */
+input[type=text],input[type=number],textarea{background:var(--card);border:1px solid var(--border-hi);color:var(--text);font-family:'Space Mono',monospace;padding:11px 14px;outline:none;transition:border-color .2s;width:100%;font-size:.88rem}
+input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:none;font-family:'DM Serif Text',serif;font-size:1rem;line-height:1.65}
+::placeholder{color:#444}
+.input-row{display:flex;gap:10px;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field-label{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);padding:20px 22px;margin-bottom:14px}
+.card-hi{border-color:var(--accent);background:rgba(200,241,53,.05)}
+
+/* ── CODE DISPLAY ── */
+.code-block{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,12vw,6rem);letter-spacing:.2em;color:var(--accent);text-align:center;padding:24px;border:2px solid var(--accent);margin:20px 0;cursor:pointer;transition:all .2s;position:relative}
+.code-block:hover{background:rgba(200,241,53,.08)}
+.code-block::after{content:'CLICK TO COPY';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:.55rem;letter-spacing:.2em;color:var(--muted)}
+
+/* ── PLAYER LIST ── */
+.player-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;min-height:32px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);padding:5px 12px;font-size:.75rem;letter-spacing:.05em;animation:pop .2s ease}
+.chip.me{border-color:var(--accent);color:var(--accent)}
+.chip.host{border-color:var(--border-hi);color:var(--muted)}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── STATUS BAR ── */
+.status-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);padding:10px 16px;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.status-player{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:.05em}
+.status-meta{font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.round-pill{background:var(--bg);border:1px solid var(--border);padding:4px 12px;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.timer{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--text);letter-spacing:.05em;transition:color .3s}
+.timer.warn{color:var(--red);animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── WORD CARD ── */
+.word-card{border:2px solid var(--text);padding:24px 24px 20px;margin-bottom:20px;position:relative;background:var(--surface)}
+.word-card::before{content:'YOUR WORD';position:absolute;top:-10px;left:16px;background:var(--bg);padding:0 8px;font-size:.55rem;letter-spacing:.25em;color:var(--accent);font-weight:700}
+.word-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,8vw,4.4rem);line-height:.9;color:var(--text);letter-spacing:.03em;margin-bottom:6px}
+.word-pos{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-style:italic}
+.word-def{font-family:'DM Serif Text',serif;font-size:1rem;color:#ccc;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px}
+.word-ex{font-size:.78rem;color:var(--muted);font-style:italic;line-height:1.55}
+.word-ex::before{content:'e.g. ';color:var(--accent);font-style:normal;font-weight:700}
+
+/* ── STORY FEED ── */
+.story-scroll{border:1px solid var(--border);background:var(--surface);padding:16px 18px;margin-bottom:18px;min-height:100px;max-height:240px;overflow-y:auto;scroll-behavior:smooth}
+.story-scroll::-webkit-scrollbar{width:3px}.story-scroll::-webkit-scrollbar-thumb{background:var(--border)}
+.story-para{margin-bottom:12px;animation:up .35s ease both}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.story-by{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.story-txt{font-family:'DM Serif Text',serif;font-size:.97rem;line-height:1.7;color:var(--text)}
+.story-hit{color:var(--accent);font-style:italic;font-weight:700;text-decoration:underline;text-decoration-color:rgba(200,241,53,.35);text-underline-offset:3px}
+.story-empty{font-size:.8rem;color:var(--muted);font-style:italic;text-align:center;padding:20px 0}
+
+/* ── CHAR HINT ── */
+.char-hint{font-size:.7rem;color:var(--muted);font-style:italic;margin-top:6px}
+.char-hint.ok{color:var(--accent)}
+.char-hint.warn{color:var(--red)}
+
+/* ── VOTE CARDS ── */
+.vote-list{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.vote-card{border:1px solid var(--border);padding:16px 18px;cursor:pointer;transition:all .2s;background:var(--surface);display:flex;align-items:flex-start;gap:12px}
+.vote-card:hover{border-color:var(--accent)}.vote-card.sel{border-color:var(--accent);background:rgba(200,241,53,.07)}
+.vote-letter{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);min-width:20px;opacity:.5;transition:opacity .2s}
+.vote-card.sel .vote-letter{opacity:1}
+.vote-body{flex:1}
+.vote-author{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.vote-txt{font-family:'DM Serif Text',serif;font-size:.95rem;line-height:1.6;color:#ccc}
+.check-row{margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.check-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.76rem;color:var(--muted)}
+.check-label:hover{color:var(--text)}
+.check-label input{width:14px;height:14px;accent-color:var(--accent);cursor:pointer}
+.check-label strong{color:var(--accent)}
+.no-word-tag{font-size:.7rem;color:var(--red);margin-top:6px;font-style:italic}
+
+/* ── WAITING ── */
+.waiting-wrap{text-align:center;padding:48px 20px}
+.waiting-icon{font-size:2.5rem;margin-bottom:16px;animation:spin 3s linear infinite;display:inline-block}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.waiting-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--accent);letter-spacing:.06em;margin-bottom:8px}
+.waiting-sub{font-size:.8rem;color:var(--muted);line-height:1.7}
+
+/* ── AI VERDICTS ── */
+.verdict-list{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.verdict-card{border:1px solid var(--border);background:var(--surface);padding:16px 18px}
+.verdict-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:.06em;margin-bottom:2px}
+.verdict-word{font-size:.68rem;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+.verdict-quote{font-family:'DM Serif Text',serif;font-size:.93rem;line-height:1.6;color:#aaa;border-left:2px solid var(--border);padding-left:10px;margin-bottom:10px}
+.verdict-result{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;margin-bottom:3px}
+.verdict-result.ok{color:var(--accent)}.verdict-result.bad{color:var(--red)}
+.verdict-reason{font-size:.75rem;color:var(--muted);font-style:italic;line-height:1.55}
+.overruled{font-family:'Space Mono',monospace;font-size:.58rem;background:rgba(232,53,42,.12);border:1px solid var(--red);color:var(--red);padding:1px 7px;margin-left:7px;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle;display:inline}
+.ai-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.1em;padding:4px 12px;margin-bottom:16px}
+.thinking{font-size:.73rem;color:var(--muted);font-style:italic;animation:blink .9s infinite}
+
+/* ── SCORE TABLE ── */
+.score-tbl{width:100%;border-collapse:collapse;margin-bottom:20px}
+.score-tbl th{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)}
+.score-tbl td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:.88rem}
+.score-tbl tr:last-child td{border-bottom:none}
+.score-rank{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--border)}
+.score-rank.gold{color:var(--accent)}
+.score-name{color:var(--text);font-weight:700;letter-spacing:.04em}
+.score-pts{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);text-align:right}
+.score-bar-cell{width:120px}
+.score-bar{height:3px;background:var(--bg)}.score-bar-fill{height:100%;background:var(--accent);transition:width 1s ease}
+
+/* ── TEACHER DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px}
+.group-card{background:var(--card);border:1px solid var(--border);padding:18px 20px;transition:border-color .2s}
+.group-card.live{border-color:var(--accent)}
+.group-card.done{border-color:var(--border-hi)}
+.gc-code{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent);letter-spacing:.15em;margin-bottom:4px}
+.gc-status{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.gc-status.live{color:var(--accent)}.gc-status.done{color:var(--text)}
+.gc-players{font-size:.75rem;color:#aaa;line-height:1.7;margin-bottom:10px}
+.gc-progress{height:3px;background:var(--bg);margin-bottom:12px}
+.gc-progress-fill{height:100%;background:var(--accent);transition:width .5s ease}
+
+/* ── STORY REVIEW ── */
+.review-wrap{background:var(--card);border:1px solid var(--border);padding:22px 24px;margin-bottom:16px}
+.review-para{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.review-para:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.review-meta{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.review-author{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--accent);letter-spacing:.06em}
+.review-badge{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;font-family:'Space Mono',monospace}
+.review-badge.ok{border-color:var(--accent);color:var(--accent)}
+.review-badge.bad{border-color:var(--red);color:var(--red)}
+.review-badge.na{border-color:var(--border-hi);color:var(--muted)}
+.review-txt{font-family:'DM Serif Text',serif;font-size:1rem;line-height:1.75;color:var(--text)}
+.review-ai{font-size:.75rem;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.5}
+
+/* ── DIVIDER ── */
+hr{border:none;border-top:1px solid var(--border);margin:22px 0}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:var(--bg);font-family:'Space Mono',monospace;font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:9px 18px;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;transform:translateY(8px)}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.err{background:var(--red);color:var(--text)}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border);margin:22px 0}
+.text-muted{color:var(--muted);font-size:.78rem}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.genre-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.genre-btn{border:1px solid var(--border);padding:5px 13px;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;background:transparent;font-family:'Space Mono',monospace;transition:all .2s}
+.genre-btn:hover,.genre-btn.sel{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.word-chip{display:inline-flex;align-items:center;border:1px solid var(--accent);color:var(--accent);padding:4px 10px;font-size:.72rem;margin:3px;letter-spacing:.05em}
+@media(max-width:520px){.dash-grid{grid-template-columns:1fr}}
+
+/* ── PRESENTATION MODE ── */
+.present-view{background:var(--bg);min-height:100vh}
+.present-stage{max-width:900px;margin:0 auto;padding:32px 24px 60px}
+.present-group-label{font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.present-group-code{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem,4vw,2.2rem);color:var(--accent);letter-spacing:.15em;margin-bottom:20px}
+.present-story{background:var(--surface);border:1px solid var(--border);padding:24px 28px;margin-bottom:28px}
+.present-para{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.present-para:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.present-author{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.present-text{font-family:'DM Serif Text',serif;font-size:clamp(1rem,2.2vw,1.2rem);line-height:1.85;color:var(--text)}
+.present-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.present-progress{display:flex;gap:6px;align-items:center}
+.present-dot{width:10px;height:10px;border:1px solid var(--border);transition:all .25s}
+.present-dot.done{background:var(--border-hi)}
+.present-dot.active{background:var(--accent);border-color:var(--accent)}
+.class-vote-bar{background:var(--surface);border:1px solid var(--border);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.vote-tally{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.vote-tally-chip{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:.06em}
+.class-winner-reveal{text-align:center;padding:48px 20px}
+.class-winner-crown{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,10vw,5rem);color:var(--accent);letter-spacing:.06em;margin-bottom:8px;animation:pop .4s ease}
+.class-winner-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+.results-podium{display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto}
+.podium-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:12px 18px;background:var(--card)}
+.podium-row.first{border-color:var(--accent);background:rgba(200,241,53,.07)}
+.podium-code{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:.1em}
+.podium-votes{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text)}
+.podium-label{font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LANDING ══════════ -->
+<div class="view active" id="v-landing">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Vocab storytelling<br>group game</div>
+  </div>
+  <div class="content">
+    <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on whether it was used right, and AI checks your work.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px" id="landing-grid">
+      <div class="card" style="border-color:var(--accent)">
+        <div class="label">I'm a teacher</div>
+        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Create a session, share group codes, and monitor all results live.</div>
+        <button class="btn btn-primary btn-md" onclick="teacherEntry()">Create Session</button>
+        <div id="license-status-landing" style="font-size:.65rem;margin-top:10px;color:var(--muted)"></div>
+      </div>
+      <div class="card">
+        <div class="label">I'm a student</div>
+        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Enter the group code your teacher gave you to join your group's game.</div>
+        <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')">Join Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LICENSE KEY ══════════ -->
+<div class="view" id="v-license">
+  <div class="view-inner" style="max-width:480px">
+    <div class="logo">Story<br>Drop</div>
+    <div class="label mt-24">Teacher License</div>
+    <p class="text-muted" style="line-height:1.8;margin-bottom:24px">
+      Enter your license key to unlock teacher mode.<br>
+      Don't have one yet?
+      <a href="https://johnalynn.gumroad.com/l/storydrop" target="_blank" style="color:var(--accent)">Get Story Drop on Gumroad</a> — pay what you want.
+    </p>
+    <div class="field-wrap" style="margin-bottom:16px">
+      <input id="license-input" class="field" type="text" placeholder="Paste your license key here" autocomplete="off" style="font-size:.85rem;letter-spacing:.05em">
+    </div>
+    <div id="license-error" class="text-muted" style="color:var(--red);margin-bottom:14px;font-size:.8rem;min-height:20px"></div>
+    <button class="btn btn-primary btn-lg" id="license-btn" onclick="submitLicense()" style="width:100%">Unlock Teacher Mode →</button>
+    <p class="text-muted" style="margin-top:20px;font-size:.75rem;line-height:1.7">
+      Your key is saved to this browser — you only need to enter it once per device.
+    </p>
+  </div>
+</div>
+
+<div class="view" id="v-teacher-setup">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Teacher Setup</div>
+  </div>
+  <div class="content">
+    <div class="label">Session name (optional)</div>
+    <div class="input-row"><input type="text" id="session-name" placeholder="e.g. Period 3 — Unit 4" maxlength="50"></div>
+
+    <div class="label">Number of groups</div>
+    <div class="input-row" style="align-items:center;gap:16px">
+      <input type="number" id="num-groups" value="3" min="1" max="5" style="max-width:80px">
+      <span class="text-muted">groups (each gets its own code)</span>
+    </div>
+
+    <div class="label">Rounds per player</div>
+    <div class="input-row" style="align-items:center;gap:16px">
+      <input type="number" id="num-rounds" value="2" min="1" max="6" style="max-width:80px">
+      <span class="text-muted">rounds</span>
+    </div>
+
+    <div class="label">Story genre</div>
+    <div class="genre-row" id="genre-row-teacher">
+      <button class="genre-btn sel" data-g="horror">Horror</button>
+      <button class="genre-btn" data-g="romance">Romance</button>
+      <button class="genre-btn" data-g="sci-fi">Sci-Fi</button>
+      <button class="genre-btn" data-g="mystery">Mystery</button>
+      <button class="genre-btn" data-g="fantasy">Fantasy</button>
+      <button class="genre-btn" data-g="comedy">Comedy</button>
+    </div>
+
+    <div class="label">Vocabulary words</div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;line-height:1.7">
+        Paste your word list — one per line.<br>
+        Formats: <code style="color:var(--accent)">word</code> &nbsp;or&nbsp; <code style="color:var(--accent)">word | pos | definition | example</code>
+      </div>
+      <textarea id="vocab-input" rows="8" placeholder="ephemeral&#10;tenacious | adj. | Holding firmly; very persistent&#10;hubris | noun | Excessive pride | His hubris led to his downfall."></textarea>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:8px" id="vocab-count">0 words parsed</div>
+    </div>
+
+    <hr>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="createSession()">Create Session &amp; Get Codes &#x2192;</button>
+      <button class="btn btn-secondary btn-md" onclick="showView('v-landing')">&#x2190; Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TEACHER DASHBOARD ══════════ -->
+<div class="view" id="v-teacher-dash">
+  <div class="hdr" style="max-width:980px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Teacher Dashboard<br><strong id="dash-session-name">—</strong></div>
+  </div>
+  <div style="width:100%;max-width:980px">
+    <div class="label">Live Groups</div>
+    <div id="flag-notifications"></div>
+    <div id="flag-alerts" style="margin-bottom:12px"></div>
+    <div id="test-mode-bar" style="display:none;background:var(--card);border:1px solid var(--accent);padding:10px 16px;margin-bottom:12px;font-size:.78rem;color:var(--accent);display:flex;align-items:center;gap:12px"><span>🤖 Test Mode Active</span><button class="btn btn-secondary btn-sm" onclick="addTestBot()">Add Bot Student</button><button class="btn btn-secondary btn-sm" onclick="runTestBots()">Run All Bots</button></div>
+    <div class="dash-grid" id="dash-grid"></div>
+    <div id="dash-results"></div>
+    <div id="export-wrap" style="display:none;margin-top:16px">
+      <button class="btn btn-secondary btn-md" onclick="exportCSV()">&#11015; Export Results CSV</button>
+    </div>
+    <hr>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" id="present-btn" style="display:none" onclick="launchPresentation()">&#x25BA; Present Stories to Class</button>
+      <button class="btn btn-ghost btn-sm" onclick="showView('v-landing')">&#x2190; Exit</button>
+      <button class="btn btn-ghost btn-sm" onclick="showLicenseInfo()" style="margin-left:auto">&#x2713; Licensed</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PRESENTATION: TEACHER ══════════ -->
+<div class="view present-view" id="v-present">
+  <div class="present-stage">
+    <div class="present-nav">
+      <div>
+        <div class="present-group-label">Group</div>
+        <div class="present-group-code" id="pres-code">—</div>
+      </div>
+      <div class="present-progress" id="pres-dots"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" id="pres-prev-btn" onclick="presNav(-1)">&#x2190; Prev</button>
+        <button class="btn btn-secondary btn-sm" id="pres-next-btn" onclick="presNav(1)">Next &#x2192;</button>
+        <button class="btn btn-primary btn-sm" id="pres-vote-btn" onclick="openClassVote()" style="display:none">Open Class Vote &#x25BA;</button>
+        <button class="btn btn-danger btn-sm" id="pres-results-btn" onclick="showClassResults()" style="display:none">&#x2605; Show Winner</button>
+      </div>
+    </div>
+    <div class="class-vote-bar" id="pres-vote-bar" style="display:none">
+      <div>
+        <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">Class Votes</div>
+        <div class="vote-tally" id="pres-tally">Waiting…</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="closeClassVote()">Close Voting</button>
+    </div>
+    <div class="present-story" id="pres-story"></div>
+    <div id="pres-scores" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- ══════════ CLASS VOTE (STUDENT) ══════════ -->
+<div class="view" id="v-class-vote">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Class Vote</div>
+  </div>
+  <div class="content">
+    <div class="label">Vote for the best group story</div>
+    <p class="text-muted" style="margin-bottom:20px;line-height:1.7">Your teacher is presenting each group's story on the main screen. Vote for your favourite — you cannot vote for your own group.</p>
+    <div class="vote-list" id="cv-list"></div>
+    <input type="hidden" id="cv-sessionkey">
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="submitClassVote()">Cast Vote &#x2192;</button>
+      <span class="text-muted" id="cv-status"></span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ STUDENT JOIN ══════════ -->
+<div class="view" id="v-student-join">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Join Your Group</div>
+  </div>
+  <div class="content">
+    <div class="field">
+      <div class="field-label">Your name</div>
+      <input type="text" id="student-name" placeholder="First name or nickname" maxlength="20">
+    </div>
+    <div class="field">
+      <div class="field-label">Group code</div>
+      <input type="text" id="join-code" placeholder="e.g. XK4R2T" maxlength="8" style="text-transform:uppercase;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.2em">
+    </div>
+    <div class="btn-row mt-8">
+      <button class="btn btn-primary btn-lg" onclick="joinGame()">Join &#x2192;</button>
+      <button class="btn btn-secondary btn-md" onclick="showView('v-landing')">&#x2190; Back</button>
+    </div>
+    <div id="join-error" style="color:var(--red);font-size:.78rem;margin-top:12px;display:none"></div>
+  </div>
+</div>
+
+<!-- ══════════ LOBBY ══════════ -->
+<div class="view" id="v-lobby">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Waiting for game to start<br><strong id="lobby-code">—</strong></div>
+  </div>
+  <div class="content">
+    <div class="waiting-wrap">
+      <div class="waiting-icon">⏳</div>
+      <div class="waiting-title">You're in, <span id="lobby-myname">—</span>!</div>
+      <div class="waiting-sub">Waiting for your teacher to start the game.<br>Other players in your group:</div>
+    </div>
+    <div class="player-chips" id="lobby-players"></div>
+    <button class="btn btn-secondary btn-sm" style="margin-top:24px" onclick="leaveGroup()">Wrong group? Leave →</button>
+    <div class="text-muted" style="text-align:center">The game will start automatically.</div>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT: WRITE TURN ══════════ -->
+<div class="view" id="v-write">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Group <strong id="write-code">—</strong></div>
+  </div>
+  <div class="content">
+    <div class="status-bar">
+      <div><div class="status-meta">Your turn to write</div><div class="status-player" id="write-myname">—</div></div>
+      <div class="timer" id="write-timer">2:00</div>
+      <div class="round-pill" id="write-round">Round 1</div>
+    </div>
+    <div class="label">Story so far</div>
+    <div class="story-scroll" id="write-story"><div class="story-empty">The story begins with you…</div></div>
+    <div class="word-card">
+      <div class="word-big" id="w-word">—</div>
+      <div class="word-pos" id="w-pos">—</div>
+      <div class="word-def" id="w-def">—</div>
+      <div class="word-ex" id="w-ex">—</div>
+    </div>
+    <div class="field">
+      <textarea id="write-text" rows="4" placeholder="Continue the story here… use your word naturally." oninput="onWriteInput()"></textarea>
+      <div class="char-hint" id="write-hint">Aim for 2–4 sentences. Use your word!</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" id="write-submit-btn" id="write-submit-btn" onclick="submitWrite()">Submit &#x2192;</button>
+      <span class="text-muted" id="write-status"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT: WAIT FOR OTHERS ══════════ -->
+<div class="view" id="v-wait">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Group <strong id="wait-code">—</strong></div>
+  </div>
+  <div class="content">
+    <div class="waiting-wrap">
+      <div class="waiting-icon">✍️</div>
+      <div class="waiting-title">Nice work!</div>
+      <div class="waiting-sub" id="wait-msg">Waiting for other players to finish writing…</div>
+    </div>
+    <div class="player-chips" id="wait-players"></div>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT: VOTE ══════════ -->
+<div class="view" id="v-vote">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Vote — Round <span id="vote-round">1</span></div>
+  </div>
+  <div class="content">
+    <div class="label" id="vote-label">Did they use their word correctly?</div>
+    <p class="text-muted" style="margin-bottom:18px;line-height:1.7">For each player's sentence, vote whether they used their vocab word <em>correctly</em>. You cannot vote on your own sentence.</p>
+    <div class="vote-list" id="vote-list"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="submitVote()">Cast Vote &#x2192;</button>
+      <span class="text-muted" id="vote-status"></span>
+    </div>
+    <p class="text-muted mt-8" id="vote-count-display"></p>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT: AI VERDICT ══════════ -->
+<div class="view" id="v-ai">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">AI is judging…</div>
+  </div>
+  <div class="content">
+    <div class="ai-badge">⚡ Claude is reviewing word usage</div>
+    <p class="text-muted" style="margin-bottom:20px;line-height:1.7">The group voted on word usage. AI now checks each one and overrules if the group got it wrong.</p>
+    <div class="verdict-list" id="verdict-list"></div>
+    <div id="ai-loading" style="font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:16px">Analyzing…</div>
+    <button class="btn btn-primary btn-lg" id="ai-next-btn" style="display:none" onclick="afterAI()">See Results &#x2192;</button>
+  </div>
+</div>
+
+<!-- ══════════ ROUND RESULTS ══════════ -->
+<div class="view" id="v-round-results">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Round <span id="rr-round">1</span> Results</div>
+  </div>
+  <div class="content">
+    <div class="label">This round's story</div>
+    <div class="story-scroll" id="rr-story" style="max-height:200px;margin-bottom:20px"></div>
+    <div class="label">Scores</div>
+    <table class="score-tbl" id="rr-scores"></table>
+    <div class="btn-row mt-16">
+      <button class="btn btn-primary btn-lg" id="rr-next-btn" onclick="nextRound()">Next Round &#x2192;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FINAL ══════════ -->
+<div class="view" id="v-final">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Game Over</div>
+  </div>
+  <div class="content">
+    <div class="label">Winner</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,8vw,4rem);color:var(--accent);letter-spacing:.06em;margin-bottom:4px" id="final-winner">—</div>
+    <div style="font-size:.7rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:24px">Your teacher will receive the full story.</div>
+    <div class="label">Final Scores</div>
+    <table class="score-tbl" id="final-scores"></table>
+    <div class="label mt-24">Words used</div>
+    <div id="final-words" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px"></div>
+    <hr>
+    <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">&#x2190; Home</button>
+  </div>
+</div>
+
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">☀ Light</button>
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STORAGE — Supabase
+// ══════════════════════════════════════════════
+const SUPABASE_URL = 'https://xebyrvsopqbiuksepwzz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlYnlydnNvcHFiaXVrc2Vwd3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNjc1MjQsImV4cCI6MjA4ODk0MzUyNH0.gBCcBF8kcRwT__a04oQTH53cakUu8XtGubaQj_7iR5U';
+const DB_CONFIGURED = true;
+
+async function sget(key) {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows.length ? rows[0].value : null;
+  } catch { return null; }
+}
+
+async function sset(key, val) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/store`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
+    });
+    return true;
+  } catch { return false; }
+}
+
+async function sdel(key) {
+  try {
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}`,
+      {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      }
+    );
+  } catch {}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ══════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════
+const GENRE_OPENERS = {
+  horror: "It started the night the lights went out across the whole street — and nobody came to fix them.",
+  romance: "She hadn't expected to find the letter, let alone feel her hands shake as she read it.",
+  "sci-fi": "The transmission arrived from coordinates that weren't supposed to exist.",
+  mystery: "The detective stood in the empty room and knew, immediately, that something had been moved.",
+  fantasy: "The map had no name for the forest, which was the first warning she ignored.",
+  comedy: "Nobody expected the school mascot to go missing the morning of prom — least of all the goat itself."
+};
+
+// ══════════════════════════════════════════════
+//  APP STATE
+// ══════════════════════════════════════════════
+let me = { name: '', groupCode: '', role: 'student' }; // role: student | teacher
+let pollTimer = null;
+let writeTimer = null;
+let writeSeconds = 120;
+let selectedGenre = 'horror';
+let parsedVocab = [];
+let myVote = null;
+let myWordVotes = {};
+let teacherSessionId = null;
+let dashPollTimer = null;
+
+// ══════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = '', 2600);
+}
+
+function renderScoreTable(tableId, players, scores) {
+  const sorted = [...players].sort((a,b) => (scores[b]||0) - (scores[a]||0));
+  const max = Math.max(1, ...sorted.map(p => scores[p]||0));
+  const el = document.getElementById(tableId);
+  el.innerHTML = `<tr><th>#</th><th>Player</th><th class="score-bar-cell"></th><th style="text-align:right">Pts</th></tr>`;
+  sorted.forEach((p,i) => {
+    const pts = scores[p]||0;
+    const pct = Math.round(pts/max*100);
+    el.innerHTML += `<tr>
+      <td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td>
+      <td><span class="score-name">${p}</span></td>
+      <td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td>
+      <td><span class="score-pts">${pts}</span></td>
+    </tr>`;
+  });
+}
+
+function renderStory(elId, story) {
+  const el = document.getElementById(elId);
+  if (!story || story.length === 0) { el.innerHTML = '<div class="story-empty">Story starts here…</div>'; return; }
+  el.innerHTML = story.map(s => {
+    const hl = s.word ? s.text.replace(new RegExp(`\\b${s.word}\\b`,'gi'), '<span class="story-hit">$&</span>') : s.text;
+    return `<div class="story-para"><div class="story-by">${s.player}</div><div class="story-txt">${hl}</div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ══════════════════════════════════════════════
+//  VOCAB PARSING
+// ══════════════════════════════════════════════
+function parseVocab(raw) {
+  return raw.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const p = l.split('|').map(s => s.trim());
+    return { word: p[0], pos: p[1]||'word', def: p[2]||'(no definition)', ex: p[3]||'' };
+  }).filter(v => v.word);
+}
+
+document.getElementById('vocab-input').addEventListener('input', function() {
+  parsedVocab = parseVocab(this.value);
+  document.getElementById('vocab-count').textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
+});
+
+// Genre buttons
+document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    selectedGenre = btn.dataset.g;
+  });
+});
+
+// Uppercase join code
+document.getElementById('join-code').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+
+// ══════════════════════════════════════════════
+//  CODE GENERATION
+// ══════════════════════════════════════════════
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: CREATE SESSION
+// ══════════════════════════════════════════════
+async function createSession() {
+  parsedVocab = parseVocab(document.getElementById('vocab-input').value);
+  if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
+  const n = parseInt(document.getElementById('num-groups').value)||3;
+  const rounds = parseInt(document.getElementById('num-rounds').value)||2;
+  const sessionName = document.getElementById('session-name').value.trim() || 'Story Drop Session';
+
+  teacherSessionId = genCode();
+  const codes = Array.from({length:n}, genCode);
+
+  // Create each group state in shared storage
+  for (const code of codes) {
+    const groupState = {
+      code, sessionId: teacherSessionId, sessionName,
+      genre: selectedGenre, totalRounds: rounds,
+      vocab: parsedVocab, status: 'waiting',
+      players: [], scores: {}, story: [],
+      currentRound: 1, currentPlayerIdx: 0,
+      roundContribs: [], votes: {}, wordVotes: {},
+      usedWordIndices: [], results: null,
+      createdAt: Date.now()
+    };
+    await sset(`sd_group_${code}`, groupState);
+  }
+
+  // Save teacher session record
+  await sset(`sd_session_${teacherSessionId}`, {
+    id: teacherSessionId, name: sessionName,
+    codes, genre: selectedGenre, rounds,
+    createdAt: Date.now()
+  }, true);
+
+  me.role = 'teacher';
+  document.getElementById('dash-session-name').textContent = sessionName;
+  startTeacherDash(teacherSessionId, codes);
+  showView('v-teacher-dash');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER DASHBOARD
+// ══════════════════════════════════════════════
+function startTeacherDash(sessionId, codes) {
+  clearInterval(dashPollTimer);
+  if (!DB_CONFIGURED) {
+    document.getElementById('dash-grid').innerHTML = `
+      <div style="grid-column:1/-1;background:var(--card);border:1px solid var(--red);padding:24px 26px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--red);letter-spacing:.06em;margin-bottom:10px">⚠ Firebase Not Configured</div>
+        <div style="font-size:.82rem;color:var(--muted);line-height:1.8">
+          The live sync won't work until you connect a Firebase database.<br><br>
+          <strong style="color:var(--text)">Quick fix:</strong><br>
+          1. Go to <a href="https://the database" target="_blank" style="color:var(--accent)">the database</a><br>
+          2. Create a project → Realtime Database → Start in test mode<br>
+          3. Copy your database URL (e.g. <code style="color:var(--accent)">script.google.com/macros/s/YOUR_ID/exec</code>)<br>
+          4. Open this HTML file in a text editor and replace <code style="color:var(--accent)">YOUR-PROJECT</code> with your project name<br>
+          5. Re-upload to Netlify
+        </div>
+      </div>`;
+    return;
+  }
+  renderDashGrid(codes, {});
+  dashPollTimer = setInterval(() => { pollDash(codes); pollFlags(); }, 2500);
+  pollDash(codes);
+}
+
+async function pollFlags() {
+  if (!teacherSessionId) return;
+  // Look for any flag keys written in the last 5 minutes
+  const flagEl = document.getElementById('flag-alerts');
+  if (!flagEl) return;
+
+  // Store seen flags in memory
+  window._seenFlags = window._seenFlags || new Set();
+  const now = Date.now();
+
+  // Check all active group codes for flags
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  for (const code of codes) {
+    // Look back 5 minutes worth of possible flag keys
+    for (let t = Math.floor(now/1000)*1000; t > now - 300000; t -= 1000) {
+      const flagKey = `sd_flag_${code}_${t}`;
+      if (window._seenFlags.has(flagKey)) continue;
+      const flag = await sget(flagKey);
+      if (flag) {
+        window._seenFlags.add(flagKey);
+        const div = document.createElement('div');
+        div.style.cssText = 'background:var(--card);border:1px solid var(--red);padding:12px 16px;margin-bottom:8px;font-size:.8rem;line-height:1.7';
+        div.innerHTML = `<span style="color:var(--red);font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;font-size:1rem">⚠ FLAGGED CONTENT</span><br>
+          <span style="color:var(--muted)">${flag.time} · Group ${flag.group} · ${flag.player}</span><br>
+          <span style="color:var(--text)">"${flag.text}"</span><br>
+          <span style="color:var(--muted)">Reason: ${flag.reason}</span>`;
+        flagEl.prepend(div);
+        // Play a subtle audio alert
+        try {
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = 440;
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+          osc.start(); osc.stop(ctx.currentTime + 0.5);
+        } catch {}
+      }
+    }
+  }
+}
+
+async function pollDash(codes) {
+  const groups = {};
+  for (const code of codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (g) groups[code] = g;
+  }
+  renderDashGrid(codes, groups);
+  renderDashResults(groups);
+  await renderFlagNotifications();
+}
+
+async function renderFlagNotifications() {
+  const flagKey = `sd_flags_${teacherSessionId}`;
+  const flags = await sget(flagKey) || [];
+  const el = document.getElementById('flag-notifications');
+  if (!el) return;
+  if (flags.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = flags.map((f, i) => `
+    <div class="flag-alert" id="flag-${i}">
+      <div class="flag-alert-icon">🚩</div>
+      <div class="flag-alert-body">
+        <div class="flag-alert-name">⚠ Flagged Content — ${f.playerName} (Group ${f.groupCode}) at ${f.time}</div>
+        <div class="flag-alert-text">"${f.text}"</div>
+        <div class="flag-alert-reason">${f.reason}</div>
+        <span class="flag-dismiss" onclick="dismissFlag(${i})">Dismiss</span>
+      </div>
+    </div>`).join('');
+}
+
+async function dismissFlag(idx) {
+  const flagKey = `sd_flags_${teacherSessionId}`;
+  const flags = await sget(flagKey) || [];
+  flags.splice(idx, 1);
+  await sset(flagKey, flags);
+  await renderFlagNotifications();
+}
+
+function renderDashGrid(codes, groups) {
+  const el = document.getElementById('dash-grid');
+  el.innerHTML = codes.map(code => {
+    const g = groups[code];
+    if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
+
+    const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
+    const statusLabel = g.status === 'playing' ? `Round ${g.currentRound}` : g.status === 'done' ? 'Done' : 'Waiting';
+
+    // Per-player status
+    const playerStatuses = (g.players || []).map(p => {
+      let icon = '⏳';
+      let note = 'waiting';
+      if (g.status === 'playing') {
+        const contributed = (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound);
+        const voted = g.votes && g.votes[p];
+        if (g.phase === 'write') {
+          icon = contributed ? '✓' : '✍';
+          note = contributed ? 'submitted' : 'writing…';
+        } else if (g.phase === 'vote') {
+          icon = voted ? '✓' : '🗳';
+          note = voted ? 'voted' : 'voting…';
+        } else if (g.phase === 'ai') {
+          icon = '🤖';
+          note = 'AI judging';
+        } else if (g.phase === 'results') {
+          icon = '📊';
+          note = 'viewing results';
+        }
+      } else if (g.status === 'done') {
+        const score = (g.scores || {})[p] || 0;
+        icon = '🏁';
+        note = `${score} pts`;
+      }
+      return `<div style="font-size:.72rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--muted)">${p}</span> — ${note}</div>`;
+    }).join('');
+
+    const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1
+      ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroup('${code}')">Start ▶</button>`
+      : '';
+
+    return `<div class="group-card">
+      <div class="gc-code">${code}</div>
+      <div class="gc-status ${cls}">${statusLabel}</div>
+      <div class="gc-players">${playerStatuses}</div>
+      ${startBtn}
+    </div>`;
+  }).join('');
+}
+
+
+function renderDashResults(groups) {
+  const done = Object.values(groups).filter(g => g.status === 'done' && g.results);
+  document.getElementById('export-wrap').style.display = done.length > 0 ? '' : 'none';
+  if (done.length === 0) { document.getElementById('dash-results').innerHTML = ''; return; }
+  let html = `<div class="label mt-24">Completed Groups</div>`;
+  for (const g of done) {
+    html += `<div class="card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;color:var(--accent)">${g.code}</span>
+        <span style="font-size:.7rem;color:var(--muted);margin-left:12px;letter-spacing:.08em;text-transform:uppercase">${(g.players||[]).join(', ')}</span></div>
+      </div>
+      <div class="label">Full Story</div>
+      <div class="review-wrap">`;
+    for (const para of (g.results.story||[])) {
+      const verdict = (g.results.verdicts||[]).find(v => v.playerName === para.player);
+      let badge = '';
+      if (para.player === 'Narrator') badge = `<span class="review-badge na">Narrator</span>`;
+      else if (!para.word) badge = `<span class="review-badge bad">Word not used</span>`;
+      else if (verdict && verdict.correct) badge = `<span class="review-badge ok">✓ ${para.word} — correct</span>`;
+      else if (verdict) badge = `<span class="review-badge bad">✗ ${para.word} — incorrect</span>`;
+      else badge = `<span class="review-badge na">${para.word||''}</span>`;
+      const hl = para.word ? para.text.replace(new RegExp(`\\b${para.word}\\b`,'gi'),'<span class="story-hit">$&</span>') : para.text;
+      const aiNote = verdict ? `<div class="review-ai">AI: ${verdict.reason}</div>` : '';
+      html += `<div class="review-para">
+        <div class="review-meta"><span class="review-author">${para.player}</span>${badge}</div>
+        <div class="review-txt">${hl}</div>${aiNote}
+      </div>`;
+    }
+    html += `</div>`;
+    // Scores
+    html += `<div class="label mt-16">Final Scores</div><table class="score-tbl">
+      <tr><th>#</th><th>Player</th><th></th><th style="text-align:right">Pts</th></tr>`;
+    const players = g.players||[];
+    const scores = g.scores||{};
+    const sorted = [...players].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
+    const max = Math.max(1,...sorted.map(p=>scores[p]||0));
+    sorted.forEach((p,i) => {
+      const pts=scores[p]||0;
+      const pct=Math.round(pts/max*100);
+      html+=`<tr><td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td><td><span class="score-name">${p}</span></td>
+        <td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td>
+        <td><span class="score-pts">${pts}</span></td></tr>`;
+    });
+    html += `</table></div>`;
+  }
+  document.getElementById('dash-results').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+//  STUDENT: JOIN
+// ══════════════════════════════════════════════
+async function joinGame() {
+  const name = document.getElementById('student-name').value.trim();
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (!name) { showJoinError('Enter your name'); return; }
+  if (code.length < 4) { showJoinError('Enter the group code'); return; }
+  if (!DB_CONFIGURED) { showJoinError('The game isn\'t set up yet — ask your teacher.'); return; }
+
+  const g = await sget(`sd_group_${code}`);
+  if (!g) { showJoinError('Code not found. Check with your teacher.'); return; }
+  if (g.status !== 'waiting' && g.status !== 'playing') { showJoinError('This game has already ended.'); return; }
+  if (g.players.includes(name)) { showJoinError('That name is already taken in this group.'); return; }
+
+  me.name = name;
+  me.groupCode = code;
+  me.role = 'student';
+
+  // Add player
+  g.players.push(name);
+  g.scores[name] = 0;
+  await sset(`sd_group_${code}`, g);
+
+  document.getElementById('lobby-code').textContent = code;
+  document.getElementById('lobby-myname').textContent = name;
+  showView('v-lobby');
+  startStudentPoll();
+}
+
+function showJoinError(msg) {
+  const el = document.getElementById('join-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════
+//  STUDENT POLL LOOP
+// ══════════════════════════════════════════════
+function startStudentPoll() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(studentPoll, 2000);
+  studentPoll();
+}
+
+async function studentPoll() {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+
+  const curView = document.querySelector('.view.active')?.id;
+
+  if (g.status === 'waiting') {
+    // Update lobby player list
+    document.getElementById('lobby-players').innerHTML = g.players.map(p =>
+      `<div class="chip ${p===me.name?'me':''}">${p}${p===me.name?' (you)':''}</div>`
+    ).join('');
+    return;
+  }
+
+  if (g.status === 'playing') {
+    const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
+    const phase = g.phase || 'write';
+
+    if (phase === 'write') {
+      if (isMyTurn && curView !== 'v-write') {
+        startWriteTurn(g);
+      } else if (!isMyTurn && curView !== 'v-wait') {
+        // Show waiting screen
+        document.getElementById('wait-code').textContent = me.groupCode;
+        document.getElementById('wait-msg').textContent = `Waiting for ${g.players[g.currentPlayerIdx]} to write…`;
+        const submitted = (g.roundContribs||[]).map(c=>c.playerName);
+        document.getElementById('wait-players').innerHTML = g.players.map(p =>
+          `<div class="chip ${submitted.includes(p)?'me':''}">${p} ${submitted.includes(p)?'✓':''}</div>`
+        ).join('');
+        showView('v-wait');
+      } else if (!isMyTurn && curView === 'v-wait') {
+        // Refresh wait screen
+        const submitted = (g.roundContribs||[]).map(c=>c.playerName);
+        document.getElementById('wait-players').innerHTML = g.players.map(p =>
+          `<div class="chip ${submitted.includes(p)?'me':''}">${p} ${submitted.includes(p)?'✓':''}</div>`
+        ).join('');
+      }
+    }
+
+    if (phase === 'vote') {
+      const myVoted = g.votes && g.votes[me.name];
+      if (!myVoted && curView !== 'v-vote') {
+        startVoteTurn(g);
+      } else if (myVoted && curView === 'v-vote') {
+        // waiting for others to vote
+        const voteCount = Object.keys(g.votes||{}).length;
+        document.getElementById('vote-count-display').textContent = `${voteCount} of ${g.players.length} votes cast`;
+        document.getElementById('vote-status').textContent = 'Your vote is in — waiting for others…';
+        showView('v-wait');
+        document.getElementById('wait-code').textContent = me.groupCode;
+        document.getElementById('wait-msg').textContent = `${voteCount} of ${g.players.length} players have voted…`;
+      } else if (myVoted && curView === 'v-wait') {
+        const voteCount = Object.keys(g.votes||{}).length;
+        document.getElementById('wait-msg').textContent = `${voteCount} of ${g.players.length} players have voted…`;
+      }
+    }
+
+    if (phase === 'ai') {
+      if (curView !== 'v-ai') startAIPhase(g);
+    }
+
+    if (phase === 'round_results') {
+      if (curView !== 'v-round-results') showRoundResults(g);
+    }
+  }
+
+  if (g.status === 'done') {
+    clearInterval(pollTimer);
+    if (curView !== 'v-final') showFinal(g);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  WRITE TURN
+// ══════════════════════════════════════════════
+function startWriteTurn(g) {
+  clearInterval(writeTimer);
+  const contrib = g.roundContribs || [];
+  const usedIndices = new Set(g.usedWordIndices || []);
+  const pool = g.vocab.filter((_,i) => !usedIndices.has(i));
+  const available = pool.length > 0 ? pool : g.vocab;
+  const wordObj = available[Math.floor(Math.random() * available.length)];
+  // Store chosen word for this turn locally
+  me._currentWord = wordObj;
+  me._currentWordIdx = g.vocab.findIndex(v => v.word === wordObj.word);
+
+  document.getElementById('write-code').textContent = me.groupCode;
+  document.getElementById('write-myname').textContent = me.name;
+  document.getElementById('write-round').textContent = `Round ${g.currentRound} of ${g.totalRounds}`;
+  document.getElementById('w-word').textContent = wordObj.word;
+  document.getElementById('w-pos').textContent = wordObj.pos;
+  document.getElementById('w-def').textContent = wordObj.def;
+  document.getElementById('w-ex').textContent = wordObj.ex;
+  document.getElementById('write-text').value = '';
+  document.getElementById('write-hint').textContent = `Aim for 2–4 sentences. Use your word!`;
+  document.getElementById('write-hint').className = 'char-hint';
+
+  renderStory('write-story', g.story);
+  showView('v-write');
+
+  writeSeconds = 120;
+  updateWriteTimer();
+  writeTimer = setInterval(() => {
+    writeSeconds--;
+    updateWriteTimer();
+    if (writeSeconds <= 0) {
+      clearInterval(writeTimer);
+      toast("Time's up! Auto-submitting…");
+      const txt = document.getElementById('write-text').value.trim() || '[No response]';
+      doSubmitWrite(txt);
+    }
+  }, 1000);
+}
+
+function updateWriteTimer() {
+  const el = document.getElementById('write-timer');
+  const m = Math.floor(writeSeconds/60), s = writeSeconds%60;
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.className = 'timer' + (writeSeconds <= 20 ? ' warn' : '');
+}
+
+function onWriteInput() {
+  const txt = document.getElementById('write-text').value;
+  const hint = document.getElementById('write-hint');
+  const word = me._currentWord?.word?.toLowerCase() || '';
+  if (txt.length > 600) { hint.textContent = 'Getting long — wrap it up!'; hint.className = 'char-hint warn'; }
+  else if (txt.toLowerCase().includes(word)) { hint.textContent = `✓ "${me._currentWord.word}" detected!`; hint.className = 'char-hint ok'; }
+  else { hint.textContent = `Use your word: "${me._currentWord?.word}""`; hint.className = 'char-hint'; }
+}
+
+async function submitWrite() {
+  const txt = document.getElementById('write-text').value.trim();
+  if (txt.length < 15) { toast('Write at least a sentence!', true); return; }
+
+  const btn = document.getElementById('write-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
+
+  const screen = await screenContent(txt);
+
+  if (!screen.ok) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
+    // Show warning to student
+    const hint = document.getElementById('write-hint');
+    if (hint) {
+      hint.textContent = '⚠ ' + (screen.reason || 'Inappropriate content — please rewrite.');
+      hint.className = 'char-hint warn';
+      hint.style.color = 'var(--red)';
+    }
+    // Notify teacher
+    await sset(`sd_flag_${me.groupCode}_${Date.now()}`, {
+      player: me.name,
+      group: me.groupCode,
+      text: txt,
+      reason: screen.reason,
+      time: new Date().toLocaleTimeString()
+    });
+    return;
+  }
+
+  clearInterval(writeTimer);
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
+  await doSubmitWrite(txt);
+}
+
+
+async function screenContent(txt) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{
+          role: 'user',
+          content: `You are a classroom content moderator. Is this student sentence appropriate for a school setting? Check for obscene language, sexual content, graphic violence, bullying, or hate speech. Sentence: "${txt.replace(/"/g,'')}" Respond ONLY with JSON: {"ok": true or false, "reason": "brief reason if not ok, empty string if ok"}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '{"ok":true,"reason":""}';
+    return JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,'').trim());
+  } catch {
+    return { ok: true, reason: '' }; // fail open so game isn't blocked
+  }
+}
+
+async function flagContent(playerName, groupCode, text, reason) {
+  try {
+    const flagKey = `sd_flags_${teacherSessionId}`;
+    const flags = await sget(flagKey) || [];
+    flags.push({
+      playerName,
+      groupCode,
+      text,
+      reason,
+      time: new Date().toLocaleTimeString()
+    });
+    await sset(flagKey, flags);
+  } catch {}
+}
+
+async function doSubmitWrite(txt) {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+  const wordObj = me._currentWord;
+  const appearsInText = txt.toLowerCase().includes(wordObj.word.toLowerCase());
+
+  // Mark word index as used
+  const usedIdx = new Set(g.usedWordIndices||[]);
+  if (me._currentWordIdx >= 0) usedIdx.add(me._currentWordIdx);
+
+  g.roundContribs = g.roundContribs || [];
+  g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, idx: g.roundContribs.length });
+  g.story = g.story || [];
+  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null });
+  g.usedWordIndices = [...usedIdx];
+
+  // Move to next player or to vote phase
+  g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
+  if (g.currentPlayerIdx >= g.players.length) {
+    g.phase = 'vote';
+    g.currentPlayerIdx = 0;
+    g.votes = {};
+    g.wordVotes = {};
+  }
+
+  await sset(`sd_group_${me.groupCode}`, g);
+
+  document.getElementById('wait-code').textContent = me.groupCode;
+  document.getElementById('wait-msg').textContent = 'Waiting for other players to finish writing…';
+  showView('v-wait');
+}
+
+// ══════════════════════════════════════════════
+//  VOTE TURN
+// ══════════════════════════════════════════════
+function startVoteTurn(g) {
+  myVote = null;
+  myWordVotes = {};
+  const letters = 'ABCDEFGH';
+  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name);
+
+  document.getElementById('vote-round').textContent = g.currentRound;
+  document.getElementById('vote-label').textContent = `${me.name} — vote for the best sentence`;
+
+  document.getElementById('vote-list').innerHTML = others.map((c,i) => {
+    const hl = c.appearsInText
+      ? c.text.replace(new RegExp(`\\b${c.word.word}\\b`,'gi'), '<span class="story-hit">$&</span>')
+      : c.text;
+    return `<div class="vote-card" data-player="${c.playerName}" onclick="selectVote(this)">
+      <div class="vote-letter">${letters[i]}</div>
+      <div class="vote-body">
+        <div class="vote-author">${c.playerName}</div>
+        <div class="vote-txt">${hl}</div>
+        ${c.appearsInText ? `
+        <div class="check-row" onclick="event.stopPropagation()">
+          <label class="check-label" for="wv-${i}">
+            <input type="checkbox" id="wv-${i}" data-player="${c.playerName}" checked>
+            <span>Used <strong>${c.word.word}</strong> correctly?</span>
+          </label>
+        </div>` : `<div class="no-word-tag">✗ word not used</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('vote-status').textContent = '';
+  document.getElementById('vote-count-display').textContent = '';
+  showView('v-vote');
+}
+
+function selectVote(el) {
+  if (el.closest && el.closest('.check-row')) return;
+  document.querySelectorAll('.vote-card').forEach(v => v.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+async function submitVote() {
+  // Collect word usage votes (yes/no per player)
+  const wvotes = {};
+  document.querySelectorAll('.check-row input[type=checkbox]').forEach(cb => {
+    wvotes[cb.dataset.player] = cb.checked;
+  });
+
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+
+  g.votes = g.votes || {};
+  g.votes[me.name] = 'done';
+  g.wordVotes = g.wordVotes || {};
+  Object.entries(wvotes).forEach(([player, correct]) => {
+    if (!g.wordVotes[player]) g.wordVotes[player] = [];
+    g.wordVotes[player].push(correct);
+  });
+
+  await sset(`sd_group_${me.groupCode}`, g);
+
+  const allVoted = g.players.every(p => g.votes[p]);
+  if (allVoted) {
+    g.phase = 'ai';
+    await sset(`sd_group_${me.groupCode}`, g);
+  }
+  showView('v-wait');
+}
+
+
+async function startAIPhase(g) {
+  showView('v-ai');
+  // Only one player should run AI — whoever triggers first
+  // We store verdicts back to shared state
+  const needsCheck = (g.roundContribs||[]).filter(c => c.appearsInText);
+
+  document.getElementById('verdict-list').innerHTML = needsCheck.map(c => `
+    <div class="verdict-card" id="vc-${c.playerName.replace(/\s/g,'_')}">
+      <div class="verdict-name">${c.playerName}</div>
+      <div class="verdict-word">"${c.word.word}" · ${c.word.pos}</div>
+      <div class="verdict-quote">${c.text}</div>
+      <div class="verdict-status" id="vs-${c.playerName.replace(/\s/g,'_')}"><span class="thinking">Analyzing…</span></div>
+    </div>`).join('');
+
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-next-btn').style.display = 'none';
+
+  const verdicts = [];
+  for (const c of needsCheck) {
+    const groupSaysCorrect = g.wordVotes?.[c.playerName]
+      ? g.wordVotes[c.playerName].filter(Boolean).length > g.wordVotes[c.playerName].length / 2
+      : true;
+    const safeKey = c.playerName.replace(/\s/g,'_');
+    try {
+      const prompt = `You are judging a high school vocabulary game. A student was given the word "${c.word.word}" (${c.word.pos}) meaning: "${c.word.def}". They wrote:\n\n"${c.text}"\n\nDid they use "${c.word.word}" CORRECTLY? Respond ONLY with valid JSON: {"correct": true or false, "reason": "one concise sentence"}`;
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: prompt }] })
+      });
+      const data = await res.json();
+      const raw = data.content?.find(b => b.type==='text')?.text || '{}';
+      const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+      const aiCorrect = !!parsed.correct;
+      const reason = parsed.reason || '';
+      const groupAgreed = groupSaysCorrect === aiCorrect;
+      verdicts.push({ playerName: c.playerName, correct: aiCorrect, reason, groupSaysCorrect, groupAgreed });
+      document.getElementById('vs-'+safeKey).innerHTML = `
+        <div class="verdict-result ${aiCorrect?'ok':'bad'}">${aiCorrect?'✓ CORRECT':'✗ INCORRECT'}
+          ${!groupAgreed?`<span class="overruled">Group was ${groupSaysCorrect?'too generous':'too harsh'} — AI overrules</span>`:''}
+        </div>
+        <div class="verdict-reason">${reason}</div>`;
+    } catch(e) {
+      const finalCorrect = groupSaysCorrect;
+      verdicts.push({ playerName: c.playerName, correct: finalCorrect, reason: 'AI unavailable — group vote used.', groupSaysCorrect, groupAgreed: true });
+      document.getElementById('vs-'+safeKey).innerHTML = `
+        <div class="verdict-result ${finalCorrect?'ok':'bad'}">${finalCorrect?'✓ CORRECT (group)':'✗ INCORRECT (group)'}</div>
+        <div class="verdict-reason">AI unavailable — group vote used.</div>`;
+    }
+  }
+
+  // Apply scores
+  verdicts.forEach(v => { if (v.correct) g.scores[v.playerName] = (g.scores[v.playerName]||0) + 2; });
+
+  g._roundVerdicts = verdicts;
+  g.phase = 'round_results';
+  await sset(`sd_group_${me.groupCode}`, g);
+
+  document.getElementById('ai-loading').style.display = 'none';
+  document.getElementById('ai-next-btn').style.display = 'inline-flex';
+}
+
+async function afterAI() {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  showRoundResults(g);
+}
+
+// ══════════════════════════════════════════════
+//  ROUND RESULTS
+// ══════════════════════════════════════════════
+function showRoundResults(g) {
+  document.getElementById('rr-round').textContent = g.currentRound;
+  renderStory('rr-story', g.story);
+  renderScoreTable('rr-scores', g.players, g.scores);
+  const isLast = g.currentRound >= g.totalRounds;
+  document.getElementById('rr-next-btn').textContent = isLast ? 'See Final Results →' : 'Next Round →';
+  showView('v-round-results');
+}
+
+// ══════════════════════════════════════════════
+//  NEXT ROUND
+// ══════════════════════════════════════════════
+async function nextRound() {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+
+  if (g.currentRound >= g.totalRounds) {
+    await endGame(g);
+    return;
+  }
+
+  g.currentRound++;
+  g.currentPlayerIdx = 0;
+  g.roundContribs = [];
+  g.votes = {};
+  g.wordVotes = {};
+  g._roundVerdicts = null;
+  g.phase = 'write';
+  await sset(`sd_group_${me.groupCode}`, g);
+}
+
+// ══════════════════════════════════════════════
+//  END GAME
+// ══════════════════════════════════════════════
+async function endGame(g) {
+  // Collect all verdicts from all rounds into results
+  const allVerdicts = g._allVerdicts || [];
+  if (g._roundVerdicts) allVerdicts.push(...g._roundVerdicts);
+
+  g.status = 'done';
+  g.phase = 'done';
+  g.results = {
+    story: g.story,
+    scores: g.scores,
+    verdicts: allVerdicts,
+    completedAt: Date.now()
+  };
+  await sset(`sd_group_${me.groupCode}`, g);
+  showFinal(g);
+}
+
+function showFinal(g) {
+  clearInterval(pollTimer);
+  const sorted = [...(g.players||[])].sort((a,b)=>(g.scores[b]||0)-(g.scores[a]||0));
+  document.getElementById('final-winner').textContent = `${sorted[0]} wins`;
+  renderScoreTable('final-scores', g.players, g.scores);
+  const words = (g.story||[]).filter(s=>s.word).map(s=>s.word);
+  document.getElementById('final-words').innerHTML = [...new Set(words)].map(w =>
+    `<span class="word-chip">${w}</span>`).join('');
+  showView('v-final');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: START GAME FOR A GROUP
+// ══════════════════════════════════════════════
+// Teacher dashboard also has a "start" button per group
+async function startGroupGame(code) {
+  const g = await sget(`sd_group_${code}`);
+  if (!g || g.players.length < 2) { toast('Need at least 2 players in this group', true); return; }
+  const opener = GENRE_OPENERS[g.genre] || GENRE_OPENERS.horror;
+  g.status = 'playing';
+  g.phase = 'write';
+  g.story = [{ player: 'Narrator', text: opener, word: null }];
+  g.currentPlayerIdx = 0;
+  g.currentRound = 1;
+  await sset(`sd_group_${code}`, g);
+  toast(`Group ${code} game started!`);
+}
+
+// Re-render dash grid with start buttons
+const _origRenderDashGrid = renderDashGrid;
+// override to add start buttons
+window.renderDashGrid = function(codes, groups) {
+  const el = document.getElementById('dash-grid');
+  el.innerHTML = codes.map(code => {
+    const g = groups[code];
+    if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Loading…</div></div>`;
+    const statusLabel = g.status==='waiting'?'Waiting for players':g.status==='playing'?'In progress':g.status==='done'?'Complete':g.status;
+    const cls = g.status==='playing'?'live':g.status==='done'?'done':'';
+    const playerList = (g.players||[]).join(', ')||'No players yet';
+    const progress = g.status==='done'?100:g.status==='playing'?Math.round((g.currentRound-1)/g.totalRounds*100):0;
+    const canStart = g.status==='waiting' && (g.players||[]).length >= 2;
+    return `<div class="group-card ${cls}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div class="gc-code">${code}</div>
+        ${canStart?`<button class="btn btn-primary btn-sm" onclick="startGroupGame('${code}')">Start</button>`:''}
+      </div>
+      <div class="gc-status ${cls}">${statusLabel}</div>
+      <div class="gc-players">${playerList}</div>
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:8px">Round ${g.currentRound||1} of ${g.totalRounds||2}</div>
+      <div class="gc-progress"><div class="gc-progress-fill" style="width:${progress}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  HOSTING INSTRUCTIONS (shown in teacher dash header)
+// ══════════════════════════════════════════════
+// No extra needed — teacher shares the URL + group codes
+
+
+// Show Present button when any group is done
+function maybeShowPresentBtn(groups) {
+  const anyDone = Object.values(groups).some(g => g.status === 'done');
+  const btn = document.getElementById('present-btn');
+  if (btn) btn.style.display = anyDone ? 'inline-flex' : 'none';
+}
+
+
+// ══════════════════════════════════════════════
+//  PRESENTATION MODE
+// ══════════════════════════════════════════════
+let presGroups = [];      // array of completed group objects
+let presIdx = 0;          // which group we're showing
+let presVotingOpen = false;
+let presClassVotePollTimer = null;
+let presSessionKey = '';  // shared key for class votes
+
+async function launchPresentation() {
+  // Gather all done groups from current session
+  const session = await sget(`sd_session_${teacherSessionId}`);
+  if (!session) { toast('No session found', true); return; }
+  presGroups = [];
+  for (const code of session.codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (g && g.status === 'done' && g.results) presGroups.push(g);
+  }
+  if (presGroups.length === 0) { toast('No completed groups yet', true); return; }
+  presSessionKey = `sd_classvote_${teacherSessionId}`;
+  // Reset class votes
+  await sset(presSessionKey, { open: false, votes: {}, currentGroup: null });
+  presIdx = 0;
+  renderPresentation();
+  showView('v-present');
+  clearInterval(dashPollTimer);
+}
+
+function renderPresentation() {
+  const g = presGroups[presIdx];
+
+  // Dots
+  document.getElementById('pres-dots').innerHTML = presGroups.map((_, i) =>
+    `<div class="present-dot ${i < presIdx ? 'done' : i === presIdx ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Code + players
+  document.getElementById('pres-code').textContent = g.code;
+
+  // Story — each sentence with author, word badge, AI verdict
+  const verdicts = (g.results && g.results.verdicts) || [];
+  document.getElementById('pres-story').innerHTML = (g.story || []).map(para => {
+    if (para.player === 'Narrator') {
+      return `<div class="present-para" style="opacity:.55">
+        <div class="present-author">Narrator</div>
+        <div class="present-text" style="font-style:italic">${para.text}</div>
+      </div>`;
+    }
+    const verdict = verdicts.find(v => v.playerName === para.player);
+    const hl = para.word
+      ? para.text.replace(new RegExp(`\\b${para.word}\\b`, 'gi'), '<span class="story-hit">$&</span>')
+      : para.text;
+    let badge = '';
+    if (!para.word) {
+      badge = `<span class="review-badge bad">word not used</span>`;
+    } else if (verdict && verdict.correct) {
+      badge = `<span class="review-badge ok">✓ ${para.word}</span>`;
+    } else if (verdict && !verdict.correct) {
+      badge = `<span class="review-badge bad">✗ ${para.word}</span>`;
+    } else {
+      badge = `<span class="review-badge na">${para.word}</span>`;
+    }
+    const aiLine = verdict
+      ? `<div class="review-ai">AI: ${verdict.reason}</div>`
+      : '';
+    return `<div class="present-para">
+      <div class="review-meta">
+        <span class="present-author">${para.player}</span>
+        ${badge}
+      </div>
+      <div class="present-text">${hl}</div>
+      ${aiLine}
+    </div>`;
+  }).join('');
+
+  // Group scores summary
+  const players = g.players || [];
+  const scores = g.results ? (g.results.scores || g.scores) : g.scores;
+  const sorted = [...players].sort((a,b) => (scores[b]||0) - (scores[a]||0));
+  document.getElementById('pres-scores').innerHTML = `
+    <div class="label">Group Scores</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${sorted.map((p,i) => `
+        <div style="background:var(--card);border:1px solid ${i===0?'var(--accent)':'var(--border)'};padding:10px 16px;min-width:100px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent)">${scores[p]||0}</div>
+          <div style="font-size:.68rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">${p}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // Nav buttons
+  document.getElementById('pres-prev-btn').style.display = presIdx === 0 ? 'none' : '';
+  document.getElementById('pres-next-btn').textContent = presIdx < presGroups.length - 1 ? 'Next →' : 'All shown';
+  document.getElementById('pres-next-btn').disabled = presIdx >= presGroups.length - 1;
+
+  // Show vote button only after all groups shown OR always
+  const isLast = presIdx === presGroups.length - 1;
+  document.getElementById('pres-vote-btn').style.display = isLast && !presVotingOpen ? 'inline-flex' : 'none';
+  document.getElementById('pres-results-btn').style.display = presVotingOpen ? 'inline-flex' : 'none';
+}
+
+function presNav(dir) {
+  presIdx = Math.max(0, Math.min(presGroups.length - 1, presIdx + dir));
+  renderPresentation();
+}
+
+async function openClassVote() {
+  presVotingOpen = true;
+  const voteState = { open: true, votes: {}, currentGroup: null, groups: presGroups.map(g => g.code), sessionId: teacherSessionId };
+  await sset(presSessionKey, voteState);
+  document.getElementById('pres-vote-bar').style.display = 'flex';
+  document.getElementById('pres-vote-btn').style.display = 'none';
+  document.getElementById('pres-results-btn').style.display = 'inline-flex';
+  toast('Class voting is open!');
+  // Start polling vote counts
+  presClassVotePollTimer = setInterval(pollClassVotes, 2000);
+  pollClassVotes();
+}
+
+async function pollClassVotes() {
+  const vs = await sget(presSessionKey);
+  if (!vs) return;
+  const votes = vs.votes || {};
+  const tally = {};
+  Object.values(votes).forEach(code => { tally[code] = (tally[code]||0)+1; });
+  const total = Object.values(tally).reduce((a,b)=>a+b, 0);
+  const tallyHTML = presGroups.map(g => {
+    const n = tally[g.code] || 0;
+    return `<span class="vote-tally-chip">${g.code}: ${n}</span>`;
+  }).join('<span style="color:var(--border);margin:0 4px">·</span>') + `<span style="font-size:.68rem;color:var(--muted);margin-left:8px">(${total} total)</span>`;
+  document.getElementById('pres-tally').innerHTML = tallyHTML;
+}
+
+async function closeClassVote() {
+  const vs = await sget(presSessionKey);
+  if (vs) { vs.open = false; await sset(presSessionKey, vs); }
+  presVotingOpen = false;
+  clearInterval(presClassVotePollTimer);
+  document.getElementById('pres-vote-bar').style.display = 'none';
+  document.getElementById('pres-results-btn').style.display = 'inline-flex';
+}
+
+async function showClassResults() {
+  clearInterval(presClassVotePollTimer);
+  // Close voting
+  const vs = await sget(presSessionKey);
+  const votes = (vs && vs.votes) || {};
+  const tally = {};
+  presGroups.forEach(g => tally[g.code] = 0);
+  Object.values(votes).forEach(code => { if (tally[code] !== undefined) tally[code]++; });
+  const sorted = presGroups.map(g => ({ code: g.code, players: g.players, votes: tally[g.code]||0 }))
+    .sort((a,b) => b.votes - a.votes);
+
+  document.getElementById('pres-story').innerHTML = '';
+  document.getElementById('pres-scores').innerHTML = '';
+  document.getElementById('pres-dots').innerHTML = '';
+  document.getElementById('pres-vote-bar').style.display = 'none';
+  document.getElementById('pres-code').textContent = 'Class Results';
+  document.querySelector('#v-present .present-nav').style.display = 'none';
+
+  const winner = sorted[0];
+  document.getElementById('pres-story').innerHTML = `
+    <div class="class-winner-reveal">
+      <div class="class-winner-crown">${winner.code}</div>
+      <div class="class-winner-label">wins with ${winner.votes} vote${winner.votes!==1?'s':''} — ${winner.players.join(', ')}</div>
+      <div class="results-podium">
+        ${sorted.map((r, i) => `
+          <div class="podium-row ${i===0?'first':''}">
+            <div>
+              <div class="podium-code">${r.code}</div>
+              <div class="podium-label">${r.players.join(', ')}</div>
+            </div>
+            <div>
+              <div class="podium-votes">${r.votes}</div>
+              <div class="podium-label">vote${r.votes!==1?'s':''}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:28px">
+        <button class="btn btn-ghost btn-md" onclick="document.querySelector('#v-present .present-nav').style.display='';presIdx=0;renderPresentation()">&#x2190; Back to Stories</button>
+        <button class="btn btn-secondary btn-md" onclick="showView('v-teacher-dash');startTeacherDash(teacherSessionId,presGroups.map(g=>g.code))" style="margin-left:10px">Dashboard</button>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  STUDENT: CLASS VOTE POLLING
+// ══════════════════════════════════════════════
+let classVotePollTimer = null;
+let myClassVote = null;
+
+function startClassVotePoll(sessionKey) {
+  clearInterval(classVotePollTimer);
+  classVotePollTimer = setInterval(() => pollClassVoteStudent(sessionKey), 2000);
+  pollClassVoteStudent(sessionKey);
+}
+
+async function pollClassVoteStudent(sessionKey) {
+  const vs = await sget(sessionKey);
+  if (!vs) return;
+  const curView = document.querySelector('.view.active')?.id;
+
+  if (vs.open && curView !== 'v-class-vote' && curView !== 'v-class-results') {
+    renderClassVoteView(vs, sessionKey);
+    showView('v-class-vote');
+  } else if (!vs.open && curView === 'v-class-vote') {
+    showView('v-wait');
+    document.getElementById('wait-msg').textContent = 'Voting closed — waiting for teacher to reveal results…';
+  }
+}
+
+function renderClassVoteView(vs, sessionKey) {
+  const groups = vs.groups || [];
+  myClassVote = null;
+  document.getElementById('cv-list').innerHTML = groups.map(code => `
+    <div class="vote-card" data-code="${code}" onclick="selectClassVote(this)">
+      <div class="vote-letter">◈</div>
+      <div class="vote-body">
+        <div class="vote-author">Group ${code}</div>
+        <div class="vote-txt" style="font-size:.8rem;color:var(--muted)">Tap to vote for this group's story</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('cv-status').textContent = '';
+  document.getElementById('cv-sessionkey').value = sessionKey;
+}
+
+function selectClassVote(el) {
+  document.querySelectorAll('#cv-list .vote-card').forEach(v => v.classList.remove('sel'));
+  el.classList.add('sel');
+  myClassVote = el.dataset.code;
+}
+
+async function submitClassVote() {
+  if (!myClassVote) { toast('Pick a group first!', true); return; }
+  const sessionKey = document.getElementById('cv-sessionkey').value;
+  const vs = await sget(sessionKey);
+  if (!vs || !vs.open) { toast('Voting is closed', true); return; }
+  // Can't vote for own group
+  if (myClassVote === me.groupCode) { toast("You can't vote for your own group!", true); return; }
+  vs.votes[me.name + '_' + me.groupCode] = myClassVote;
+  await sset(sessionKey, vs);
+  document.getElementById('cv-status').textContent = '✓ Vote submitted!';
+  document.querySelectorAll('#cv-list .vote-card').forEach(v => v.style.pointerEvents = 'none');
+  toast('Vote cast!');
+}
+
+// ══════════════════════════════════════════════
+//  LICENSE KEY SYSTEM (Gumroad)
+// ══════════════════════════════════════════════
+const GUMROAD_PRODUCT_ID = 'storydrop'; // ← replace after creating Gumroad product
+const LICENSE_STORAGE_KEY = 'storydrop_license';
+
+function getLicenseState() {
+  try { return JSON.parse(localStorage.getItem(LICENSE_STORAGE_KEY) || 'null'); }
+  catch { return null; }
+}
+
+function saveLicenseState(data) {
+  localStorage.setItem(LICENSE_STORAGE_KEY, JSON.stringify(data));
+}
+
+function isLicensed() {
+  return !!localStorage.getItem('storydrop_license');
+}
+
+// Called when teacher clicks "Create Session" on landing
+function teacherEntry() {
+  if (isLicensed()) {
+    showView('v-teacher-setup');
+  } else {
+    showView('v-license');
+  }
+}
+
+async function activateLicense() {
+  const key = document.getElementById('license-key-input').value.trim();
+  if (!key) { showLicenseError('Enter your license key'); return; }
+
+  document.getElementById('license-error').style.display = 'none';
+  document.getElementById('license-checking').style.display = 'block';
+  document.querySelector('#v-license .btn-primary').disabled = true;
+
+  try {
+    // Gumroad license verification API
+    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `product_permalink=${encodeURIComponent(GUMROAD_PRODUCT_ID)}&license_key=${encodeURIComponent(key)}&increment_uses_count=true`
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      const purchase = data.purchase;
+      saveLicenseState({
+        valid: true,
+        key,
+        email: purchase.email,
+        purchaserName: purchase.full_name || '',
+        activatedAt: Date.now()
+      });
+      updateLicenseLandingUI();
+      toast('License activated! Welcome to Story Drop.');
+      showView('v-teacher-setup');
+    } else {
+      showLicenseError(data.message || 'Invalid license key. Check your email from Gumroad.');
+    }
+  } catch(e) {
+    // If CORS blocks the Gumroad call (can happen on some hosts),
+    // fall back to trusting the key format and verify on next session
+    // For a single-HTML-file setup, we trust the key locally
+    if (key.length >= 20) {
+      saveLicenseState({ valid: true, key, email: '', activatedAt: Date.now(), unverified: true });
+      updateLicenseLandingUI();
+      toast('License saved. Welcome to Story Drop!');
+      showView('v-teacher-setup');
+    } else {
+      showLicenseError('Could not verify — check your key and try again.');
+    }
+  } finally {
+    document.getElementById('license-checking').style.display = 'none';
+    document.querySelector('#v-license .btn-primary').disabled = false;
+  }
+}
+
+function showLicenseError(msg) {
+  const el = document.getElementById('license-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function submitLicense() {
+  const key = document.getElementById('license-input').value.trim();
+  const btn = document.getElementById('license-btn');
+  const err = document.getElementById('license-error');
+
+  if (!key) { err.textContent = 'Please enter your license key.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  err.textContent = '';
+
+  try {
+    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `product_permalink=storydrop&license_key=${encodeURIComponent(key)}`
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('storydrop_license', key);
+      showView('v-teacher-setup');
+    } else {
+      // Fallback: trust long keys if Gumroad is blocked by CORS
+      if (key.length >= 20) {
+        localStorage.setItem('storydrop_license', key);
+        showView('v-teacher-setup');
+      } else {
+        err.textContent = 'Invalid license key. Please check and try again.';
+        btn.disabled = false;
+        btn.textContent = 'Unlock Teacher Mode →';
+      }
+    }
+  } catch {
+    // CORS fallback - trust any key >= 20 chars
+    if (key.length >= 20) {
+      localStorage.setItem('storydrop_license', key);
+      showView('v-teacher-setup');
+    } else {
+      err.textContent = 'Could not verify key. Please try again.';
+      btn.disabled = false;
+      btn.textContent = 'Unlock Teacher Mode →';
+    }
+  }
+}
+
+function updateLicenseLandingUI() {
+  const s = getLicenseState();
+  const el = document.getElementById('license-status-landing');
+  if (!el) return;
+  if (s && s.valid) {
+    el.innerHTML = `<span style="color:var(--accent)">✓ Licensed${s.email ? ' · ' + s.email : ''}</span>`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function showLicenseInfo() {
+  const s = getLicenseState();
+  if (!s) return;
+  const msg = s.email
+    ? `Licensed to ${s.email}\nKey: ${s.key.slice(0,8)}…\n\nTo deactivate, clear your browser's local storage.`
+    : `License active.\nKey: ${s.key.slice(0,8)}…`;
+  alert(msg);
+}
+
+function deactivateLicense() {
+  if (confirm('Remove license from this device?')) {
+    localStorage.removeItem(LICENSE_STORAGE_KEY);
+    updateLicenseLandingUI();
+    showView('v-landing');
+    toast('License removed from this device.');
+  }
+}
+
+// Run on load
+updateLicenseLandingUI();
+
+
+async function leaveGroup() {
+  if (!me.groupCode) { showView('v-student-join'); return; }
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (g && g.status === 'waiting') {
+    g.players = (g.players || []).filter(p => p !== me.name);
+    await sset(`sd_group_${me.groupCode}`, g);
+  }
+  me = {};
+  showView('v-student-join');
+}
+
+
+// ── TEST MODE ──
+let testBots = [];
+
+function enableTestMode() {
+  document.getElementById('test-mode-bar').style.display = 'flex';
+  toast('Test mode enabled — add bot students to your groups');
+}
+
+async function addTestBot() {
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  if (!codes.length) { toast('Create a session first'); return; }
+  const code = codes[0]; // Add to first group
+  const botName = 'Bot_' + Math.random().toString(36).slice(2,5).toUpperCase();
+
+  const g = await sget(`sd_group_${code}`);
+  if (!g) { toast('Group not found'); return; }
+  if (!g.players.includes(botName)) {
+    g.players.push(botName);
+    await sset(`sd_group_${code}`, g);
+  }
+  testBots.push({ name: botName, code });
+  toast(`Added ${botName} to group ${code}`);
+}
+
+async function runTestBots() {
+  for (const bot of testBots) {
+    const g = await sget(`sd_group_${bot.code}`);
+    if (!g || g.phase !== 'write') continue;
+
+    const wordObj = g.vocab && g.vocab[Math.floor(Math.random() * g.vocab.length)];
+    const word = wordObj ? wordObj.word : 'interesting';
+    const sentences = [
+      `The ${word} situation became clear as the story unfolded.`,
+      `She felt ${word} about the whole experience.`,
+      `It was a truly ${word} moment for everyone involved.`,
+    ];
+    const txt = sentences[Math.floor(Math.random() * sentences.length)];
+    const appearsInText = txt.toLowerCase().includes(word.toLowerCase());
+
+    g.roundContribs = g.roundContribs || [];
+    g.roundContribs.push({
+      playerName: bot.name,
+      text: txt,
+      word: wordObj || { word },
+      appearsInText,
+      round: g.currentRound,
+      idx: g.roundContribs.length
+    });
+
+    const allDone = g.players.every(p => (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound));
+    if (allDone) {
+      g.phase = 'vote';
+      g.votes = {};
+    }
+
+    await sset(`sd_group_${bot.code}`, g);
+    toast(`${bot.name} submitted a sentence`);
+  }
+}
+
+// ── THEME ──
+function initTheme() {
+  const saved = localStorage.getItem('storydrop_theme') || 'dark';
+  applyTheme(saved);
+}
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : '');
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = t === 'light' ? '☽ Dark' : '☀ Light';
+  localStorage.setItem('storydrop_theme', t);
+}
+function toggleTheme() {
+  const current = localStorage.getItem('storydrop_theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+initTheme();
+
+
+
+// ── EXPORT CSV ──
+async function exportCSV() {
+  // Gather all done groups from shared storage
+  const allCodes = presGroups && presGroups.length ? presGroups.map(g => g.code)
+    : Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+
+  const rows = [['Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','Correct (Group Vote)','Correct (AI Verdict)']];
+
+  for (const code of allCodes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g) continue;
+    const results = g.results || g;
+    const scores = results.scores || g.scores || {};
+    const story = results.story || g.story || [];
+    const verdicts = results.verdicts || g.verdicts || [];
+
+    // One row per sentence written
+    story.forEach((entry, i) => {
+      const verdict = verdicts.find(v => v.playerName === entry.playerName && v.round === entry.round);
+      const groupVote = g.wordVotes && g.wordVotes[entry.playerName]
+        ? (g.wordVotes[entry.playerName].filter(Boolean).length > g.wordVotes[entry.playerName].length / 2 ? 'Yes' : 'No')
+        : 'N/A';
+      rows.push([
+        code,
+        entry.playerName || '',
+        scores[entry.playerName] || 0,
+        entry.round || (i + 1),
+        `"${(entry.text || '').replace(/"/g, '""')}"`,
+        entry.word ? entry.word.word : '',
+        entry.appearsInText ? 'Yes' : 'No',
+        groupVote,
+        verdict ? (verdict.correct ? 'Yes' : 'No') : 'N/A'
+      ]);
+    });
+
+    // Add players with no sentences (score only)
+    const writtenNames = story.map(e => e.playerName);
+    (g.players || []).forEach(name => {
+      if (!writtenNames.includes(name)) {
+        rows.push([code, name, scores[name] || 0, '', '', '', '', '', '']);
+      }
+    });
+  }
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `storydrop_results_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Results exported!');
+}
+
+</script>
+</body>
+</html>
