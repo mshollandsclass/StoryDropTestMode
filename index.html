@@ -623,6 +623,9 @@ const SUPABASE_URL = 'https://xebyrvsopqbiuksepwzz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlYnlydnNvcHFiaXVrc2Vwd3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNjc1MjQsImV4cCI6MjA4ODk0MzUyNH0.gBCcBF8kcRwT__a04oQTH53cakUu8XtGubaQj_7iR5U';
 const DB_CONFIGURED = true;
 
+// ── ANTHROPIC API KEY (for testing only — move to PHP proxy before selling) ──
+const ANTHROPIC_KEY = 'YOUR_ANTHROPIC_KEY_HERE';
+
 async function sget(key) {
   try {
     const res = await fetch(
@@ -1276,7 +1279,7 @@ async function screenContent(txt) {
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 100,
@@ -1463,7 +1466,7 @@ async function startAIPhase(g) {
       const prompt = `You are judging a high school vocabulary game. A student was given the word "${c.word.word}" (${c.word.pos}) meaning: "${c.word.def}". They wrote:\n\n"${c.text}"\n\nDid they use "${c.word.word}" CORRECTLY? Respond ONLY with valid JSON: {"correct": true or false, "reason": "one concise sentence"}`;
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: prompt }] })
       });
       const data = await res.json();
