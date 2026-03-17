@@ -703,6 +703,8 @@ function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  // Save current view so we can restore it
+  try { localStorage.setItem('sd_current_view', id); } catch {}
 }
 
 function toast(msg, isErr=false) {
@@ -822,6 +824,8 @@ async function createSession() {
 //  TEACHER DASHBOARD
 // ══════════════════════════════════════════════
 function startTeacherDash(sessionId, codes) {
+  // codes may be passed as JSON string from restore button
+  if (typeof codes === 'string') { try { codes = JSON.parse(codes); } catch {} }
   clearInterval(dashPollTimer);
   if (!DB_CONFIGURED) {
     document.getElementById('dash-grid').innerHTML = `
@@ -1969,33 +1973,71 @@ function deactivateLicense() {
 
 // Run on load
 updateLicenseLandingUI();
+restoreSession();
 
 // Restore teacher session if one was active
-// Restore session after page is ready
-window.addEventListener('load', function() {
-  setTimeout(async function() {
-    const saved = localStorage.getItem('sd_teacher_session');
-    if (!saved) return;
-    try {
-      const { id, codes } = JSON.parse(saved);
-      if (!id || !codes) return;
-      const session = await sget(`sd_session_${id}`);
-      if (!session) { localStorage.removeItem('sd_teacher_session'); return; }
-      teacherSessionId = id;
-      const banner = document.createElement('div');
-      banner.style.cssText = 'background:var(--card);border:1px solid var(--accent);padding:12px 18px;margin-top:20px;font-size:.82rem;line-height:1.8;max-width:400px;width:100%';
-      banner.innerHTML = `<span style="color:var(--accent);font-family:'Bebas Neue',sans-serif;letter-spacing:.08em">Active Session Found</span><br>
-        <span style="color:var(--muted)">Session: ${session.name || id}</span><br>
-        <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="restoreTeacherDash()">Return to Dashboard →</button>
-        <button class="btn btn-secondary btn-sm" style="margin-top:10px;margin-left:8px" onclick="clearSavedSession()">Clear</button>`;
-      const inner = document.querySelector('#v-landing .view-inner');
-      if (inner) inner.appendChild(banner);
-    } catch(e) {
-      console.log('Session restore error:', e);
+// ── SESSION RESTORE ──
+async function restoreSession() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  const lastView = localStorage.getItem('sd_current_view');
+  if (!saved) return;
+
+  try {
+    const { id, codes } = JSON.parse(saved);
+    if (!id || !codes) return;
+
+    // Verify session still exists
+    const session = await sget(`sd_session_${id}`);
+    if (!session) {
       localStorage.removeItem('sd_teacher_session');
+      localStorage.removeItem('sd_current_view');
+      return;
     }
-  }, 1000);
-});
+
+    teacherSessionId = id;
+
+    // If teacher was on the dashboard, restore directly
+    const teacherViews = ['v-teacher-dash', 'v-present', 'v-class-vote'];
+    if (lastView && teacherViews.includes(lastView)) {
+      startTeacherDash(id, codes);
+      return;
+    }
+
+    // Otherwise show restore banner on landing page
+    showRestoreBanner(session, id, codes);
+
+  } catch(e) {
+    console.warn('Session restore failed:', e);
+  }
+}
+
+function showRestoreBanner(session, id, codes) {
+  // Remove any existing banner
+  const existing = document.getElementById('restore-banner');
+  if (existing) existing.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'restore-banner';
+  banner.style.cssText = 'background:var(--card);border:2px solid var(--accent);padding:16px 20px;margin-top:24px;font-size:.82rem;line-height:1.9;width:100%;max-width:400px;box-sizing:border-box';
+  banner.innerHTML = `
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;color:var(--accent);margin-bottom:6px">⚡ Active Session</div>
+    <div style="color:var(--muted);margin-bottom:14px">${session.name || 'Unnamed session'} · ${codes.length} group${codes.length !== 1 ? 's' : ''}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="startTeacherDash('${id}', ${JSON.stringify(codes)})">Return to Dashboard →</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearSavedSession()">End Session</button>
+    </div>`;
+
+  const grid = document.getElementById('landing-grid');
+  if (grid) grid.after(banner);
+}
+
+function clearSavedSession() {
+  localStorage.removeItem('sd_teacher_session');
+  localStorage.removeItem('sd_current_view');
+  const banner = document.getElementById('restore-banner');
+  if (banner) banner.remove();
+  teacherSessionId = null;
+}
 
 async function restoreTeacherDash() {
   const saved = localStorage.getItem('sd_teacher_session');
