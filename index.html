@@ -974,6 +974,9 @@ function renderDashGrid(codes, groups) {
       return `<div style="font-size:.72rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--muted)">${p}</span> — ${note}</div>`;
     }).join('');
 
+    const teamScoreDisplay = g.status === 'done' && g.results
+      ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:.06em;margin-top:6px">${g.results.teamScore || 0} team pts</div>`
+      : '';
     const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1
       ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroup('${code}')">Start ▶</button>`
       : '';
@@ -982,6 +985,7 @@ function renderDashGrid(codes, groups) {
       <div class="gc-code">${code}</div>
       <div class="gc-status ${cls}">${statusLabel}</div>
       <div class="gc-players">${playerStatuses}</div>
+      ${teamScoreDisplay}
       ${startBtn}
     </div>`;
   }).join('');
@@ -996,8 +1000,24 @@ function renderDashResults(groups) {
   for (const g of done) {
     html += `<div class="card" style="margin-bottom:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-        <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;color:var(--accent)">${g.code}</span>
-        <span style="font-size:.7rem;color:var(--muted);margin-left:12px;letter-spacing:.08em;text-transform:uppercase">${(g.players||[]).join(', ')}</span></div>
+        <div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;color:var(--accent)">${g.code}</span>
+          <span style="font-size:.7rem;color:var(--muted);margin-left:12px;letter-spacing:.08em;text-transform:uppercase">${(g.players||[]).join(', ')}</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);letter-spacing:.06em">
+            ${g.results.teamScore || 0} pts
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        ${(g.results.verdicts||[]).map(v => `
+          <div style="background:var(--surface);padding:6px 12px;font-size:.75rem;border-left:3px solid ${v.correct ? 'var(--accent)' : 'var(--red)'}">
+            <span style="color:var(--muted)">${v.playerName}</span>
+            <span style="color:${v.correct ? 'var(--accent)' : 'var(--red)'}">
+              ${v.correct ? '✓' : '✗'} ${v.word || ''}
+            </span>
+          </div>`).join('')}
       </div>
       <div class="label">Full Story</div>
       <div class="review-wrap">`;
@@ -1557,7 +1577,10 @@ async function endGame(g) {
   g.results = {
     story: g.story,
     scores: g.scores,
+    teamScore: g.teamScore || 0,
     verdicts: allVerdicts,
+    wordVotes: g.wordVotes || {},
+    players: g.players,
     completedAt: Date.now()
   };
   await sset(`sd_group_${me.groupCode}`, g);
