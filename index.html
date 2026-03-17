@@ -42,6 +42,13 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--text);m
 .toggle-switch.on{background:var(--accent)}
 .toggle-switch.on::after{transform:translateX(18px);background:var(--btn-fg)}
 
+
+/* ── VOTE YES/NO/IDK ── */
+.vote-yn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--border-hi);font-size:.78rem;transition:all .15s;user-select:none}
+.vote-yn input{display:none}
+.vote-yn:has(input:checked){border-color:var(--accent);background:rgba(200,241,53,.08);color:var(--accent)}
+[data-theme="light"] .vote-yn:has(input:checked){background:rgba(74,122,0,.08)}
+
 /* ── SCREENS ── */
 .view{display:none;min-height:100vh}
 .view.active{display:flex;flex-direction:column;align-items:center;padding:0 16px 48px}
@@ -258,7 +265,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">Vocab storytelling<br>group game</div>
   </div>
   <div class="content">
-    <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on whether it was used right, and AI checks your work.</p>
+    <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on correct usage — correct answers and accurate votes earn team points, wrong votes lose them. AI keeps everyone honest.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px" id="landing-grid">
       <div class="card" style="border-color:var(--accent)">
         <div class="label">I'm a teacher</div>
@@ -513,7 +520,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
   <div class="content">
     <div class="label" id="vote-label">Did they use their word correctly?</div>
-    <p class="text-muted" style="margin-bottom:18px;line-height:1.7">For each player's sentence, vote whether they used their vocab word <em>correctly</em>. You cannot vote on your own sentence.</p>
+    <p class="text-muted" style="margin-bottom:18px;line-height:1.7">Read each teammate's sentence and vote on whether they used their vocab word correctly. Choosing <strong>Not sure</strong> means you abstain — if everyone abstains, that player forfeits their points. You cannot vote on your own sentence.</p>
     <div class="vote-list" id="vote-list"></div>
     <div class="btn-row">
       <button class="btn btn-primary btn-lg" onclick="submitVote()">Cast Vote &#x2192;</button>
@@ -548,6 +555,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="label">This round's story</div>
     <div class="story-scroll" id="rr-story" style="max-height:200px;margin-bottom:20px"></div>
     <div class="label">Scores</div>
+    <div id="rr-team-score" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:var(--accent);margin-bottom:8px"></div>
     <table class="score-tbl" id="rr-scores"></table>
     <div class="btn-row mt-16">
       <button class="btn btn-primary btn-lg" id="rr-next-btn" onclick="nextRound()">Next Round &#x2192;</button>
@@ -566,6 +574,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,8vw,4rem);color:var(--accent);letter-spacing:.06em;margin-bottom:4px" id="final-winner">—</div>
     <div style="font-size:.7rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:24px">Your teacher will receive the full story.</div>
     <div class="label">Final Scores</div>
+    <div id="final-team-score" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.08em;color:var(--accent);margin-bottom:12px"></div>
     <table class="score-tbl" id="final-scores"></table>
     <div class="label mt-24">Words used</div>
     <div id="final-words" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px"></div>
@@ -1053,7 +1062,13 @@ async function joinGame() {
 
   document.getElementById('lobby-code').textContent = code;
   document.getElementById('lobby-myname').textContent = name;
-  showView('v-lobby');
+  // Show rules first, then lobby
+  if (!localStorage.getItem('sd_rules_seen')) {
+    localStorage.setItem('sd_rules_seen', '1');
+    showView('v-rules');
+  } else {
+    showView('v-lobby');
+  }
   startStudentPoll();
 }
 
@@ -1310,29 +1325,41 @@ async function doSubmitWrite(txt) {
 //  VOTE TURN
 // ══════════════════════════════════════════════
 function startVoteTurn(g) {
-  myVote = null;
+  myVote = 'done';
   myWordVotes = {};
-  const letters = 'ABCDEFGH';
-  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name);
+  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && c.round === g.currentRound);
 
   document.getElementById('vote-round').textContent = g.currentRound;
-  document.getElementById('vote-label').textContent = `${me.name} — vote for the best sentence`;
+  document.getElementById('vote-label').textContent = 'Did they use their word correctly?';
 
   document.getElementById('vote-list').innerHTML = others.map((c,i) => {
     const hl = c.appearsInText
       ? c.text.replace(new RegExp(`\\b${c.word.word}\\b`,'gi'), '<span class="story-hit">$&</span>')
       : c.text;
-    return `<div class="vote-card" data-player="${c.playerName}" onclick="selectVote(this)">
-      <div class="vote-letter">${letters[i]}</div>
+    return `<div class="vote-card" style="cursor:default">
       <div class="vote-body">
         <div class="vote-author">${c.playerName}</div>
         <div class="vote-txt">${hl}</div>
         ${c.appearsInText ? `
-        <div class="check-row" onclick="event.stopPropagation()">
-          <label class="check-label" for="wv-${i}">
-            <input type="checkbox" id="wv-${i}" data-player="${c.playerName}" checked>
-            <span>Used <strong>${c.word.word}</strong> correctly?</span>
-          </label>
+        <div class="check-row" onclick="event.stopPropagation()" style="margin-top:10px">
+          <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px">
+            Did <strong style="color:var(--text)">${c.playerName}</strong> use
+            <strong style="color:var(--accent)">${c.word.word}</strong> correctly?
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label class="vote-yn" for="wv-yes-${i}">
+              <input type="radio" id="wv-yes-${i}" name="wv-${i}" data-player="${c.playerName}" value="yes">
+              <span>✓ Yes</span>
+            </label>
+            <label class="vote-yn" for="wv-no-${i}">
+              <input type="radio" id="wv-no-${i}" name="wv-${i}" data-player="${c.playerName}" value="no">
+              <span>✗ No</span>
+            </label>
+            <label class="vote-yn" for="wv-idk-${i}">
+              <input type="radio" id="wv-idk-${i}" name="wv-${i}" data-player="${c.playerName}" value="idk" checked>
+              <span>? Not sure</span>
+            </label>
+          </div>
         </div>` : `<div class="no-word-tag">✗ word not used</div>`}
       </div>
     </div>`;
@@ -1343,6 +1370,7 @@ function startVoteTurn(g) {
   showView('v-vote');
 }
 
+
 function selectVote(el) {
   if (el.closest && el.closest('.check-row')) return;
   document.querySelectorAll('.vote-card').forEach(v => v.classList.remove('sel'));
@@ -1350,10 +1378,15 @@ function selectVote(el) {
 }
 
 async function submitVote() {
-  // Collect word usage votes (yes/no per player)
+  // Collect word usage votes (yes/no/idk per player)
   const wvotes = {};
-  document.querySelectorAll('.check-row input[type=checkbox]').forEach(cb => {
-    wvotes[cb.dataset.player] = cb.checked;
+  document.querySelectorAll('.check-row').forEach(row => {
+    const checked = row.querySelector('input[type=radio]:checked');
+    if (checked) {
+      const player = checked.dataset.player;
+      // yes = true, no = false, idk = null (AI decides)
+      wvotes[player] = checked.value === 'yes' ? true : checked.value === 'no' ? false : null;
+    }
   });
 
   const g = await sget(`sd_group_${me.groupCode}`);
@@ -1364,7 +1397,8 @@ async function submitVote() {
   g.wordVotes = g.wordVotes || {};
   Object.entries(wvotes).forEach(([player, correct]) => {
     if (!g.wordVotes[player]) g.wordVotes[player] = [];
-    g.wordVotes[player].push(correct);
+    // Only count definitive yes/no votes, skip idk
+    if (correct !== null) g.wordVotes[player].push(correct);
   });
 
   await sset(`sd_group_${me.groupCode}`, g);
@@ -1397,9 +1431,13 @@ async function startAIPhase(g) {
 
   const verdicts = [];
   for (const c of needsCheck) {
-    const groupSaysCorrect = g.wordVotes?.[c.playerName]
-      ? g.wordVotes[c.playerName].filter(Boolean).length > g.wordVotes[c.playerName].length / 2
-      : true;
+    const rawVotes = g.wordVotes?.[c.playerName] || [];
+    // null = idk (abstain), only count true/false votes
+    const definitiveVotes = rawVotes.filter(v => v !== null);
+    // If no one cast a definitive vote, forfeit (no points)
+    const groupSaysCorrect = definitiveVotes.length > 0
+      ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2
+      : false;
     const safeKey = c.playerName.replace(/\s/g,'_');
     try {
       const prompt = `You are judging a high school vocabulary game. A student was given the word "${c.word.word}" (${c.word.pos}) meaning: "${c.word.def}". They wrote:\n\n"${c.text}"\n\nDid they use "${c.word.word}" CORRECTLY? Respond ONLY with valid JSON: {"correct": true or false, "reason": "one concise sentence"}`;
@@ -1422,15 +1460,39 @@ async function startAIPhase(g) {
         <div class="verdict-reason">${reason}</div>`;
     } catch(e) {
       const finalCorrect = groupSaysCorrect;
-      verdicts.push({ playerName: c.playerName, correct: finalCorrect, reason: 'AI unavailable — group vote used.', groupSaysCorrect, groupAgreed: true });
+      verdicts.push({ playerName: c.playerName, correct: finalCorrect, reason: 'AI unavailable — group vote used. No definitive votes = no points.', groupSaysCorrect, groupAgreed: true });
       document.getElementById('vs-'+safeKey).innerHTML = `
         <div class="verdict-result ${finalCorrect?'ok':'bad'}">${finalCorrect?'✓ CORRECT (group)':'✗ INCORRECT (group)'}</div>
-        <div class="verdict-reason">AI unavailable — group vote used.</div>`;
+        <div class="verdict-reason">AI unavailable — group vote used. No definitive votes = no points.</div>`;
     }
   }
 
-  // Apply scores
-  verdicts.forEach(v => { if (v.correct) g.scores[v.playerName] = (g.scores[v.playerName]||0) + 2; });
+  // Apply scores — team-based point system
+  g.teamScore = g.teamScore || 0;
+
+  verdicts.forEach(v => {
+    const wordCorrect = v.correct; // AI final verdict
+
+    // +1 if player used the word correctly
+    if (wordCorrect) g.teamScore += 1;
+
+    // Each teammate's vote earns or loses a point based on accuracy
+    const votes = g.wordVotes?.[v.playerName] || [];
+    votes.forEach(vote => {
+      if (vote === null) return; // Not sure = 0 points
+      if (vote === true  &&  wordCorrect) g.teamScore += 1; // Yes + correct  = +1
+      if (vote === true  && !wordCorrect) g.teamScore -= 1; // Yes + wrong    = -1
+      if (vote === false && !wordCorrect) g.teamScore += 1; // No  + correct  = +1
+      if (vote === false &&  wordCorrect) g.teamScore -= 1; // No  + wrong    = -1
+    });
+
+    // Keep individual scores for leaderboard display
+    if (wordCorrect) g.scores[v.playerName] = (g.scores[v.playerName]||0) + 1;
+  });
+
+  // Store final team score
+  g.results = g.results || {};
+  g.results.teamScore = g.teamScore;
 
   g._roundVerdicts = verdicts;
   g.phase = 'round_results';
@@ -1452,6 +1514,9 @@ function showRoundResults(g) {
   document.getElementById('rr-round').textContent = g.currentRound;
   renderStory('rr-story', g.story);
   renderScoreTable('rr-scores', g.players, g.scores);
+  const teamScore = g.teamScore || 0;
+  const teamScoreEl = document.getElementById('rr-team-score');
+  if (teamScoreEl) teamScoreEl.textContent = `Team Score: ${teamScore} point${teamScore !== 1 ? 's' : ''}`;
   const isLast = g.currentRound >= g.totalRounds;
   document.getElementById('rr-next-btn').textContent = isLast ? 'See Final Results →' : 'Next Round →';
   showView('v-round-results');
@@ -2023,12 +2088,21 @@ function showRestoreBanner(session, id, codes) {
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;color:var(--accent);margin-bottom:6px">⚡ Active Session</div>
     <div style="color:var(--muted);margin-bottom:14px">${session.name || 'Unnamed session'} · ${codes.length} group${codes.length !== 1 ? 's' : ''}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="startTeacherDash('${id}', ${JSON.stringify(codes)})">Return to Dashboard →</button>
+      <button class="btn btn-primary btn-sm" onclick="restoreTeacherDash()">Go to Dashboard →</button>
       <button class="btn btn-secondary btn-sm" onclick="clearSavedSession()">End Session</button>
     </div>`;
 
   const grid = document.getElementById('landing-grid');
   if (grid) grid.after(banner);
+}
+
+function restoreTeacherDash() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  if (!saved) return;
+  try {
+    const { id, codes } = JSON.parse(saved);
+    startTeacherDash(id, codes);
+  } catch {}
 }
 
 function clearSavedSession() {
@@ -2045,6 +2119,15 @@ async function restoreTeacherDash() {
   const { id, codes } = JSON.parse(saved);
   teacherSessionId = id;
   startTeacherDash(id, codes);
+}
+
+function restoreTeacherDash() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  if (!saved) return;
+  try {
+    const { id, codes } = JSON.parse(saved);
+    startTeacherDash(id, codes);
+  } catch {}
 }
 
 function clearSavedSession() {
@@ -2165,7 +2248,7 @@ async function runTestBots() {
         g.wordVotes = g.wordVotes || {};
         others.forEach(c => {
           if (!g.wordVotes[c.playerName]) g.wordVotes[c.playerName] = [];
-          g.wordVotes[c.playerName].push(c.appearsInText ? true : Math.random() > 0.5);
+          g.wordVotes[c.playerName].push(c.appearsInText ? true : false);
         });
         actioned++;
       }
@@ -2312,4 +2395,70 @@ async function exportCSV() {
 
 </script>
 </body>
-</html>
+</html<!-- ══════════ RULES ══════════ -->
+<div class="view" id="v-rules">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">Story<br>Drop</div>
+    <div class="hdr-meta">How to Play</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">🎯 The Goal</div>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">✍ Writing Your Sentence</div>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Each round you get a vocab word. Write one sentence that continues the story and uses your word <strong>correctly</strong>. You have 2 minutes.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">🗳 Voting</div>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)">
+          <strong style="color:var(--accent)">Yes</strong> — you think they used it correctly
+        </div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)">
+          <strong style="color:var(--red)">No</strong> — you think they used it incorrectly
+        </div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)">
+          <strong style="color:var(--muted)">Not sure</strong> — you abstain and earn nothing
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">⭐ Scoring</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
+          <span>Player uses their word correctly</span>
+          <strong style="color:var(--accent)">+1</strong>
+        </div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
+          <span>Your vote matches the correct answer</span>
+          <strong style="color:var(--accent)">+1</strong>
+        </div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
+          <span>Your vote is wrong</span>
+          <strong style="color:var(--red)">-1</strong>
+        </div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
+          <span>You vote Not sure</span>
+          <strong style="color:var(--muted)">0</strong>
+        </div>
+      </div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:12px;line-height:1.7">The game will check if your vote was right or wrong. With 3 players, one word can earn your team up to 3 points.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:28px">
+      <div class="label" style="margin-bottom:10px">🏆 Winning</div>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class at the end.</p>
+    </div>
+
+    <button class="btn btn-primary btn-lg" style="width:100%" onclick="showView('v-lobby')">Got it — let's play →</button>
+  </div>
+</div>
+
+>
