@@ -1300,9 +1300,9 @@ async function doSubmitWrite(txt) {
   if (me._currentWordIdx >= 0) usedIdx.add(me._currentWordIdx);
 
   g.roundContribs = g.roundContribs || [];
-  g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, idx: g.roundContribs.length });
+  g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, round: g.currentRound, idx: g.roundContribs.length });
   g.story = g.story || [];
-  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null });
+  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null, round: g.currentRound });
   g.usedWordIndices = [...usedIdx];
 
   // Move to next player or to vote phase
@@ -1327,7 +1327,7 @@ async function doSubmitWrite(txt) {
 function startVoteTurn(g) {
   myVote = 'done';
   myWordVotes = {};
-  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && c.round === g.currentRound);
+  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && (c.round === g.currentRound || c.round == null));
 
   document.getElementById('vote-round').textContent = g.currentRound;
   document.getElementById('vote-label').textContent = 'Did they use their word correctly?';
