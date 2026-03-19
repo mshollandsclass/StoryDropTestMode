@@ -1305,6 +1305,7 @@ async function createSession() {
   parsedVocab = parseVocab(document.getElementById('vocab-input').value);
   if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
   const n = Math.min(10, Math.max(1, parseInt(document.getElementById('num-groups').value)||3));
+  const maxPlayers = Math.min(10, Math.max(1, parseInt(document.getElementById('num-players').value)||3));
   const rounds = parseInt(document.getElementById('num-rounds').value)||2;
   const sessionName = document.getElementById('session-name').value.trim();
   if (!sessionName) { toast('Please enter a session name', true); return; }
