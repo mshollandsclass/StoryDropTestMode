@@ -99,6 +99,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── INPUTS ── */
 input[type=text],input[type=number],textarea{background:var(--card);border:1px solid var(--border-hi);color:var(--text);font-family:'Courier Prime',monospace;padding:11px 14px;outline:none;transition:border-color .2s;width:100%;font-size:1.2rem}
 input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(--accent)}
+.field::placeholder,input[type=text]::placeholder,textarea::placeholder{color:var(--text3);opacity:1}
+[data-theme="dark"] .field::placeholder,[data-theme="dark"] input[type=text]::placeholder,[data-theme="dark"] textarea::placeholder{color:#909090;opacity:1}
+[data-theme="dark"] input[type=text],[data-theme="dark"] textarea,[data-theme="dark"] input[type=number]{color:var(--text);background:var(--card)}
 textarea{resize:none;font-family:'DM Sans',sans-serif;font-size:1.2rem;line-height:1.65}
 ::placeholder{color:#444}
 .input-row{display:flex;gap:10px;margin-bottom:14px}
