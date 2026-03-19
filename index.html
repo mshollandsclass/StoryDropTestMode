@@ -8,16 +8,16 @@
 <style>
 :root{
   --bg:#ffffff;
-  --surface:#f7f7f5;
+  --surface:#ffffff;
   --card:#ffffff;
-  --text:#111111;
-  --text2:#666660;
-  --text3:#767676;
-  --accent:#111111;
-  --muted:#aaaaaa;
+  --text:#000000;
+  --text2:#444444;
+  --text3:#666666;
+  --accent:#000000;
+  --muted:#888888;
   --red:#cc0000;
-  --border:#e5e5e2;
-  --border-hi:#d0d0cc;
+  --border:#cccccc;
+  --border-hi:#999999;
   --btn-fg:#ffffff;
   --radius:12px;
   --radius-sm:8px;
@@ -135,7 +135,7 @@ textarea{resize:none;font-family:'DM Sans',sans-serif;font-size:1rem;line-height
 .word-card::before{content:'YOUR WORD';position:absolute;top:-10px;left:16px;background:var(--bg);padding:0 8px;font-size:1.2rem;letter-spacing:.25em;color:var(--accent);font-weight:700}
 .word-big{font-family:'Courier Prime',monospace;font-size:clamp(2.6rem,8vw,4.4rem);line-height:.9;color:var(--text);letter-spacing:.03em;margin-bottom:6px}
 .word-pos{font-size:1.2rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-style:italic}
-.word-def{font-family:'DM Sans',sans-serif;font-size:1.2rem;color:#ccc;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px}
+.word-def{font-family:'DM Sans',sans-serif;font-size:1.2rem;color:var(--text);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px}
 .word-ex{font-size:1.2rem;color:var(--text2);font-style:italic;line-height:1.55}
 .word-ex::before{content:'e.g. ';color:var(--accent);font-style:normal;font-weight:700}
 
@@ -162,7 +162,7 @@ textarea{resize:none;font-family:'DM Sans',sans-serif;font-size:1rem;line-height
 .vote-card.sel .vote-letter{opacity:1}
 .vote-body{flex:1}
 .vote-author{font-size:1.2rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
-.vote-txt{font-family:'DM Sans',sans-serif;font-size:1.2rem;line-height:1.6;color:#ccc}
+.vote-txt{font-family:'DM Sans',sans-serif;font-size:1.2rem;line-height:1.6;color:var(--text)}
 .check-row{margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
 .check-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.2rem;color:var(--text2)}
 .check-label:hover{color:var(--text)}
@@ -182,7 +182,7 @@ textarea{resize:none;font-family:'DM Sans',sans-serif;font-size:1rem;line-height
 .verdict-card{border:1px solid var(--border);background:var(--surface);padding:16px 18px}
 .verdict-name{font-family:'Courier Prime',monospace;font-size:1.2rem;color:var(--accent);letter-spacing:.06em;margin-bottom:2px}
 .verdict-word{font-size:1.2rem;letter-spacing:.1em;color:var(--text2);margin-bottom:8px;text-transform:uppercase}
-.verdict-quote{font-family:'DM Sans',sans-serif;font-size:1.2rem;line-height:1.6;color:#aaa;border-left:2px solid var(--border);padding-left:10px;margin-bottom:10px}
+.verdict-quote{font-family:'DM Sans',sans-serif;font-size:1.2rem;line-height:1.6;color:var(--text2);border-left:2px solid var(--border);padding-left:10px;margin-bottom:10px}
 .verdict-result{font-family:'Courier Prime',monospace;font-size:1.2rem;letter-spacing:.08em;margin-bottom:3px}
 .verdict-result.ok{color:var(--accent)}.verdict-result.bad{color:var(--red)}
 .verdict-reason{font-size:1.2rem;color:var(--text2);font-style:italic;line-height:1.55}
@@ -490,11 +490,22 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="field-label">Group code</div>
       <input type="text" id="join-code" placeholder="e.g. XK4R2T" maxlength="8" style="text-transform:uppercase;font-family:'Courier Prime',monospace;font-size:1.4rem;letter-spacing:.2em">
     </div>
+    <div class="card" style="margin-bottom:14px;font-size:1rem;line-height:1.8;color:var(--text2)">
+      <div class="label" style="margin-bottom:8px">Quick Rules</div>
+      <div>✍ Write a sentence using your vocab word correctly</div>
+      <div>🗳 Vote on whether teammates used their words correctly</div>
+      <div style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border)">
+        <span style="color:var(--text);font-weight:600">Points:</span>
+        <span style="color:var(--text)">+1</span> word used correctly &nbsp;·&nbsp;
+        <span style="color:var(--text)">+1</span> accurate vote &nbsp;·&nbsp;
+        <span style="color:var(--red)">−1</span> wrong vote
+      </div>
+    </div>
     <div class="btn-row mt-8">
       <button class="btn btn-primary btn-lg" onclick="joinGame()">Join &#x2192;</button>
       <button class="btn btn-secondary btn-md" onclick="showView('v-landing')">&#x2190; Back</button>
     </div>
-    <div id="join-error" style="color:var(--red);font-size:.78rem;margin-top:12px;display:none"></div>
+    <div id="join-error" style="color:var(--red);font-size:1rem;margin-top:12px;display:none"></div>
   </div>
 </div>
 
@@ -871,6 +882,13 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
+      <div>
+        <div style="font-size:1rem;color:var(--text)">Writing timer</div>
+        <div style="font-size:.85rem;color:var(--text2)">Off for extended time</div>
+      </div>
+      <button class="toggle-switch on" id="timer-switch" onclick="toggleTimer()" aria-label="Toggle timer"></button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
       <span style="font-size:1rem;color:var(--text)">Language</span>
       <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
         <option value="en">EN</option>
@@ -1064,6 +1082,7 @@ let selectedGenre = 'horror';
 let parsedVocab = [];
 let myVote = null;
 let myWordVotes = {};
+let timerEnabled = localStorage.getItem('sd_timer') !== 'off';
 let teacherSessionId = null;
 let dashPollTimer = null;
 
@@ -1497,11 +1516,18 @@ async function studentPoll() {
     if (phase === 'ai' && curView !== 'v-ai') startAIPhase(g);
     if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
   }
-  if (g.status === 'done') { clearInterval(pollTimer); if (curView !== 'v-final') showFinal(g); }
-  // Check for class vote
-  const sessionKey = `sd_classvote_${g.sessionId}`;
-  const vs = await sget(sessionKey);
-  if (vs && vs.open && curView !== 'v-class-vote') { renderClassVoteView(vs, sessionKey); showView('v-class-vote'); }
+  if (g.status === 'done') {
+    if (curView !== 'v-final' && curView !== 'v-class-vote') showFinal(g);
+  }
+  // Check for class vote — works from any screen including final
+  if (g.status === 'done' || g.status === 'playing') {
+    const sessionKey = `sd_classvote_${g.sessionId}`;
+    const vs = await sget(sessionKey);
+    if (vs && vs.open && curView !== 'v-class-vote') {
+      renderClassVoteView(vs, sessionKey);
+      showView('v-class-vote');
+    }
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1529,6 +1555,11 @@ function startWriteTurn(g) {
   showView('v-write');
   writeSeconds = 120;
   updateWriteTimer();
+  if (!timerEnabled) {
+    document.getElementById('write-timer').textContent = '∞';
+    document.getElementById('write-timer').className = 'timer';
+    return;
+  }
   writeTimer = setInterval(() => {
     writeSeconds--;
     updateWriteTimer();
@@ -2143,6 +2174,21 @@ function clearLicense() {
 }
 
 // ══════════════════════════════════════════════
+//  TIMER TOGGLE
+// ══════════════════════════════════════════════
+function toggleTimer() {
+  timerEnabled = !timerEnabled;
+  localStorage.setItem('sd_timer', timerEnabled ? 'on' : 'off');
+  const sw = document.getElementById('timer-switch');
+  if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : '');
+}
+
+function initTimer() {
+  const sw = document.getElementById('timer-switch');
+  if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : '');
+}
+
+// ══════════════════════════════════════════════
 //  THEME
 // ══════════════════════════════════════════════
 function initTheme() {
@@ -2356,6 +2402,7 @@ updateLicenseLandingUI();
 initTheme();
 applyTranslations();
 updateMenuForView('v-landing');
+initTimer();
 window.addEventListener('load', function() {
   setTimeout(restoreSession, 500);
 });
