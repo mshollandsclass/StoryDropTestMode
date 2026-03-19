@@ -369,12 +369,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <span class="text-muted">groups (each gets its own code)</span>
     </div>
 
-    <div class="label">Rounds per group</div>
-    <div class="input-row" style="align-items:center;gap:16px">
-      <input type="number" id="num-rounds" value="2" min="1" max="10" style="max-width:80px">
-      <span class="text-muted">rounds</span>
-    </div>
-
     <div class="label">Story genre</div>
     <div class="genre-row" id="genre-row-teacher">
       <button class="genre-btn sel" data-g="horror">Horror</button>
@@ -578,7 +572,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view" id="v-vote">
   <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Vote — Round <span id="vote-round">1</span></div>
+    <div class="hdr-meta">Vote — Turn <span id="vote-round">1</span></div>
   </div>
   <div class="content">
     <div class="label" id="vote-label" data-t="vote_title">Did they use their word correctly?</div>
@@ -611,7 +605,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view" id="v-round-results">
   <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Round <span id="rr-round">1</span> Results</div>
+    <div class="hdr-meta">Turn <span id="rr-round">1</span> Results</div>
   </div>
   <div class="content">
     <div class="label">This round's story</div>
@@ -1063,13 +1057,54 @@ function applyTranslations() {
 //  CONSTANTS
 // ══════════════════════════════════════════════
 const GENRE_OPENERS = {
-  horror: "It started the night the lights went out across the whole street — and nobody came to fix them.",
-  romance: "She hadn't expected to find the letter, let alone feel her hands shake as she read it.",
-  "sci-fi": "The transmission arrived from coordinates that weren't supposed to exist.",
-  mystery: "The detective stood in the empty room and knew, immediately, that something had been moved.",
-  fantasy: "The map had no name for the forest, which was the first warning she ignored.",
-  comedy: "Nobody expected the school mascot to go missing the morning of prom — least of all the goat itself."
+  horror: [
+    "It started the night the lights went out across the whole street — and nobody came to fix them.",
+    "The door at the end of the hallway had always been locked. Until this morning.",
+    "She found the note slipped under her door, written in her own handwriting, dated three days from now.",
+    "Everyone in town agreed: the old house on Mercer Hill had been empty for thirty years. So why was there smoke coming from the chimney?",
+    "The dog started barking at the corner of the room at exactly 3am. Every night. At nothing."
+  ],
+  romance: [
+    "She hadn't expected to find the letter, let alone feel her hands shake as she read it.",
+    "They had said goodbye at this same train station five years ago. She hadn't expected him to be standing there when the doors opened.",
+    "The playlist he'd made her still had forty-seven songs on it. She'd only ever listened to the first one.",
+    "It was supposed to be a fake date. Just to convince her parents. Neither of them had planned on staying until closing time.",
+    "He'd returned every book to the library except one — the one with her phone number written inside the cover."
+  ],
+  "sci-fi": [
+    "The transmission arrived from coordinates that weren't supposed to exist.",
+    "The AI passed the test on a Tuesday. By Friday, it had stopped answering questions and started asking them.",
+    "They had been in cryosleep for six months. When they woke up, the ship's calendar said it had been forty years.",
+    "The colony on Europa was supposed to be uninhabited. The footprints in the ice said otherwise.",
+    "She'd volunteered for the memory trial because she needed the money. She hadn't expected to wake up remembering someone else's life."
+  ],
+  mystery: [
+    "The detective stood in the empty room and knew, immediately, that something had been moved.",
+    "The last person to see Marcus alive was his assistant — who had called in sick that day.",
+    "Three people had reported hearing the same piano melody coming from the sealed wing of the museum. There was no piano in the sealed wing.",
+    "The security footage showed the vault door opening at 2:17am. The vault required two keys. Only one person had been in the building.",
+    "She hadn't reported the theft. She hadn't reported it because nothing had actually been taken — just rearranged."
+  ],
+  fantasy: [
+    "The map had no name for the forest, which was the first warning she ignored.",
+    "The merchant sold only one item: a small glass bottle containing what he claimed was the last hour of someone's life.",
+    "Every child in the village was born with a mark. Hers had never appeared — until the morning of her sixteenth birthday.",
+    "The dragon wasn't guarding gold. It was guarding a door. And the door was guarding something that wanted very badly to get out.",
+    "He had been a knight for twenty years. He had never once drawn his sword. The reason was a secret he intended to take to his grave."
+  ],
+  comedy: [
+    "Nobody expected the school mascot to go missing the morning of prom — least of all the goat itself.",
+    "The escape room was supposed to take sixty minutes. They'd been inside for four hours and had only made things worse.",
+    "Her grandmother had left her three things in the will: a storage unit, a pet iguana, and a strongly worded note about the iguana.",
+    "The team-building exercise had been going fine until someone suggested they actually try to win.",
+    "He had one job at the wedding. One job. And somehow it had led to him standing in a fountain at 2pm on a Saturday, holding a cake."
+  ]
 };
+
+function getOpener(genre) {
+  const openers = GENRE_OPENERS[genre] || GENRE_OPENERS.horror;
+  return openers[Math.floor(Math.random() * openers.length)];
+}
 
 // ══════════════════════════════════════════════
 //  APP STATE
@@ -1264,7 +1299,6 @@ async function createSession() {
   if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
   const n = Math.min(10, Math.max(1, parseInt(document.getElementById('num-groups').value)||3));
   const maxPlayers = Math.min(10, Math.max(1, parseInt(document.getElementById('num-players').value)||3));
-  const rounds = parseInt(document.getElementById('num-rounds').value)||2;
   const sessionName = document.getElementById('session-name').value.trim();
   if (!sessionName) { toast('Please enter a session name', true); return; }
   teacherSessionId = genCode();
@@ -1272,7 +1306,7 @@ async function createSession() {
   for (const code of codes) {
     await sset(`sd_group_${code}`, {
       code, sessionId: teacherSessionId, sessionName,
-      genre: selectedGenre, totalRounds: rounds, maxPlayers,
+      genre: selectedGenre, maxPlayers,
       vocab: parsedVocab, status: 'waiting',
       players: [], scores: {}, story: [],
       currentRound: 1, currentPlayerIdx: 0,
@@ -1290,7 +1324,7 @@ async function createSession() {
   localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
   // Auto-save session config
   await saveCurrentSession(teacherSessionId, sessionName, {
-    numGroups: n, numPlayers: maxPlayers, rounds,
+    numGroups: n, numPlayers: maxPlayers,
     genre: selectedGenre,
     vocab: parsedVocab,
     vocabRaw: document.getElementById('vocab-input').value
@@ -1362,7 +1396,7 @@ function renderDashGrid(codes, groups) {
     if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
     const maxP = g.maxPlayers || 10;
     const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
-    const statusLabel = g.status === 'playing' ? `Round ${g.currentRound}` : g.status === 'done' ? 'Done' : 'Waiting';
+    const statusLabel = g.status === 'playing' ? `Turn ${g.currentRound || 1}` : g.status === 'done' ? 'Done' : 'Waiting';
     const playerStatuses = (g.players || []).map(p => {
       let icon = '⏳', note = 'waiting';
       if (g.status === 'playing') {
@@ -1555,7 +1589,7 @@ function startWriteTurn(g) {
   me._currentWordIdx = g.vocab.findIndex(v => v.word === wordObj.word);
   document.getElementById('write-code').textContent = me.groupCode;
   document.getElementById('write-myname').textContent = me.name;
-  document.getElementById('write-round').textContent = `Round ${g.currentRound} of ${g.totalRounds}`;
+  document.getElementById('write-round').textContent = `Turn ${g.currentRound || 1}`;
   document.getElementById('w-word').textContent = wordObj.word;
   document.getElementById('w-pos').textContent = wordObj.pos;
   document.getElementById('w-def').textContent = wordObj.def;
@@ -1648,6 +1682,12 @@ async function doSubmitWrite(txt) {
   await sset(`sd_group_${me.groupCode}`, g);
   document.getElementById('wait-code').textContent = me.groupCode;
   document.getElementById('wait-msg').textContent = 'Waiting for other players to finish writing…';
+  // Show gif and "Let's Go!" only on round 1
+  const isFirstRound = (!g.currentRound || g.currentRound === 1);
+  const gifWrap = document.getElementById('wait-gif-wrap');
+  const waitTitle = document.getElementById('wait-title');
+  if (gifWrap) gifWrap.style.display = isFirstRound ? 'block' : 'none';
+  if (waitTitle) waitTitle.textContent = isFirstRound ? "Let's Go!" : 'Submitted!';
   showView('v-wait');
 }
 
@@ -1789,15 +1829,27 @@ function showRoundResults(g) {
   const teamScore = g.teamScore || 0;
   const el = document.getElementById('rr-team-score');
   if (el) el.textContent = `Team Score: ${teamScore} point${teamScore !== 1 ? 's' : ''}`;
-  document.getElementById('rr-next-btn').textContent = g.currentRound >= g.totalRounds ? 'See Final Results →' : 'Next Round →';
+  const usedCount = (g.usedWordIndices || []).length;
+  const totalWords = (g.vocab || []).length;
+  const allWordsUsed = usedCount >= totalWords;
+  document.getElementById('rr-next-btn').textContent = allWordsUsed ? 'See Final Results →' : 'Next Turn →';
   showView('v-round-results');
 }
 
 async function nextRound() {
   const g = await sget(`sd_group_${me.groupCode}`);
   if (!g) return;
-  if (g.currentRound >= g.totalRounds) { await endGame(g); return; }
-  g.currentRound++; g.currentPlayerIdx = 0; g.roundContribs = [];
+  // End game when all vocab words have been used
+  const usedCount = (g.usedWordIndices || []).length;
+  const totalWords = (g.vocab || []).length;
+  if (usedCount >= totalWords) {
+    await endGame(g);
+    return;
+  }
+  // Continue to next turn
+  g.currentRound = (g.currentRound || 1) + 1;
+  g.currentPlayerIdx = 0;
+  g.roundContribs = [];
   g.votes = {}; g.wordVotes = {}; g._roundVerdicts = null; g.phase = 'write';
   await sset(`sd_group_${me.groupCode}`, g);
 }
@@ -1828,7 +1880,7 @@ async function startGroupGame(code) {
   const g = await sget(`sd_group_${code}`);
   if (!g || g.players.length < 1) { toast('Need at least 1 player to start', true); return; }
   if (g.players.length > (g.maxPlayers || 10)) { toast(`This group is full (max ${g.maxPlayers} players)`, true); return; }
-  const opener = GENRE_OPENERS[g.genre] || GENRE_OPENERS.horror;
+  const opener = getOpener(g.genre);
   g.status = 'playing'; g.phase = 'write';
   g.story = [{ player: 'Narrator', text: opener, word: null }];
   g.currentPlayerIdx = 0; g.currentRound = 1;
@@ -2224,7 +2276,15 @@ async function restoreSession() {
     if (!session) { localStorage.removeItem('sd_teacher_session'); localStorage.removeItem('sd_current_view'); return; }
     teacherSessionId = id;
     const teacherViews = ['v-teacher-dash','v-present'];
-    if (lastView && teacherViews.includes(lastView)) { startTeacherDash(id, codes); return; }
+    if (lastView && teacherViews.includes(lastView)) {
+      // Bypass showView gate — we know teacher is licensed
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('v-teacher-dash').classList.add('active');
+      window.scrollTo(0,0);
+      updateMenuForView('v-teacher-dash');
+      startTeacherDash(id, codes);
+      return;
+    }
     const existing = document.getElementById('restore-banner');
     if (existing) existing.remove();
     const banner = document.createElement('div');
@@ -2248,6 +2308,7 @@ function restoreTeacherDash() {
   try {
     const { id, codes } = JSON.parse(saved);
     teacherSessionId = id;
+    showView('v-teacher-dash');
     startTeacherDash(id, codes);
   } catch {}
 }
