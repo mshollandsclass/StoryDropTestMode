@@ -864,33 +864,13 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </button>
   <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:8px;min-width:220px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
 
-    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Navigation</div>
-
-    <button onclick="closeMenu();showView('v-account')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-      👤 Account Info
-    </button>
-
-    <button onclick="closeMenu();showView('v-saved-sessions')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-      📂 Saved Sessions
-    </button>
-
-    <button onclick="closeMenu();showReportsModal()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-      📊 Past Reports
-    </button>
-
-    <button onclick="closeMenu();showView('v-support')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-      🛟 Support
-    </button>
-
-    <div style="height:1px;background:var(--border);margin:6px 0"></div>
-    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Settings</div>
-
+    <!-- Always visible: dark mode + language -->
+    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Display</div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
       <span style="font-size:1rem;color:var(--text)">Dark mode</span>
       <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
     </div>
-
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
       <span style="font-size:1rem;color:var(--text)">Language</span>
       <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
         <option value="en">EN</option>
@@ -899,7 +879,14 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       </select>
     </div>
 
-    <div id="teacher-menu-items" style="display:none">
+    <!-- Teacher only: hidden by default, shown via updateMenuForView() -->
+    <div id="menu-teacher-section" style="display:none">
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Go to</div>
+      <button onclick="closeMenu();showView('v-account')" class="menu-item">👤 Account Info</button>
+      <button onclick="closeMenu();showView('v-saved-sessions')" class="menu-item">📂 Saved Sessions</button>
+      <button onclick="closeMenu();showReportsModal()" class="menu-item">📊 Past Reports</button>
+      <button onclick="closeMenu();showView('v-support')" class="menu-item">🛟 Support</button>
       <div style="height:1px;background:var(--border);margin:6px 0"></div>
       <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Teacher</div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
@@ -910,9 +897,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
       </div>
-      <button onclick="closeMenu();clearLicense()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--red);cursor:pointer;border-radius:var(--radius-sm);text-align:left" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-        🔑 Clear License Key
-      </button>
+      <button onclick="closeMenu();clearLicense()" class="menu-item" style="color:var(--red)">🔑 Clear License Key</button>
     </div>
 
   </div>
@@ -1096,6 +1081,7 @@ function showView(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
   try { localStorage.setItem('sd_current_view', id); } catch {}
+  updateMenuForView(id);
   if (id === 'v-account') loadAccountInfo();
   if (id === 'v-saved-sessions') showSavedSessions();
 }
@@ -2089,31 +2075,19 @@ async function leaveGroup() {
 // ══════════════════════════════════════════════
 let settingsOpen = false;
 
-function toggleSettings() {
-  settingsOpen = !settingsOpen;
-  const panel = document.getElementById('settings-panel');
-  panel.style.display = settingsOpen ? 'block' : 'none';
+// Views where full teacher menu is available
+const TEACHER_VIEWS = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+// Views where only gear icon + dark/language shown
+const GEAR_ONLY_VIEWS = ['v-landing', 'v-license', 'v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
 
+function updateMenuForView(viewId) {
   const licensed = isLicensed();
-  const teacherViews = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
-  const studentOnlyViews = ['v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
-  const currentView = document.querySelector('.view.active')?.id;
+  const isGearOnly = GEAR_ONLY_VIEWS.includes(viewId) || !licensed;
 
-  // Student views OR unlicensed users only get gear with dark/language
-  const isStudentView = studentOnlyViews.includes(currentView) || !licensed;
-
-  // Show/hide navigation section (licensed teachers only)
-  const navSection = document.getElementById('menu-nav-section');
-  if (navSection) navSection.style.display = licensed && !isStudentView ? 'block' : 'none';
-
-  // Show/hide teacher options (licensed + teacher view only)
-  const tm = document.getElementById('teacher-menu-items');
-  if (tm) tm.style.display = licensed && teacherViews.includes(currentView) ? 'block' : 'none';
-
-  // Update button appearance
+  // Update button
   const btn = document.getElementById('settings-btn');
   if (btn) {
-    if (isStudentView) {
+    if (isGearOnly) {
       btn.innerHTML = '<span style="font-size:1.3rem">⚙</span>';
       btn.style.padding = '6px 10px';
     } else {
@@ -2121,6 +2095,20 @@ function toggleSettings() {
       btn.style.padding = '6px 14px';
     }
   }
+
+  // Show/hide teacher section
+  const ts = document.getElementById('menu-teacher-section');
+  if (ts) ts.style.display = !isGearOnly ? 'block' : 'none';
+
+  // Close panel on view change
+  closeMenu();
+}
+
+
+function toggleSettings() {
+  settingsOpen = !settingsOpen;
+  const panel = document.getElementById('settings-panel');
+  panel.style.display = settingsOpen ? 'block' : 'none';
 }
 
 function closeMenu() {
@@ -2367,6 +2355,7 @@ async function deleteSavedSession(sessionId) {
 updateLicenseLandingUI();
 initTheme();
 applyTranslations();
+updateMenuForView('v-landing');
 window.addEventListener('load', function() {
   setTimeout(restoreSession, 500);
 });
