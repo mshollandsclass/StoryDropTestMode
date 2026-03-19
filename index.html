@@ -2274,24 +2274,18 @@ function toggleTheme() {
 // ══════════════════════════════════════════════
 async function restoreSession() {
   const saved = localStorage.getItem('sd_teacher_session');
-  const lastView = localStorage.getItem('sd_current_view');
   if (!saved) return;
   try {
     const { id, codes } = JSON.parse(saved);
     if (!id || !codes) return;
     const session = await sget(`sd_session_${id}`);
-    if (!session) { localStorage.removeItem('sd_teacher_session'); localStorage.removeItem('sd_current_view'); return; }
-    teacherSessionId = id;
-    const teacherViews = ['v-teacher-dash','v-present'];
-    if (lastView && teacherViews.includes(lastView)) {
-      // Bypass showView gate — we know teacher is licensed
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById('v-teacher-dash').classList.add('active');
-      window.scrollTo(0,0);
-      updateMenuForView('v-teacher-dash');
-      startTeacherDash(id, codes);
+    if (!session || session.closed) {
+      localStorage.removeItem('sd_teacher_session');
+      localStorage.removeItem('sd_current_view');
       return;
     }
+    teacherSessionId = id;
+    // Always show banner — never auto-redirect
     const existing = document.getElementById('restore-banner');
     if (existing) existing.remove();
     const banner = document.createElement('div');
