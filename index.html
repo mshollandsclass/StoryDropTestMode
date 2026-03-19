@@ -1202,7 +1202,7 @@ async function loadReports() {
   try {
     const licenseKey = localStorage.getItem('storydrop_license');
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${licenseKey}_*&select=key,value`,
+      `${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${licenseKey}_%&select=key,value`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
     if (!res.ok) return [];
@@ -1393,9 +1393,21 @@ function renderDashGrid(codes, groups) {
   if (btn) btn.style.display = anyDone ? 'inline-flex' : 'none';
 }
 
+// Track which groups we've already saved reports for
+window._savedReportCodes = window._savedReportCodes || new Set();
+
 function renderDashResults(groups) {
   const done = Object.values(groups).filter(g => g.status === 'done' && g.results);
   document.getElementById('export-wrap').style.display = done.length > 0 ? '' : 'none';
+
+  // Auto-save reports for newly completed groups
+  done.forEach(g => {
+    if (!window._savedReportCodes.has(g.code)) {
+      window._savedReportCodes.add(g.code);
+      saveReport(teacherSessionId, g.sessionName || 'Story Drop Session', done);
+    }
+  });
+
   if (done.length === 0) { document.getElementById('dash-results').innerHTML = ''; return; }
   let html = `<div class="label mt-24">Completed Groups</div>`;
   for (const g of done) {
@@ -1796,13 +1808,7 @@ async function endGame(g) {
   g.status = 'done'; g.phase = 'done';
   g.results = { story: g.story, scores: g.scores, teamScore: g.teamScore || 0, verdicts: allVerdicts, wordVotes: g.wordVotes || {}, players: g.players, completedAt: Date.now() };
   await sset(`sd_group_${me.groupCode}`, g);
-  // Auto-save report
-  try {
-    const session = await sget(`sd_session_${g.sessionId || ''}`);
-    const allCodes = session?.codes || [me.groupCode];
-    const allGroups = await Promise.all(allCodes.map(c => sget(`sd_group_${c}`)));
-    await saveReport(g.sessionId || me.groupCode, session?.name || 'Story Drop Session', allGroups.filter(Boolean));
-  } catch {}
+  // Report saved by teacher dashboard when group completes
   showFinal(g);
 }
 
@@ -2323,7 +2329,7 @@ async function loadSavedSessions() {
   if (!licenseKey) return [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${licenseKey}_*&select=key,value&order=value->savedAt.desc`,
+      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${licenseKey}_%&select=key,value&order=value->savedAt.desc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
     if (!res.ok) return [];
@@ -2337,11 +2343,15 @@ async function showSavedSessions() {
   const list = document.getElementById('saved-sessions-list');
   list.innerHTML = '<div class="text-muted">Loading…</div>';
   const sessions = await loadSavedSessions();
+
+  // Store sessions globally so loadSession can access by index
+  window._cachedSessions = sessions;
+
   if (!sessions.length) {
     list.innerHTML = '<div class="text-muted" style="padding:20px 0">No saved sessions yet. Sessions save automatically when you create them.</div>';
     return;
   }
-  list.innerHTML = sessions.map(s => `
+  list.innerHTML = sessions.map((s, i) => `
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
         <div>
@@ -2352,12 +2362,12 @@ async function showSavedSessions() {
             ${s.config.genre||'horror'} ·
             ${s.config.rounds||2} rounds ·
             ${s.config.numGroups||3} groups ·
-            ${s.config.numPlayers||3} players
+            ${s.config.numPlayers||3} players/group
           </div>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick='loadSession(${JSON.stringify(s)})'>Load →</button>
-          <button class="btn btn-secondary btn-sm" onclick='deleteSavedSession("${s.sessionId}")'>Delete</button>
+          <button class="btn btn-primary btn-sm" onclick="loadSessionByIndex(${i})">Load →</button>
+          <button class="btn btn-secondary btn-sm" onclick="deleteSavedSession('${s.sessionId}')">Delete</button>
         </div>
       </div>
       <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
@@ -2366,6 +2376,13 @@ async function showSavedSessions() {
       </div>
     </div>`).join('');
 }
+
+function loadSessionByIndex(i) {
+  const s = window._cachedSessions?.[i];
+  if (!s) { toast('Session not found', true); return; }
+  loadSession(s);
+}
+
 
 function loadSession(s) {
   // Pre-fill setup form with saved config
