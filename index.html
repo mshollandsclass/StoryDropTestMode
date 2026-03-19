@@ -1185,22 +1185,26 @@ function parseVocab(raw) {
   }).filter(v => v.word);
 }
 
-document.getElementById('vocab-input').addEventListener('input', function() {
-  parsedVocab = parseVocab(this.value);
-  document.getElementById('vocab-count').textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
-});
-
-document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
-    selectedGenre = btn.dataset.g;
+function initDOMListeners() {
+  const vocabInput = document.getElementById('vocab-input');
+  if (vocabInput) vocabInput.addEventListener('input', function() {
+    parsedVocab = parseVocab(this.value);
+    document.getElementById('vocab-count').textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
   });
-});
 
-document.getElementById('join-code').addEventListener('input', function() {
-  this.value = this.value.toUpperCase();
-});
+  document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      selectedGenre = btn.dataset.g;
+    });
+  });
+
+  const joinCode = document.getElementById('join-code');
+  if (joinCode) joinCode.addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
+}
 
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1323,7 +1327,7 @@ async function createSession() {
   }
   await sset(`sd_session_${teacherSessionId}`, {
     id: teacherSessionId, name: sessionName,
-    codes, genre: selectedGenre, rounds, createdAt: Date.now()
+    codes, genre: selectedGenre, createdAt: Date.now()
   });
   me.role = 'teacher';
   document.getElementById('dash-session-name').textContent = sessionName;
@@ -2513,12 +2517,13 @@ async function deleteSavedSession(sessionId) {
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
-updateLicenseLandingUI();
-initTheme();
-applyTranslations();
-updateMenuForView('v-landing');
-initTimer();
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
+  initDOMListeners();
+  updateLicenseLandingUI();
+  initTheme();
+  applyTranslations();
+  updateMenuForView('v-landing');
+  initTimer();
   setTimeout(restoreSession, 500);
 });
 
