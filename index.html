@@ -275,6 +275,11 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 .podium-votes{font-family:'Courier Prime',monospace;font-size:1.6rem;color:var(--text)}
 .podium-label{font-size:1.2rem;color:var(--text2);letter-spacing:.1em;text-transform:uppercase}
 
+
+/* ── MENU ── */
+.menu-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s}
+.menu-item:hover{background:var(--surface)}
+
 /* ── MOBILE ── */
 @media(max-width:600px){
   .view.active{padding:0 12px 48px}
@@ -327,7 +332,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <!-- ══════════ LICENSE KEY ══════════ -->
 <div class="view" id="v-license">
   <div class="view-inner" style="max-width:480px">
-    <div class="logo">Story<br>Drop</div>
+    <div class="logo">STORY<br><span>DROP</span></div>
     <div class="label mt-24">Teacher License</div>
     <p class="text-muted" style="line-height:1.8;margin-bottom:24px">
       Enter your license key to unlock teacher mode.<br>
@@ -351,18 +356,24 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">Teacher Setup</div>
   </div>
   <div class="content">
-    <div class="label">Session name (optional)</div>
-    <div class="input-row"><input type="text" id="session-name" placeholder="e.g. Period 3 — Unit 4" maxlength="50"></div>
+    <div class="label">Session name</div>
+    <div class="input-row"><input type="text" id="session-name" placeholder="e.g. Period 3 — Unit 4" required maxlength="50"></div>
+
+    <div class="label">Number of players per group</div>
+    <div class="input-row" style="align-items:center;gap:16px">
+      <input type="number" id="num-players" value="3" min="1" max="10" style="max-width:80px">
+      <span class="text-muted">players per group</span>
+    </div>
 
     <div class="label">Number of groups</div>
     <div class="input-row" style="align-items:center;gap:16px">
-      <input type="number" id="num-groups" value="3" min="1" max="5" style="max-width:80px">
+      <input type="number" id="num-groups" value="3" min="1" max="10" style="max-width:80px">
       <span class="text-muted">groups (each gets its own code)</span>
     </div>
 
-    <div class="label">Rounds per player</div>
+    <div class="label">Rounds per group</div>
     <div class="input-row" style="align-items:center;gap:16px">
-      <input type="number" id="num-rounds" value="2" min="1" max="6" style="max-width:80px">
+      <input type="number" id="num-rounds" value="2" min="1" max="10" style="max-width:80px">
       <span class="text-muted">rounds</span>
     </div>
 
@@ -499,7 +510,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="waiting-wrap">
       <div class="waiting-icon">⏳</div>
       <div class="waiting-title">You're in, <span id="lobby-myname">—</span>!</div>
-      <div class="waiting-sub">Waiting for your teacher to start the game.<br>Other players in your group:</div>
+      <div class="waiting-sub" id="lobby-sub">Waiting for your teacher to start the game.<br>Other players in your group:</div>
     </div>
     <div class="player-chips" id="lobby-players"></div>
     <button class="btn btn-secondary btn-sm" style="margin-top:24px" onclick="leaveGroup()">Wrong group? Leave →</button>
@@ -627,44 +638,49 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 
 <!-- ══════════ SETTINGS BTN + PANEL ══════════ -->
 <div id="settings-container" style="position:fixed;top:14px;right:16px;z-index:9999">
-  <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s" aria-label="Settings">
-    <span style="font-size:1.2rem">⚙</span> Settings
+  <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s" aria-label="Menu">
+    <span style="font-size:1.2rem">☰</span> Menu
   </button>
-  <div id="settings-panel" style="display:none;position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:20px 24px;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.25);border-radius:var(--radius)">
-    <div style="font-family:'Courier Prime',monospace;font-size:1.1rem;letter-spacing:.06em;color:var(--text);margin-bottom:16px" data-t="settings_title">Settings</div>
+  <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:8px;min-width:220px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
 
-    <div style="margin-bottom:16px">
-      <div style="font-size:1rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);margin-bottom:8px" data-t="appearance">Appearance</div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:1rem;color:var(--text)" data-t="dark_mode">Dark mode</span>
-        <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
-      </div>
+    <div id="menu-nav-section">
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Go to</div>
+      <button onclick="closeMenu();showView('v-account')" class="menu-item">👤 Account Info</button>
+      <button onclick="closeMenu();showView('v-saved-sessions')" class="menu-item">📂 Saved Sessions</button>
+      <button onclick="closeMenu();showReportsModal()" class="menu-item">📊 Past Reports</button>
+      <button onclick="closeMenu();showView('v-support')" class="menu-item">🛟 Support</button>
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    </div>
+    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Settings</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+      <span style="font-size:1rem;color:var(--text)">Dark mode</span>
+      <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
     </div>
 
-    <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
-    <div style="font-size:1rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);margin-bottom:8px" data-t="language">Language</div>
-    <select id="lang-select" onchange="setLanguage(this.value)" style="width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border-hi);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;border-radius:var(--radius-sm);margin-bottom:16px">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-    </select>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
+      <span style="font-size:1rem;color:var(--text)">Language</span>
+      <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="fr">FR</option>
+      </select>
+    </div>
 
-    <div id="teacher-settings" style="display:none">
-      <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
-      <div style="font-size:1rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);margin-bottom:8px" data-t="teacher_options">Teacher Options</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span style="font-size:1rem;color:var(--text)" data-t="test_mode">Test mode</span>
+    <div id="teacher-menu-items" style="display:none">
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Teacher</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+        <span style="font-size:1rem;color:var(--text)">Test mode</span>
         <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
       </div>
-      <div id="test-mode-bar" style="display:none;margin-top:8px;gap:8px;flex-direction:column">
+      <div id="test-mode-bar" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
       </div>
-      <div style="height:1px;background:var(--border);margin:16px 0"></div>
-      <button class="btn btn-secondary btn-sm" style="width:100%;font-size:1rem" onclick="clearLicense()">Clear License Key</button>
+      <button onclick="closeMenu();clearLicense()" class="menu-item" style="color:var(--red)">🔑 Clear License Key</button>
     </div>
   </div>
-</div>
 
 <!-- ══════════ REPORTS MODAL ══════════ -->
 <div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -674,6 +690,72 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <button onclick="document.getElementById('reports-modal').style.display='none'" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
     </div>
     <div id="reports-list"></div>
+  </div>
+</div>
+
+
+<!-- ══════════ ACCOUNT INFO ══════════ -->
+<div class="view" id="v-account">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Account Info</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:16px">Your Details</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="field">
+          <div class="field-label">Name</div>
+          <input type="text" id="account-name" placeholder="Your name" maxlength="60" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">School or District</div>
+          <input type="text" id="account-school" placeholder="School or district name" maxlength="80" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">License Key</div>
+          <div style="font-family:'Courier Prime',monospace;font-size:1rem;color:var(--text2);padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm)" id="account-license">—</div>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted" style="line-height:1.7;margin-bottom:24px">Your name and school are saved to this browser only and are not shared with anyone.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SAVED SESSIONS ══════════ -->
+<div class="view" id="v-saved-sessions">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Saved Sessions</div>
+  </div>
+  <div class="content" style="max-width:780px;width:100%">
+    <div class="btn-row" style="margin-bottom:20px">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">← Back to Setup</button>
+    </div>
+    <div id="saved-sessions-list">
+      <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SUPPORT ══════════ -->
+<div class="view" id="v-support">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Support</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
   </div>
 </div>
 
@@ -686,6 +768,72 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <button onclick="document.getElementById('reports-modal').style.display='none'" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
     </div>
     <div id="reports-list"></div>
+  </div>
+</div>
+
+
+<!-- ══════════ ACCOUNT INFO ══════════ -->
+<div class="view" id="v-account">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Account Info</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:16px">Your Details</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="field">
+          <div class="field-label">Name</div>
+          <input type="text" id="account-name" placeholder="Your name" maxlength="60" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">School or District</div>
+          <input type="text" id="account-school" placeholder="School or district name" maxlength="80" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">License Key</div>
+          <div style="font-family:'Courier Prime',monospace;font-size:1rem;color:var(--text2);padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm)" id="account-license">—</div>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted" style="line-height:1.7;margin-bottom:24px">Your name and school are saved to this browser only and are not shared with anyone.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SAVED SESSIONS ══════════ -->
+<div class="view" id="v-saved-sessions">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Saved Sessions</div>
+  </div>
+  <div class="content" style="max-width:780px;width:100%">
+    <div class="btn-row" style="margin-bottom:20px">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">← Back to Setup</button>
+    </div>
+    <div id="saved-sessions-list">
+      <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SUPPORT ══════════ -->
+<div class="view" id="v-support">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Support</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
   </div>
 </div>
 
@@ -693,7 +841,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 </html<!-- ══════════ RULES ══════════ -->
 <div class="view" id="v-rules">
   <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">Story<br>Drop</div>
+    <div class="logo">STORY<br><span>DROP</span></div>
     <div class="hdr-meta">How to Play</div>
   </div>
   <div class="content" style="max-width:680px;width:100%">
@@ -756,41 +904,64 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
 </div
 
-<!-- ══════════ SETTINGS BTN ══════════ -->
-<div id="settings-container" style="position:fixed;top:14px;right:16px;z-index:9999">
+<!-- ══════════ MENU ══════════ -->
+<div id="menu-container" style="position:fixed;top:14px;right:16px;z-index:9999">
   <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s">
-    <span style="font-size:1.3rem">⚙</span> Settings
+    <span style="font-size:1.3rem">☰</span> Menu
   </button>
-  <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:20px 24px;min-width:280px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
-    <div style="font-family:'Courier Prime',monospace;font-size:1.1rem;color:var(--text);margin-bottom:16px" data-t="settings_title">Settings</div>
-    <div style="margin-bottom:16px">
-      <div style="font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px" data-t="appearance">Appearance</div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:1rem;color:var(--text)" data-t="dark_mode">Dark mode</span>
-        <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
-      </div>
+  <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:8px;min-width:220px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
+
+    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Navigation</div>
+
+    <button onclick="closeMenu();showView('v-account')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+      👤 Account Info
+    </button>
+
+    <button onclick="closeMenu();showView('v-saved-sessions')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+      📂 Saved Sessions
+    </button>
+
+    <button onclick="closeMenu();showReportsModal()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+      📊 Past Reports
+    </button>
+
+    <button onclick="closeMenu();showView('v-support')" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+      🛟 Support
+    </button>
+
+    <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Settings</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+      <span style="font-size:1rem;color:var(--text)">Dark mode</span>
+      <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
     </div>
-    <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
-    <div style="font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px" data-t="language">Language</div>
-    <select id="lang-select" onchange="setLanguage(this.value)" style="width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border-hi);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;border-radius:var(--radius-sm);margin-bottom:16px">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-    </select>
-    <div id="teacher-settings" style="display:none">
-      <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
-      <div style="font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px" data-t="teacher_options">Teacher Options</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span style="font-size:1rem;color:var(--text)" data-t="test_mode">Test mode</span>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+      <span style="font-size:1rem;color:var(--text)">Language</span>
+      <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="fr">FR</option>
+      </select>
+    </div>
+
+    <div id="teacher-menu-items" style="display:none">
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Teacher</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+        <span style="font-size:1rem;color:var(--text)">Test mode</span>
         <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
       </div>
-      <div id="test-mode-bar" style="display:none;margin-top:8px;gap:8px;flex-direction:column">
+      <div id="test-mode-bar" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
       </div>
-      <div style="height:1px;background:var(--border);margin:16px 0"></div>
-      <button class="btn btn-secondary btn-sm" style="width:100%;font-size:1rem" onclick="clearLicense()" data-t="clear_license">Clear License Key</button>
+      <button onclick="closeMenu();clearLicense()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--red);cursor:pointer;border-radius:var(--radius-sm);text-align:left" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+        🔑 Clear License Key
+      </button>
     </div>
+
   </div>
 </div>
 
@@ -962,10 +1133,18 @@ let dashPollTimer = null;
 //  UI HELPERS
 // ══════════════════════════════════════════════
 function showView(id) {
+  // Gate teacher pages behind license
+  const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+  if (teacherOnlyViews.includes(id) && !isLicensed()) {
+    showView('v-license');
+    return;
+  }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
   try { localStorage.setItem('sd_current_view', id); } catch {}
+  if (id === 'v-account') loadAccountInfo();
+  if (id === 'v-saved-sessions') showSavedSessions();
 }
 
 function toast(msg, isErr=false) {
@@ -1125,15 +1304,16 @@ function downloadReportCSV(report) {
 async function createSession() {
   parsedVocab = parseVocab(document.getElementById('vocab-input').value);
   if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
-  const n = parseInt(document.getElementById('num-groups').value)||3;
+  const n = Math.min(10, Math.max(1, parseInt(document.getElementById('num-groups').value)||3));
   const rounds = parseInt(document.getElementById('num-rounds').value)||2;
-  const sessionName = document.getElementById('session-name').value.trim() || 'Story Drop Session';
+  const sessionName = document.getElementById('session-name').value.trim();
+  if (!sessionName) { toast('Please enter a session name', true); return; }
   teacherSessionId = genCode();
   const codes = Array.from({length:n}, genCode);
   for (const code of codes) {
     await sset(`sd_group_${code}`, {
       code, sessionId: teacherSessionId, sessionName,
-      genre: selectedGenre, totalRounds: rounds,
+      genre: selectedGenre, totalRounds: rounds, maxPlayers,
       vocab: parsedVocab, status: 'waiting',
       players: [], scores: {}, story: [],
       currentRound: 1, currentPlayerIdx: 0,
@@ -1149,6 +1329,13 @@ async function createSession() {
   me.role = 'teacher';
   document.getElementById('dash-session-name').textContent = sessionName;
   localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
+  // Auto-save session config
+  await saveCurrentSession(teacherSessionId, sessionName, {
+    numGroups: n, numPlayers: maxPlayers, rounds,
+    genre: selectedGenre,
+    vocab: parsedVocab,
+    vocabRaw: document.getElementById('vocab-input').value
+  });
   startTeacherDash(teacherSessionId, codes);
   showView('v-teacher-dash');
 }
@@ -1214,6 +1401,7 @@ function renderDashGrid(codes, groups) {
   el.innerHTML = codes.map(code => {
     const g = groups[code];
     if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
+    const maxP = g.maxPlayers || 10;
     const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
     const statusLabel = g.status === 'playing' ? `Round ${g.currentRound}` : g.status === 'done' ? 'Done' : 'Waiting';
     const playerStatuses = (g.players || []).map(p => {
@@ -1308,6 +1496,7 @@ async function joinGame() {
   if (!g) { showJoinError('Code not found. Check with your teacher.'); return; }
   if (g.status !== 'waiting' && g.status !== 'playing') { showJoinError('This game has already ended.'); return; }
   if (g.players.includes(name)) { showJoinError('That name is already taken in this group.'); return; }
+  if (g.maxPlayers && g.players.length >= g.maxPlayers) { showJoinError(`This group is full (max ${g.maxPlayers} players).`); return; }
   me.name = name; me.groupCode = code; me.role = 'student';
   g.players.push(name); g.scores[name] = 0;
   await sset(`sd_group_${code}`, g);
@@ -1469,7 +1658,9 @@ async function doSubmitWrite(txt) {
   g.usedWordIndices = [...usedIdx];
   g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
   if (g.currentPlayerIdx >= g.players.length) {
-    g.phase = 'vote'; g.currentPlayerIdx = 0; g.votes = {}; g.wordVotes = {};
+    g.currentPlayerIdx = 0; g.votes = {}; g.wordVotes = {};
+    // Single player — skip vote, go straight to AI
+    g.phase = g.players.length === 1 ? 'ai' : 'vote';
   }
   await sset(`sd_group_${me.groupCode}`, g);
   document.getElementById('wait-code').textContent = me.groupCode;
@@ -1480,9 +1671,18 @@ async function doSubmitWrite(txt) {
 // ══════════════════════════════════════════════
 //  VOTE TURN
 // ══════════════════════════════════════════════
-function startVoteTurn(g) {
+async function startVoteTurn(g) {
   myVote = 'done'; myWordVotes = {};
   const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && (c.round === g.currentRound || c.round == null));
+  // Single player — no one to vote on, skip straight to AI
+  if (others.length === 0) {
+    g.votes = g.votes || {};
+    g.votes[me.name] = 'done';
+    g.phase = 'ai';
+    sset(`sd_group_${me.groupCode}`, g);
+    showView('v-wait');
+    return;
+  }
   document.getElementById('vote-round').textContent = g.currentRound;
   document.getElementById('vote-list').innerHTML = others.map((c,i) => {
     const hl = c.appearsInText ? c.text.replace(new RegExp(`\b${c.word.word}\b`,'gi'), '<span class="story-hit">$&</span>') : c.text;
@@ -1504,6 +1704,13 @@ function startVoteTurn(g) {
   }).join('');
   document.getElementById('vote-status').textContent = '';
   document.getElementById('vote-count-display').textContent = '';
+  // Single player — no one to vote on, skip straight to AI
+  if (others.length === 0) {
+    const g2 = await sget(`sd_group_${me.groupCode}`);
+    if (g2) { g2.votes[me.name] = 'done'; g2.phase = 'ai'; await sset(`sd_group_${me.groupCode}`, g2); }
+    showView('v-wait');
+    return;
+  }
   showView('v-vote');
 }
 
@@ -1643,6 +1850,7 @@ function showFinal(g) {
 async function startGroupGame(code) {
   const g = await sget(`sd_group_${code}`);
   if (!g || g.players.length < 1) { toast('Need at least 1 player to start', true); return; }
+  if (g.players.length > (g.maxPlayers || 10)) { toast(`This group is full (max ${g.maxPlayers} players)`, true); return; }
   const opener = GENRE_OPENERS[g.genre] || GENRE_OPENERS.horror;
   g.status = 'playing'; g.phase = 'write';
   g.story = [{ player: 'Narrator', text: opener, word: null }];
@@ -1931,16 +2139,45 @@ function toggleSettings() {
   settingsOpen = !settingsOpen;
   const panel = document.getElementById('settings-panel');
   panel.style.display = settingsOpen ? 'block' : 'none';
-  const teacherViews = ['v-teacher-dash','v-teacher-setup'];
+
+  const licensed = isLicensed();
+  const teacherViews = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+  const studentOnlyViews = ['v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
   const currentView = document.querySelector('.view.active')?.id;
-  const ts = document.getElementById('teacher-settings');
-  if (ts) ts.style.display = teacherViews.includes(currentView) ? 'block' : 'none';
+
+  // Student views OR unlicensed users only get gear with dark/language
+  const isStudentView = studentOnlyViews.includes(currentView) || !licensed;
+
+  // Show/hide navigation section (licensed teachers only)
+  const navSection = document.getElementById('menu-nav-section');
+  if (navSection) navSection.style.display = licensed && !isStudentView ? 'block' : 'none';
+
+  // Show/hide teacher options (licensed + teacher view only)
+  const tm = document.getElementById('teacher-menu-items');
+  if (tm) tm.style.display = licensed && teacherViews.includes(currentView) ? 'block' : 'none';
+
+  // Update button appearance
+  const btn = document.getElementById('settings-btn');
+  if (btn) {
+    if (isStudentView) {
+      btn.innerHTML = '<span style="font-size:1.3rem">⚙</span>';
+      btn.style.padding = '6px 10px';
+    } else {
+      btn.innerHTML = '<span style="font-size:1.3rem">☰</span> Menu';
+      btn.style.padding = '6px 14px';
+    }
+  }
+}
+
+function closeMenu() {
+  settingsOpen = false;
+  const panel = document.getElementById('settings-panel');
+  if (panel) panel.style.display = 'none';
 }
 
 document.addEventListener('click', function(e) {
   if (settingsOpen && !e.target.closest('#settings-panel') && !e.target.closest('#settings-btn')) {
-    settingsOpen = false;
-    document.getElementById('settings-panel').style.display = 'none';
+    closeMenu();
   }
 });
 
@@ -2057,6 +2294,119 @@ async function exportCSV() {
   URL.revokeObjectURL(url); toast('Results exported!');
 }
 
+
+// ══════════════════════════════════════════════
+//  ACCOUNT INFO
+// ══════════════════════════════════════════════
+function loadAccountInfo() {
+  const info = JSON.parse(localStorage.getItem('sd_account_info') || '{}');
+  const nameEl = document.getElementById('account-name');
+  const schoolEl = document.getElementById('account-school');
+  const licenseEl = document.getElementById('account-license');
+  if (nameEl && info.name) nameEl.value = info.name;
+  if (schoolEl && info.school) schoolEl.value = info.school;
+  if (licenseEl) {
+    const key = localStorage.getItem('storydrop_license');
+    licenseEl.textContent = key ? key.slice(0,8) + '••••••••••••••••' : 'No license saved';
+  }
+}
+
+function saveAccountInfo() {
+  const name = document.getElementById('account-name')?.value || '';
+  const school = document.getElementById('account-school')?.value || '';
+  localStorage.setItem('sd_account_info', JSON.stringify({ name, school }));
+}
+
+// ══════════════════════════════════════════════
+//  SAVED SESSIONS
+// ══════════════════════════════════════════════
+async function saveCurrentSession(sessionId, sessionName, config) {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  if (!licenseKey) return;
+  const key = `sd_saved_session_${licenseKey}_${sessionId}`;
+  await sset(key, {
+    sessionId, sessionName, config,
+    savedAt: new Date().toISOString()
+  });
+}
+
+async function loadSavedSessions() {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  if (!licenseKey) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${licenseKey}_*&select=key,value&order=value->savedAt.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return rows.map(r => r.value);
+  } catch { return []; }
+}
+
+async function showSavedSessions() {
+  showView('v-saved-sessions');
+  const list = document.getElementById('saved-sessions-list');
+  list.innerHTML = '<div class="text-muted">Loading…</div>';
+  const sessions = await loadSavedSessions();
+  if (!sessions.length) {
+    list.innerHTML = '<div class="text-muted" style="padding:20px 0">No saved sessions yet. Sessions save automatically when you create them.</div>';
+    return;
+  }
+  list.innerHTML = sessions.map(s => `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:1.2rem;color:var(--text);letter-spacing:.04em">${s.sessionName}</div>
+          <div style="font-size:1rem;color:var(--text2);margin-top:4px">
+            ${new Date(s.savedAt).toLocaleDateString()} ·
+            ${(s.config.vocab||[]).length} words ·
+            ${s.config.genre||'horror'} ·
+            ${s.config.rounds||2} rounds ·
+            ${s.config.numGroups||3} groups ·
+            ${s.config.numPlayers||3} players
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick='loadSession(${JSON.stringify(s)})'>Load →</button>
+          <button class="btn btn-secondary btn-sm" onclick='deleteSavedSession("${s.sessionId}")'>Delete</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
+        ${(s.config.vocab||[]).slice(0,6).map(v => `<span class="word-chip">${v.word}</span>`).join('')}
+        ${(s.config.vocab||[]).length > 6 ? `<span class="text-muted">+${(s.config.vocab||[]).length-6} more</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function loadSession(s) {
+  // Pre-fill setup form with saved config
+  if (document.getElementById('session-name')) document.getElementById('session-name').value = s.sessionName || '';
+  if (document.getElementById('num-groups')) document.getElementById('num-groups').value = s.config.numGroups || 3;
+  if (document.getElementById('num-players')) document.getElementById('num-players').value = s.config.numPlayers || 3;
+  if (document.getElementById('num-rounds')) document.getElementById('num-rounds').value = s.config.rounds || 2;
+  if (document.getElementById('vocab-input') && s.config.vocabRaw) {
+    document.getElementById('vocab-input').value = s.config.vocabRaw;
+    parsedVocab = s.config.vocab || [];
+    const countEl = document.getElementById('vocab-count');
+    if (countEl) countEl.textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
+  }
+  if (s.config.genre) {
+    selectedGenre = s.config.genre;
+    document.querySelectorAll('.genre-btn').forEach(b => b.classList.toggle('sel', b.dataset.g === s.config.genre));
+  }
+  showView('v-teacher-setup');
+  toast(`Session "${s.sessionName}" loaded — new codes will be generated`);
+}
+
+async function deleteSavedSession(sessionId) {
+  if (!confirm('Delete this saved session?')) return;
+  const licenseKey = localStorage.getItem('storydrop_license');
+  await sdel(`sd_saved_session_${licenseKey}_${sessionId}`);
+  showSavedSessions();
+  toast('Session deleted');
+}
+
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
@@ -2068,5 +2418,71 @@ window.addEventListener('load', function() {
 });
 
 </script>
+
+<!-- ══════════ ACCOUNT INFO ══════════ -->
+<div class="view" id="v-account">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Account Info</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:16px">Your Details</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="field">
+          <div class="field-label">Name</div>
+          <input type="text" id="account-name" placeholder="Your name" maxlength="60" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">School or District</div>
+          <input type="text" id="account-school" placeholder="School or district name" maxlength="80" oninput="saveAccountInfo()">
+        </div>
+        <div class="field">
+          <div class="field-label">License Key</div>
+          <div style="font-family:'Courier Prime',monospace;font-size:1rem;color:var(--text2);padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm)" id="account-license">—</div>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted" style="line-height:1.7;margin-bottom:24px">Your name and school are saved to this browser only and are not shared with anyone.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SAVED SESSIONS ══════════ -->
+<div class="view" id="v-saved-sessions">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Saved Sessions</div>
+  </div>
+  <div class="content" style="max-width:780px;width:100%">
+    <div class="btn-row" style="margin-bottom:20px">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">← Back to Setup</button>
+    </div>
+    <div id="saved-sessions-list">
+      <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SUPPORT ══════════ -->
+<div class="view" id="v-support">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Support</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
