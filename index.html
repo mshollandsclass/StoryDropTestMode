@@ -417,6 +417,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="btn-row">
       <button class="btn btn-primary btn-lg" id="present-btn" style="display:none" onclick="launchPresentation()">&#x25BA; Present Stories to Class</button>
       <button class="btn btn-ghost btn-sm" onclick="showView('v-landing')">&#x2190; Exit</button>
+      <button class="btn btn-primary btn-sm" onclick="endSessionFully()">✓ Save &amp; End Session</button>
       <button class="btn btn-ghost btn-sm" onclick="showLicenseInfo()" style="margin-left:auto">&#x2713; Licensed</button>
     </div>
   </div>
@@ -1219,7 +1220,9 @@ function genCode() {
 //  REPORTS
 // ══════════════════════════════════════════════
 async function saveReport(sessionId, sessionName, groups) {
-  const key = `sd_report_${localStorage.getItem('storydrop_license')}_${sessionId}`;
+  const prefix = getLicensePrefix();
+  if (!prefix) return;
+  const key = `sd_report_${prefix}_${sessionId}`;
   await sset(key, {
     sessionId, sessionName: sessionName || 'Unnamed Session',
     completedAt: new Date().toISOString(),
@@ -1234,15 +1237,18 @@ async function saveReport(sessionId, sessionName, groups) {
 }
 
 async function loadReports() {
+  const prefix = getLicensePrefix();
+  if (!prefix) return [];
   try {
-    const licenseKey = localStorage.getItem('storydrop_license');
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${licenseKey}_%&select=key,value`,
+      `${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${prefix}_%25&select=key,value`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
     if (!res.ok) return [];
     const rows = await res.json();
-    return rows.map(r => r.value);
+    const results = rows.map(r => r.value).filter(Boolean);
+    results.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    return results;
   } catch { return []; }
 }
 
@@ -1992,9 +1998,10 @@ async function showClassResults() {
           <div><div class="podium-code">${r.code}</div><div class="podium-label">${r.players.join(', ')}</div></div>
           <div><div class="podium-votes">${r.votes}</div><div class="podium-label">vote${r.votes!==1?'s':''}</div></div>
         </div>`).join('')}</div>
-      <div style="margin-top:28px">
+      <div style="margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
         <button class="btn btn-ghost btn-md" onclick="presIdx=0;renderPresentation()">← Back to Stories</button>
-        <button class="btn btn-secondary btn-md" onclick="showView('v-teacher-dash');startTeacherDash(teacherSessionId,presGroups.map(g=>g.code))" style="margin-left:10px">Dashboard</button>
+        <button class="btn btn-secondary btn-md" onclick="showView('v-teacher-dash');startTeacherDash(teacherSessionId,presGroups.map(g=>g.code))">Dashboard</button>
+        <button class="btn btn-primary btn-md" onclick="endSessionFully()">✓ Save &amp; End Session</button>
       </div>
     </div>`;
   document.getElementById('pres-scores').innerHTML = '';
@@ -2350,6 +2357,33 @@ async function exportCSV() {
 }
 
 
+
+// ══════════════════════════════════════════════
+//  END SESSION
+// ══════════════════════════════════════════════
+async function endSessionFully() {
+  if (!confirm('Save and end this session? Students will no longer be able to join or continue.')) return;
+
+  // Mark session as closed in Supabase
+  if (teacherSessionId) {
+    const session = await sget(`sd_session_${teacherSessionId}`);
+    if (session) {
+      session.closed = true;
+      session.closedAt = new Date().toISOString();
+      await sset(`sd_session_${teacherSessionId}`, session);
+    }
+  }
+
+  // Clear local session state
+  clearSavedSession();
+  teacherSessionId = null;
+  clearInterval(dashPollTimer);
+  clearInterval(presClassVotePollTimer);
+
+  toast('Session saved and ended');
+  showView('v-landing');
+}
+
 // ══════════════════════════════════════════════
 //  ACCOUNT INFO
 // ══════════════════════════════════════════════
@@ -2375,10 +2409,16 @@ function saveAccountInfo() {
 // ══════════════════════════════════════════════
 //  SAVED SESSIONS
 // ══════════════════════════════════════════════
+function getLicensePrefix() {
+  // Use first 8 chars of license key — safe for URL, unique enough
+  const key = localStorage.getItem('storydrop_license') || '';
+  return key.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toLowerCase();
+}
+
 async function saveCurrentSession(sessionId, sessionName, config) {
-  const licenseKey = localStorage.getItem('storydrop_license');
-  if (!licenseKey) return;
-  const key = `sd_saved_session_${licenseKey}_${sessionId}`;
+  const prefix = getLicensePrefix();
+  if (!prefix) return;
+  const key = `sd_saved_${prefix}_${sessionId}`;
   await sset(key, {
     sessionId, sessionName, config,
     savedAt: new Date().toISOString()
@@ -2386,16 +2426,19 @@ async function saveCurrentSession(sessionId, sessionName, config) {
 }
 
 async function loadSavedSessions() {
-  const licenseKey = localStorage.getItem('storydrop_license');
-  if (!licenseKey) return [];
+  const prefix = getLicensePrefix();
+  if (!prefix) return [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${licenseKey}_%&select=key,value&order=value->savedAt.desc`,
+      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_${prefix}_%25&select=key,value`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
     if (!res.ok) return [];
     const rows = await res.json();
-    return rows.map(r => r.value);
+    // Sort by savedAt descending
+    const results = rows.map(r => r.value).filter(Boolean);
+    results.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+    return results;
   } catch { return []; }
 }
 
@@ -2467,8 +2510,8 @@ function loadSession(s) {
 
 async function deleteSavedSession(sessionId) {
   if (!confirm('Delete this saved session?')) return;
-  const licenseKey = localStorage.getItem('storydrop_license');
-  await sdel(`sd_saved_session_${licenseKey}_${sessionId}`);
+  const prefix = getLicensePrefix();
+  await sdel(`sd_saved_${prefix}_${sessionId}`);
   showSavedSessions();
   toast('Session deleted');
 }
