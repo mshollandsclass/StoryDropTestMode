@@ -548,7 +548,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="char-hint" id="write-hint">Aim for 2–4 sentences. Use your word!</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary btn-lg" id="write-submit-btn" id="write-submit-btn" onclick="submitWrite()">Submit &#x2192;</button>
+      <button class="btn btn-primary btn-lg" id="write-submit-btn" onclick="submitWrite()">Submit &#x2192;</button>
       <span class="text-muted" id="write-status"></span>
     </div>
   </div>
@@ -654,216 +654,9 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 </div>
 
 
-<!-- ══════════ ACCOUNT INFO ══════════ -->
-<div class="view" id="v-account">
-  <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Account Info</div>
-  </div>
-  <div class="content" style="max-width:680px;width:100%">
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:16px">Your Details</div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="field">
-          <div class="field-label">Name</div>
-          <input type="text" id="account-name" placeholder="Your name" maxlength="60" oninput="saveAccountInfo()">
-        </div>
-        <div class="field">
-          <div class="field-label">School or District</div>
-          <input type="text" id="account-school" placeholder="School or district name" maxlength="80" oninput="saveAccountInfo()">
-        </div>
-        <div class="field">
-          <div class="field-label">License Key</div>
-          <div style="font-family:'Courier Prime',monospace;font-size:1rem;color:var(--text2);padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm)" id="account-license">—</div>
-        </div>
-      </div>
-    </div>
-    <p class="text-muted" style="line-height:1.7;margin-bottom:24px">Your name and school are saved to this browser only and are not shared with anyone.</p>
-    <div class="btn-row">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════ SAVED SESSIONS ══════════ -->
-<div class="view" id="v-saved-sessions">
-  <div class="hdr" style="max-width:780px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Saved Sessions</div>
-  </div>
-  <div class="content" style="max-width:780px;width:100%">
-    <div class="btn-row" style="margin-bottom:20px">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">← Back to Setup</button>
-    </div>
-    <div id="saved-sessions-list">
-      <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ SUPPORT ══════════ -->
-<div class="view" id="v-support">
-  <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Support</div>
-  </div>
-  <div class="content" style="max-width:680px;width:100%">
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
-    </div>
-  </div>
-</div>
-
-</body>
-<!-- ══════════ REPORTS MODAL ══════════ -->
-<div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Courier Prime',monospace;font-size:1.3rem;font-weight:700;color:var(--text)">Past Reports</div>
-      <button onclick="document.getElementById('reports-modal').style.display='none'" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
-    </div>
-    <div id="reports-list"></div>
-  </div>
-</div>
-
-
-<!-- ══════════ ACCOUNT INFO ══════════ -->
-<div class="view" id="v-account">
-  <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Account Info</div>
-  </div>
-  <div class="content" style="max-width:680px;width:100%">
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:16px">Your Details</div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="field">
-          <div class="field-label">Name</div>
-          <input type="text" id="account-name" placeholder="Your name" maxlength="60" oninput="saveAccountInfo()">
-        </div>
-        <div class="field">
-          <div class="field-label">School or District</div>
-          <input type="text" id="account-school" placeholder="School or district name" maxlength="80" oninput="saveAccountInfo()">
-        </div>
-        <div class="field">
-          <div class="field-label">License Key</div>
-          <div style="font-family:'Courier Prime',monospace;font-size:1rem;color:var(--text2);padding:11px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm)" id="account-license">—</div>
-        </div>
-      </div>
-    </div>
-    <p class="text-muted" style="line-height:1.7;margin-bottom:24px">Your name and school are saved to this browser only and are not shared with anyone.</p>
-    <div class="btn-row">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══════════ SAVED SESSIONS ══════════ -->
-<div class="view" id="v-saved-sessions">
-  <div class="hdr" style="max-width:780px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Saved Sessions</div>
-  </div>
-  <div class="content" style="max-width:780px;width:100%">
-    <div class="btn-row" style="margin-bottom:20px">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">← Back to Setup</button>
-    </div>
-    <div id="saved-sessions-list">
-      <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ SUPPORT ══════════ -->
-<div class="view" id="v-support">
-  <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Support</div>
-  </div>
-  <div class="content" style="max-width:680px;width:100%">
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
-    </div>
-  </div>
-</div>
-
-</body>
-</html<!-- ══════════ RULES ══════════ -->
-<div class="view" id="v-rules" style="align-items:flex-start">
-  <div class="hdr" style="max-width:680px;width:100%">
-    <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">How to Play</div>
-  </div>
-  <div class="content" style="max-width:680px;width:100%">
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:10px">🎯 The Goal</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:10px">✍ Writing Your Sentence</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Each round you get a vocab word. Write one sentence that continues the story and uses your word <strong>correctly</strong>. You have 2 minutes.</p>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:10px">🗳 Voting</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
-      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)">
-          <strong style="color:var(--accent)">Yes</strong> — you think they used it correctly
-        </div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)">
-          <strong style="color:var(--red)">No</strong> — you think they used it incorrectly
-        </div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)">
-          <strong style="color:var(--text2)">Not sure</strong> — you abstain and earn nothing
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:10px">⭐ Scoring</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
-          <span>Player uses their word correctly</span>
-          <strong style="color:var(--accent)">+1</strong>
-        </div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
-          <span>Your vote matches the correct answer</span>
-          <strong style="color:var(--accent)">+1</strong>
-        </div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
-          <span>Your vote is wrong</span>
-          <strong style="color:var(--red)">-1</strong>
-        </div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center">
-          <span>You vote Not sure</span>
-          <strong style="color:var(--text2)">0</strong>
-        </div>
-      </div>
-      <p style="font-size:.78rem;color:var(--text2);margin-top:12px;line-height:1.7">The game will check if your vote was right or wrong. With 3 players, one word can earn your team up to 3 points.</p>
-    </div>
-
-    <div class="card" style="margin-bottom:28px">
-      <div class="label" style="margin-bottom:10px">🏆 Winning</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class at the end.</p>
-    </div>
-
-    <button class="btn btn-primary btn-lg" style="width:100%" onclick="showView('v-lobby')">Got it — let's play →</button>
-  </div>
-</div
-
 <!-- ══════════ MENU ══════════ -->
 <div id="menu-container" style="position:fixed;top:14px;right:16px;z-index:9999">
   <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s">
@@ -899,7 +692,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
         <span style="font-size:1rem;color:var(--text)">Test mode</span>
         <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
       </div>
-      <div id="test-mode-bar" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
+      <div id="settings-test-mode-bar" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
         <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
       </div>
@@ -909,16 +702,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
 </div>
 
-<!-- ══════════ REPORTS MODAL ══════════ -->
-<div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Courier Prime',monospace;font-size:1.3rem;font-weight:700;color:var(--text)">Past Reports</div>
-      <button onclick="document.getElementById('reports-modal').style.display='none'" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
-    </div>
-    <div id="reports-list"></div>
-  </div>
-</div>
+
 
 <div id="toast"></div>
 
@@ -2188,7 +1972,7 @@ let testModeActive = false;
 function toggleTestMode() {
   testModeActive = !testModeActive;
   const sw = document.getElementById('testmode-switch');
-  const bar = document.getElementById('test-mode-bar');
+  const bar = document.getElementById('settings-test-mode-bar');
   if (sw) sw.className = 'toggle-switch' + (testModeActive?' on':'');
   if (bar) bar.style.display = testModeActive ? 'flex' : 'none';
   if (testModeActive) toast('Test mode on');
