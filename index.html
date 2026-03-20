@@ -947,7 +947,7 @@ async function sget(key) {
 
 async function sset(key, val) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/store`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -957,8 +957,16 @@ async function sset(key, val) {
       },
       body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
     });
+    if (!res.ok) {
+      const err = await res.text().catch(() => res.status);
+      console.warn(`sset failed for key "${key}":`, err);
+      return false;
+    }
     return true;
-  } catch { return false; }
+  } catch(e) {
+    console.warn(`sset error for key "${key}":`, e.message);
+    return false;
+  }
 }
 
 async function sdel(key) {
@@ -1246,36 +1254,54 @@ async function createSession() {
   const maxPlayers = Math.min(10, Math.max(1, parseInt(document.getElementById('num-players').value)||3));
   const sessionName = document.getElementById('session-name').value.trim();
   if (!sessionName) { toast('Please enter a session name', true); return; }
-  teacherSessionId = genCode();
-  const codes = Array.from({length:n}, genCode);
-  for (const code of codes) {
-    await sset(`sd_group_${code}`, {
-      code, sessionId: teacherSessionId, sessionName,
-      genre: selectedGenre, maxPlayers,
-      vocab: parsedVocab, status: 'waiting',
-      players: [], scores: {}, story: [],
-      currentRound: 1, currentPlayerIdx: 0,
-      roundContribs: [], votes: {}, wordVotes: {},
-      usedWordIndices: [], results: null,
-      createdAt: Date.now()
+
+  // Show loading state
+  const btn = document.querySelector('[onclick="createSession()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+
+  try {
+    teacherSessionId = genCode();
+    const codes = Array.from({length:n}, genCode);
+
+    for (const code of codes) {
+      const ok = await sset(`sd_group_${code}`, {
+        code, sessionId: teacherSessionId, sessionName,
+        genre: selectedGenre, maxPlayers,
+        vocab: parsedVocab, status: 'waiting',
+        players: [], scores: {}, story: [],
+        currentRound: 1, currentPlayerIdx: 0,
+        roundContribs: [], votes: {}, wordVotes: {},
+        usedWordIndices: [], results: null,
+        createdAt: Date.now()
+      });
+      if (!ok) throw new Error(`Failed to create group ${code}`);
+    }
+
+    await sset(`sd_session_${teacherSessionId}`, {
+      id: teacherSessionId, name: sessionName,
+      codes, genre: selectedGenre, createdAt: Date.now()
     });
+
+    me.role = 'teacher';
+    document.getElementById('dash-session-name').textContent = sessionName;
+    localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
+
+    // Auto-save session config (non-blocking — don't fail if this errors)
+    saveCurrentSession(teacherSessionId, sessionName, {
+      numGroups: n, numPlayers: maxPlayers,
+      genre: selectedGenre,
+      vocab: parsedVocab,
+      vocabRaw: document.getElementById('vocab-input').value
+    }).catch(() => {});
+
+    startTeacherDash(teacherSessionId, codes);
+    showView('v-teacher-dash');
+
+  } catch(e) {
+    console.error('createSession error:', e);
+    toast('Connection error — check your internet and try again', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Create Session & Get Codes →'; }
   }
-  await sset(`sd_session_${teacherSessionId}`, {
-    id: teacherSessionId, name: sessionName,
-    codes, genre: selectedGenre, createdAt: Date.now()
-  });
-  me.role = 'teacher';
-  document.getElementById('dash-session-name').textContent = sessionName;
-  localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
-  // Auto-save session config
-  await saveCurrentSession(teacherSessionId, sessionName, {
-    numGroups: n, numPlayers: maxPlayers,
-    genre: selectedGenre,
-    vocab: parsedVocab,
-    vocabRaw: document.getElementById('vocab-input').value
-  });
-  startTeacherDash(teacherSessionId, codes);
-  showView('v-teacher-dash');
 }
 
 // ══════════════════════════════════════════════
