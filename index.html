@@ -307,7 +307,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view active" id="v-landing">
   <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta" data-t="tagline">Vocab storytelling<br>group game</div>
+    <div class="hdr-meta">Vocab storytelling<br>group game</div>
   </div>
   <div class="content">
     <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on correct usage — correct answers and accurate votes earn team points, wrong votes lose them. AI keeps everyone honest.</p>
@@ -315,13 +315,13 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="card" style="border-color:var(--accent)">
         <div class="label">I'm a teacher</div>
         <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Create a session, share group codes, and monitor all results live.</div>
-        <button class="btn btn-primary btn-md" onclick="teacherEntry()" data-t="create_session">Create Session</button>
+        <button class="btn btn-primary btn-md" onclick="teacherEntry()">Create Session</button>
         <div id="license-status-landing" style="font-size:.65rem;margin-top:10px;color:var(--text2)"></div>
       </div>
       <div class="card">
         <div class="label">I'm a student</div>
         <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Enter the group code your teacher gave you to join your group's game.</div>
-        <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')" data-t="join_game">Join Game</button>
+        <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')">Join Game</button>
       </div>
     </div>
   </div>
@@ -576,7 +576,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">Vote — Turn <span id="vote-round">1</span></div>
   </div>
   <div class="content">
-    <div class="label" id="vote-label" data-t="vote_title">Did they use their word correctly?</div>
+    <div class="label" id="vote-label">Did they use their word correctly?</div>
     <p class="text-muted" style="margin-bottom:18px;line-height:1.7">Read each teammate's sentence and vote on whether they used their vocab word correctly. Choosing <strong>Not sure</strong> means you abstain — if everyone abstains, that player forfeits their points. You cannot vote on your own sentence.</p>
     <div class="vote-list" id="vote-list"></div>
     <div class="btn-row">
@@ -883,14 +883,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       </div>
       <button class="toggle-switch on" id="timer-switch" onclick="toggleTimer()" aria-label="Toggle timer"></button>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
-      <span style="font-size:1rem;color:var(--text)">Language</span>
-      <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
-        <option value="en">EN</option>
-        <option value="es">ES</option>
-        <option value="fr">FR</option>
-      </select>
-    </div>
 
     <!-- Teacher only: hidden by default, shown via updateMenuForView() -->
     <div id="menu-teacher-section" style="display:none">
@@ -994,64 +986,6 @@ async function callAI(prompt, maxTokens = 200) {
     const data = await res.json();
     return data.content?.find(b => b.type === 'text')?.text || null;
   } catch { return null; }
-}
-
-// ══════════════════════════════════════════════
-//  TRANSLATIONS
-// ══════════════════════════════════════════════
-const TRANSLATIONS = {
-  en: {
-    tagline: 'Vocab storytelling group game',
-    create_session: 'Create Session',
-    join_game: 'Join Game',
-    settings_title: 'Settings',
-    appearance: 'Appearance',
-    dark_mode: 'Dark mode',
-    teacher_options: 'Teacher Options',
-    test_mode: 'Test mode',
-    clear_license: 'Clear License Key',
-    language: 'Language',
-    vote_title: 'Did they use their word correctly?',
-  },
-  es: {
-    tagline: 'Juego grupal de vocabulario narrativo',
-    create_session: 'Crear Sesión',
-    join_game: 'Unirse al Juego',
-    settings_title: 'Configuración',
-    appearance: 'Apariencia',
-    dark_mode: 'Modo oscuro',
-    teacher_options: 'Opciones del Maestro',
-    test_mode: 'Modo de prueba',
-    clear_license: 'Borrar Licencia',
-    language: 'Idioma',
-    vote_title: '¿Usaron su palabra correctamente?',
-  },
-  fr: {
-    tagline: 'Jeu de groupe avec vocabulaire narratif',
-    create_session: 'Créer une Session',
-    join_game: 'Rejoindre le Jeu',
-    settings_title: 'Paramètres',
-    appearance: 'Apparence',
-    dark_mode: 'Mode sombre',
-    teacher_options: "Options de l'Enseignant",
-    test_mode: 'Mode test',
-    clear_license: 'Effacer la Licence',
-    language: 'Langue',
-    vote_title: 'Ont-ils utilisé leur mot correctement ?',
-  }
-};
-
-let currentLang = localStorage.getItem('storydrop_lang') || 'en';
-function t(key) { return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS['en'][key] || key; }
-function setLanguage(lang) { currentLang = lang; localStorage.setItem('storydrop_lang', lang); applyTranslations(); }
-function applyTranslations() {
-  document.querySelectorAll('[data-t]').forEach(el => {
-    const key = el.dataset.t;
-    if (el.dataset.tAttr === 'placeholder') el.placeholder = t(key);
-    else el.textContent = t(key);
-  });
-  const sel = document.getElementById('lang-select');
-  if (sel) sel.value = currentLang;
 }
 
 // ══════════════════════════════════════════════
@@ -2521,7 +2455,6 @@ document.addEventListener('DOMContentLoaded', function() {
   initDOMListeners();
   updateLicenseLandingUI();
   initTheme();
-  applyTranslations();
   updateMenuForView('v-landing');
   initTimer();
   setTimeout(restoreSession, 500);
