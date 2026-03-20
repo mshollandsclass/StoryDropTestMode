@@ -854,14 +854,15 @@ let dashPollTimer = null;
 //  UI HELPERS
 // ══════════════════════════════════════════════
 function showView(id) {
+  const el = document.getElementById(id);
+  if (!el) { console.error('showView: element not found:', id); return; }
   // Gate teacher pages behind license
   const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
   if (teacherOnlyViews.includes(id) && !isLicensed()) {
-    console.warn('showView blocked — not licensed, redirecting to v-license');
-    id = 'v-license';
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('v-license').classList.add('active');
+    return;
   }
-  const el = document.getElementById(id);
-  if (!el) { console.error('showView: element not found for id:', id); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   el.classList.add('active');
   window.scrollTo(0,0);
@@ -1082,7 +1083,11 @@ async function createSession() {
     }).catch(() => {});
 
     startTeacherDash(teacherSessionId, codes);
-    showView('v-teacher-dash');
+    // Directly activate teacher dash - bypass license gate
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('v-teacher-dash').classList.add('active');
+    window.scrollTo(0,0);
+    updateMenuForView('v-teacher-dash');
 
   } catch(e) {
     console.error('createSession error:', e);
