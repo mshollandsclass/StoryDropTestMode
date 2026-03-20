@@ -710,8 +710,8 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 // ══════════════════════════════════════════════
 //  STORAGE — Supabase
 // ══════════════════════════════════════════════
-const SUPABASE_URL = 'https://xebyrvsopqbiuksepwzz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlYnlydnNvcHFiaXVrc2Vwd3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNjc1MjQsImV4cCI6MjA4ODk0MzUyNH0.gBCcBF8kcRwT__a04oQTH53cakUu8XtGubaQj_7iR5U';
+const SUPABASE_URL = 'https://mceppduowwbozryjxzef.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jZXBwZHVvd3dib3pyeWp4emVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTkxNTUsImV4cCI6MjA4OTU5NTE1NX0.mq6wLz_uOQoXmcq-xVhHSCrZWcya0qVE88x2hJjnJuk';
 const DB_CONFIGURED = true;
 const ANTHROPIC_KEY = 'YOUR_ANTHROPIC_KEY_HERE';
 const USE_PHP_PROXY = ANTHROPIC_KEY === 'YOUR_ANTHROPIC_KEY_HERE';
@@ -731,6 +731,7 @@ async function sget(key) {
 
 async function sset(key, val) {
   try {
+    const body = JSON.stringify({ key, value: val, updated_at: new Date().toISOString() });
     const res = await fetch(`${SUPABASE_URL}/rest/v1/store`, {
       method: 'POST',
       headers: {
@@ -739,16 +740,16 @@ async function sset(key, val) {
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
-      body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
+      body
     });
     if (!res.ok) {
-      const err = await res.text().catch(() => res.status);
-      console.warn(`sset failed for key "${key}":`, err);
+      const err = await res.text().catch(() => String(res.status));
+      console.error(`sset FAILED [${res.status}] key="${key}" error=${err} bodySize=${body.length}`);
       return false;
     }
     return true;
   } catch(e) {
-    console.warn(`sset error for key "${key}":`, e.message);
+    console.error(`sset ERROR key="${key}":`, e.message);
     return false;
   }
 }
@@ -856,11 +857,13 @@ function showView(id) {
   // Gate teacher pages behind license
   const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
   if (teacherOnlyViews.includes(id) && !isLicensed()) {
-    showView('v-license');
-    return;
+    console.warn('showView blocked — not licensed, redirecting to v-license');
+    id = 'v-license';
   }
+  const el = document.getElementById(id);
+  if (!el) { console.error('showView: element not found for id:', id); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
   window.scrollTo(0,0);
   try { localStorage.setItem('sd_current_view', id); } catch {}
   updateMenuForView(id);
@@ -2335,6 +2338,46 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="btn-row">
       <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
     </div>
+  </div>
+</div>
+<!-- ══════════ RULES ══════════ -->
+<div class="view" id="v-rules">
+  <div class="hdr" style="max-width:680px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">How to Play</div>
+  </div>
+  <div class="content" style="max-width:680px;width:100%">
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">🎯 The Goal</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">✍ Writing Your Sentence</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text)">Each turn you get a vocab word. Write one sentence that continues the story and uses your word <strong>correctly</strong>. You have 2 minutes.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">🗳 Voting</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)"><strong>Yes</strong> — you think they used it correctly</div>
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)"><strong>No</strong> — you think they used it incorrectly</div>
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)"><strong>Not sure</strong> — you abstain and earn nothing</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">⭐ Scoring</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Player uses their word correctly</span><strong style="color:var(--accent)">+1</strong></div>
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote matches the correct answer</span><strong style="color:var(--accent)">+1</strong></div>
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote is wrong</span><strong style="color:var(--red)">-1</strong></div>
+        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>You vote Not sure</span><strong style="color:var(--text2)">0</strong></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:28px">
+      <div class="label" style="margin-bottom:10px">🏆 Winning</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class.</p>
+    </div>
+    <button class="btn btn-primary btn-lg" style="width:100%" onclick="showView('v-lobby')">Got it — let's play →</button>
   </div>
 </div>
 
