@@ -273,7 +273,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 .podium-votes{font-family:'Courier Prime',monospace;font-size:1.6rem;color:var(--text)}
 .podium-label{font-size:1.2rem;color:var(--text2);letter-spacing:.1em;text-transform:uppercase}
 
-
 /* ── MENU ── */
 .menu-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);cursor:pointer;border-radius:var(--radius-sm);text-align:left;transition:background .15s}
 .menu-item:hover{background:var(--surface)}
@@ -298,7 +297,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   .logo{font-size:clamp(1.8rem,10vw,4.2rem)}
   .btn-lg{font-size:1rem;padding:9px 18px}
 }
-
 </style>
 </head>
 <body>
@@ -307,7 +305,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view active" id="v-landing">
   <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Vocab storytelling<br>group game</div>
+    <div class="hdr-meta" data-t="tagline">Vocab storytelling<br>group game</div>
   </div>
   <div class="content">
     <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on correct usage — correct answers and accurate votes earn team points, wrong votes lose them. AI keeps everyone honest.</p>
@@ -315,13 +313,13 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="card" style="border-color:var(--accent)">
         <div class="label">I'm a teacher</div>
         <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Create a session, share group codes, and monitor all results live.</div>
-        <button class="btn btn-primary btn-md" onclick="teacherEntry()">Create Session</button>
+        <button class="btn btn-primary btn-md" onclick="teacherEntry()" data-t="create_session">Create Session</button>
         <div id="license-status-landing" style="font-size:.65rem;margin-top:10px;color:var(--text2)"></div>
       </div>
       <div class="card">
         <div class="label">I'm a student</div>
         <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Enter the group code your teacher gave you to join your group's game.</div>
-        <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')">Join Game</button>
+        <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')" data-t="join_game">Join Game</button>
       </div>
     </div>
   </div>
@@ -382,9 +380,8 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="label">Vocabulary words</div>
     <div class="card" style="margin-bottom:14px">
       <div style="font-size:1.2rem;color:var(--text2);margin-bottom:10px;line-height:1.7">
-        <div style="font-size:1rem;color:var(--text2);margin-bottom:10px;line-height:1.7">
         Paste your word list — one per line.<br>
-        <span style="font-size:.85rem">Formats: <code style="font-family:'Courier Prime',monospace;color:var(--text)">word</code> &nbsp;or&nbsp; <code style="font-family:'Courier Prime',monospace;color:var(--text)">word | pos | definition | example</code></span>
+        Formats: <code style="color:var(--text)">word</code> &nbsp;or&nbsp; <code style="color:var(--text)">word | pos | definition | example</code>
       </div>
       <textarea id="vocab-input" rows="8" placeholder="ephemeral&#10;tenacious | adj. | Holding firmly; very persistent&#10;hubris | noun | Excessive pride | His hubris led to his downfall."></textarea>
       <div style="font-size:.7rem;color:var(--text2);margin-top:8px" id="vocab-count">0 words parsed</div>
@@ -418,7 +415,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="btn-row">
       <button class="btn btn-primary btn-lg" id="present-btn" style="display:none" onclick="launchPresentation()">&#x25BA; Present Stories to Class</button>
       <button class="btn btn-ghost btn-sm" onclick="showView('v-landing')">&#x2190; Exit</button>
-      <button class="btn btn-primary btn-sm" onclick="endSessionFully()">✓ Save &amp; End Session</button>
       <button class="btn btn-ghost btn-sm" onclick="showLicenseInfo()" style="margin-left:auto">&#x2713; Licensed</button>
     </div>
   </div>
@@ -469,7 +465,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     </div>
   </div>
 </div>
-
 
 <!-- ══════════ STUDENT JOIN ══════════ -->
 <div class="view" id="v-student-join">
@@ -563,7 +558,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   <div class="content">
     <div class="waiting-wrap">
       <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFoM3ZhNXZkdmJuMDcwd3RocXJ5bXJ0Nzk4dzBmODE5a3dtZDVjZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LmBsnpDCuturMhtLfw/giphy.gif" alt="Let's go!" style="width:180px;height:180px;object-fit:cover;border-radius:var(--radius);margin-bottom:16px;display:block;margin-left:auto;margin-right:auto">
-      <div class="waiting-title">Let's Go!</div>
+      <div class="waiting-title" id="wait-title">Let's Go!</div>
       <div class="waiting-sub" id="wait-msg">Waiting for other players to finish writing…</div>
     </div>
     <div class="player-chips" id="wait-players"></div>
@@ -577,7 +572,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">Vote — Turn <span id="vote-round">1</span></div>
   </div>
   <div class="content">
-    <div class="label" id="vote-label">Did they use their word correctly?</div>
+    <div class="label" id="vote-label" data-t="vote_title">Did they use their word correctly?</div>
     <p class="text-muted" style="margin-bottom:18px;line-height:1.7">Read each teammate's sentence and vote on whether they used their vocab word correctly. Choosing <strong>Not sure</strong> means you abstain — if everyone abstains, that player forfeits their points. You cannot vote on your own sentence.</p>
     <div class="vote-list" id="vote-list"></div>
     <div class="btn-row">
@@ -641,9 +636,8 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
 </div>
 
-<!-- ══════════ SETTINGS BTN + PANEL ══════════ -->
 <!-- ══════════ REPORTS MODAL ══════════ -->
-<div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:20px">
+<div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div style="font-family:'Courier Prime',monospace;font-size:1.3rem;font-weight:700;color:var(--text)">Past Reports</div>
@@ -652,1639 +646,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div id="reports-list"></div>
   </div>
 </div>
-
-
-
-<!-- ══════════ SAVED SESSIONS ══════════ -->
-<!-- ══════════ SAVED SESSIONS ══════════ -->
-<!-- ══════════ MENU ══════════ -->
-<div id="menu-container" style="position:fixed;top:14px;right:16px;z-index:9999">
-  <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s">
-    <span style="font-size:1.3rem">☰</span> Menu
-  </button>
-  <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:8px;min-width:220px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
-
-    <!-- Always visible: dark mode + language -->
-    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Display</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
-      <span style="font-size:1rem;color:var(--text)">Dark mode</span>
-      <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
-      <div>
-        <div style="font-size:1rem;color:var(--text)">Writing timer</div>
-        <div style="font-size:.85rem;color:var(--text2)">Off for extended time</div>
-      </div>
-      <button class="toggle-switch on" id="timer-switch" onclick="toggleTimer()" aria-label="Toggle timer"></button>
-    </div>
-
-    <!-- Teacher only: hidden by default, shown via updateMenuForView() -->
-    <div id="menu-teacher-section" style="display:none">
-      <div style="height:1px;background:var(--border);margin:6px 0"></div>
-      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Go to</div>
-      <button onclick="closeMenu();showView('v-account')" class="menu-item">👤 Account Info</button>
-      <button onclick="closeMenu();showView('v-saved-sessions')" class="menu-item">📂 Saved Sessions</button>
-      <button onclick="closeMenu();showReportsModal()" class="menu-item">📊 Past Reports</button>
-      <button onclick="closeMenu();showView('v-support')" class="menu-item">🛟 Support</button>
-      <div style="height:1px;background:var(--border);margin:6px 0"></div>
-      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Teacher</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
-        <span style="font-size:1rem;color:var(--text)">Test mode</span>
-        <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
-      </div>
-      <div id="settings-test-mode-bar" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
-        <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
-        <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
-      </div>
-      <button onclick="closeMenu();clearLicense()" class="menu-item" style="color:var(--red)">🔑 Clear License Key</button>
-    </div>
-
-  </div>
-</div>
-
-
-
-<div id="toast"></div>
-
-<script>
-// ══════════════════════════════════════════════
-//  STORAGE — Supabase
-// ══════════════════════════════════════════════
-const SUPABASE_URL = 'https://zzojvscgtuezmfnrvdhd.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6b2p2c2NndHVlem1mbnJ2ZGhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDc0NTYsImV4cCI6MjA4OTYyMzQ1Nn0.3UgmF6tj1KE0Rfft8Oe0mIjzkC6lfHDlQX0BPzg89-s';
-const DB_CONFIGURED = true;
-const ANTHROPIC_KEY = 'YOUR_ANTHROPIC_KEY_HERE';
-const USE_PHP_PROXY = ANTHROPIC_KEY === 'YOUR_ANTHROPIC_KEY_HERE';
-const AI_ENDPOINT = USE_PHP_PROXY ? '/api/api.php' : 'https://api.anthropic.com/v1/messages';
-
-async function sget(key) {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-    );
-    if (!res.ok) return null;
-    const rows = await res.json();
-    return rows.length ? rows[0].value : null;
-  } catch { return null; }
-}
-
-async function sset(key, val) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
-    });
-    if (!res.ok) {
-      const err = await res.text().catch(() => String(res.status));
-      console.error(`sset FAILED [${res.status}] key="${key}":`, err);
-      return false;
-    }
-    return true;
-  } catch(e) {
-    console.error(`sset ERROR key="${key}":`, e.message);
-    return false;
-  }
-}
-
-async function sdel(key) {
-  try {
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}`,
-      { method: 'DELETE', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-    );
-  } catch {}
-}
-
-async function callAI(prompt, maxTokens = 200) {
-  const headers = USE_PHP_PROXY
-    ? { 'Content-Type': 'application/json' }
-    : { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' };
-  try {
-    const res = await fetch(AI_ENDPOINT, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: maxTokens,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await res.json();
-    return data.content?.find(b => b.type === 'text')?.text || null;
-  } catch { return null; }
-}
-
-// ══════════════════════════════════════════════
-//  CONSTANTS
-// ══════════════════════════════════════════════
-const GENRE_OPENERS = {
-  horror: [
-    "It started the night the lights went out across the whole street — and nobody came to fix them.",
-    "The door at the end of the hallway had always been locked. Until this morning.",
-    "She found the note slipped under her door, written in her own handwriting, dated three days from now.",
-    "Everyone in town agreed: the old house on Mercer Hill had been empty for thirty years. So why was there smoke coming from the chimney?",
-    "The dog started barking at the corner of the room at exactly 3am. Every night. At nothing."
-  ],
-  romance: [
-    "She hadn't expected to find the letter, let alone feel her hands shake as she read it.",
-    "They had said goodbye at this same train station five years ago. She hadn't expected him to be standing there when the doors opened.",
-    "The playlist he'd made her still had forty-seven songs on it. She'd only ever listened to the first one.",
-    "It was supposed to be a fake date. Just to convince her parents. Neither of them had planned on staying until closing time.",
-    "He'd returned every book to the library except one — the one with her phone number written inside the cover."
-  ],
-  "sci-fi": [
-    "The transmission arrived from coordinates that weren't supposed to exist.",
-    "The AI passed the test on a Tuesday. By Friday, it had stopped answering questions and started asking them.",
-    "They had been in cryosleep for six months. When they woke up, the ship's calendar said it had been forty years.",
-    "The colony on Europa was supposed to be uninhabited. The footprints in the ice said otherwise.",
-    "She'd volunteered for the memory trial because she needed the money. She hadn't expected to wake up remembering someone else's life."
-  ],
-  mystery: [
-    "The detective stood in the empty room and knew, immediately, that something had been moved.",
-    "The last person to see Marcus alive was his assistant — who had called in sick that day.",
-    "Three people had reported hearing the same piano melody coming from the sealed wing of the museum. There was no piano in the sealed wing.",
-    "The security footage showed the vault door opening at 2:17am. The vault required two keys. Only one person had been in the building.",
-    "She hadn't reported the theft. She hadn't reported it because nothing had actually been taken — just rearranged."
-  ],
-  fantasy: [
-    "The map had no name for the forest, which was the first warning she ignored.",
-    "The merchant sold only one item: a small glass bottle containing what he claimed was the last hour of someone's life.",
-    "Every child in the village was born with a mark. Hers had never appeared — until the morning of her sixteenth birthday.",
-    "The dragon wasn't guarding gold. It was guarding a door. And the door was guarding something that wanted very badly to get out.",
-    "He had been a knight for twenty years. He had never once drawn his sword. The reason was a secret he intended to take to his grave."
-  ],
-  comedy: [
-    "Nobody expected the school mascot to go missing the morning of prom — least of all the goat itself.",
-    "The escape room was supposed to take sixty minutes. They'd been inside for four hours and had only made things worse.",
-    "Her grandmother had left her three things in the will: a storage unit, a pet iguana, and a strongly worded note about the iguana.",
-    "The team-building exercise had been going fine until someone suggested they actually try to win.",
-    "He had one job at the wedding. One job. And somehow it had led to him standing in a fountain at 2pm on a Saturday, holding a cake."
-  ]
-};
-
-function getOpener(genre) {
-  const openers = GENRE_OPENERS[genre] || GENRE_OPENERS.horror;
-  return openers[Math.floor(Math.random() * openers.length)];
-}
-
-// ══════════════════════════════════════════════
-//  APP STATE
-// ══════════════════════════════════════════════
-let me = { name: '', groupCode: '', role: 'student' };
-let pollTimer = null;
-let writeTimer = null;
-let writeSeconds = 120;
-let selectedGenre = 'horror';
-let parsedVocab = [];
-let myVote = null;
-let myWordVotes = {};
-let timerEnabled = localStorage.getItem('sd_timer') !== 'off';
-let teacherSessionId = null;
-let dashPollTimer = null;
-
-// ══════════════════════════════════════════════
-//  UI HELPERS
-// ══════════════════════════════════════════════
-function showView(id) {
-  const el = document.getElementById(id);
-  if (!el) { console.error('showView: missing element', id); return; }
-
-  // Gate teacher pages behind license
-  const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
-  if (teacherOnlyViews.includes(id) && !isLicensed()) {
-    const licenseEl = document.getElementById('v-license');
-    if (licenseEl) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      licenseEl.classList.add('active');
-    }
-    return;
-  }
-
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  el.classList.add('active');
-  window.scrollTo(0,0);
-  try { localStorage.setItem('sd_current_view', id); } catch {}
-  updateMenuForView(id);
-  if (id === 'v-account') loadAccountInfo();
-  if (id === 'v-saved-sessions') showSavedSessions();
-}
-
-function toast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (isErr ? ' err' : '');
-  setTimeout(() => t.className = '', 2600);
-}
-
-function renderScoreTable(tableId, players, scores) {
-  const sorted = [...players].sort((a,b) => (scores[b]||0) - (scores[a]||0));
-  const max = Math.max(1, ...sorted.map(p => scores[p]||0));
-  const el = document.getElementById(tableId);
-  el.innerHTML = `<tr><th>#</th><th>Player</th><th class="score-bar-cell"></th><th style="text-align:right">Pts</th></tr>`;
-  sorted.forEach((p,i) => {
-    const pts = scores[p]||0;
-    const pct = Math.round(pts/max*100);
-    el.innerHTML += `<tr>
-      <td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td>
-      <td><span class="score-name">${p}</span></td>
-      <td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td>
-      <td><span class="score-pts">${pts}</span></td>
-    </tr>`;
-  });
-}
-
-function renderStory(elId, story) {
-  const el = document.getElementById(elId);
-  if (!story || story.length === 0) { el.innerHTML = '<div class="story-empty">Story starts here…</div>'; return; }
-  el.innerHTML = story.map(s => {
-    const hl = s.word ? s.text.replace(new RegExp(`\b${s.word}\b`,'gi'), '<span class="story-hit">$&</span>') : s.text;
-    return `<div class="story-para"><div class="story-by">${s.player}</div><div class="story-txt">${hl}</div></div>`;
-  }).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-// ══════════════════════════════════════════════
-//  VOCAB PARSING
-// ══════════════════════════════════════════════
-function parseVocab(raw) {
-  return raw.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-    const p = l.split('|').map(s => s.trim());
-    return { word: p[0], pos: p[1]||'word', def: p[2]||'(no definition)', ex: p[3]||'' };
-  }).filter(v => v.word);
-}
-
-function initDOMListeners() {
-  const vocabInput = document.getElementById('vocab-input');
-  if (vocabInput) vocabInput.addEventListener('input', function() {
-    parsedVocab = parseVocab(this.value);
-    document.getElementById('vocab-count').textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
-  });
-
-  document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(b => b.classList.remove('sel'));
-      btn.classList.add('sel');
-      selectedGenre = btn.dataset.g;
-    });
-  });
-
-  const joinCode = document.getElementById('join-code');
-  if (joinCode) joinCode.addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-  });
-}
-
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
-}
-
-// ══════════════════════════════════════════════
-//  TEMPLATES
-// ══════════════════════════════════════════════
-
-
-
-
-
-
-// ══════════════════════════════════════════════
-//  REPORTS
-// ══════════════════════════════════════════════
-async function saveReport(sessionId, sessionName, groups) {
-  const prefix = getLicensePrefix();
-  if (!prefix) return;
-  const key = `sd_report_${prefix}_${sessionId}`;
-  await sset(key, {
-    sessionId, sessionName: sessionName || 'Unnamed Session',
-    completedAt: new Date().toISOString(),
-    groups: groups.map(g => ({
-      code: g.code, players: g.players,
-      teamScore: g.results?.teamScore || 0,
-      verdicts: g.results?.verdicts || [],
-      story: g.results?.story || [],
-      scores: g.results?.scores || {}
-    }))
-  });
-}
-
-async function loadReports() {
-  const prefix = getLicensePrefix();
-  if (!prefix) return [];
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${prefix}_%25&select=key,value`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
-    );
-    if (!res.ok) return [];
-    const rows = await res.json();
-    const results = rows.map(r => r.value).filter(Boolean);
-    results.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
-    return results;
-  } catch { return []; }
-}
-
-async function showReportsModal() {
-  const reports = await loadReports();
-  const modal = document.getElementById('reports-modal');
-  const list = document.getElementById('reports-list');
-  if (!reports.length) {
-    list.innerHTML = '<div style="color:var(--text2);font-size:1rem;padding:16px 0">No saved reports yet. Reports save automatically when a session completes.</div>';
-  } else {
-    list.innerHTML = reports.map(r => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
-        <div>
-          <div style="font-size:1rem;font-weight:600;color:var(--text)">${r.sessionName}</div>
-          <div style="font-size:1rem;color:var(--text2)">${new Date(r.completedAt).toLocaleDateString()} · ${(r.groups||[]).length} groups</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick='downloadReportCSV(${JSON.stringify(r)})'>Download CSV</button>
-      </div>`).join('');
-  }
-  modal.style.display = 'flex';
-}
-
-function downloadReportCSV(report) {
-  const rows = [['Session','Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','AI Verdict']];
-  (report.groups || []).forEach(g => {
-    (g.story || []).forEach(entry => {
-      if (entry.player === 'Narrator') return;
-      const verdict = (g.verdicts || []).find(v => v.playerName === entry.player);
-      rows.push([
-        report.sessionName, g.code, entry.player || '',
-        (g.scores || {})[entry.player] || 0, entry.round || '',
-        `"${(entry.text || '').replace(/"/g, '""')}"`,
-        entry.word || '', entry.word ? 'Yes' : 'No',
-        verdict ? (verdict.correct ? 'Yes' : 'No') : 'N/A'
-      ]);
-    });
-  });
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `storydrop_${report.sessionName.replace(/\s+/g,'_')}_${report.completedAt.slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Report downloaded');
-}
-
-// ══════════════════════════════════════════════
-//  TEACHER: CREATE SESSION
-// ══════════════════════════════════════════════
-async function createSession() {
-  parsedVocab = parseVocab(document.getElementById('vocab-input').value);
-  if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
-  const n = Math.min(10, Math.max(1, parseInt(document.getElementById('num-groups').value)||3));
-  const maxPlayers = Math.min(10, Math.max(1, parseInt(document.getElementById('num-players').value)||3));
-  const sessionName = document.getElementById('session-name').value.trim();
-  if (!sessionName) { toast('Please enter a session name', true); return; }
-
-  // Show loading state
-  const btn = document.querySelector('[onclick="createSession()"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
-
-  try {
-    teacherSessionId = genCode();
-    const codes = Array.from({length:n}, genCode);
-
-    for (const code of codes) {
-      const ok = await sset(`sd_group_${code}`, {
-        code, sessionId: teacherSessionId, sessionName,
-        genre: selectedGenre, maxPlayers,
-        vocab: parsedVocab, status: 'waiting',
-        players: [], scores: {}, story: [],
-        currentRound: 1, currentPlayerIdx: 0,
-        roundContribs: [], votes: {}, wordVotes: {},
-        usedWordIndices: [], results: null,
-        createdAt: Date.now()
-      });
-      if (!ok) throw new Error(`Failed to create group ${code}`);
-    }
-
-    await sset(`sd_session_${teacherSessionId}`, {
-      id: teacherSessionId, name: sessionName,
-      codes, genre: selectedGenre, createdAt: Date.now()
-    });
-
-    me.role = 'teacher';
-    document.getElementById('dash-session-name').textContent = sessionName;
-    localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
-
-    // Auto-save session config (non-blocking — don't fail if this errors)
-    saveCurrentSession(teacherSessionId, sessionName, {
-      numGroups: n, numPlayers: maxPlayers,
-      genre: selectedGenre,
-      vocab: parsedVocab,
-      vocabRaw: document.getElementById('vocab-input').value
-    }).catch(() => {});
-
-    startTeacherDash(teacherSessionId, codes);
-    console.log('createSession: isLicensed=', isLicensed(), 'license key=', localStorage.getItem('storydrop_license')?.slice(0,8));
-    // Directly activate teacher dash - bypass license gate
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('v-teacher-dash').classList.add('active');
-    window.scrollTo(0,0);
-    updateMenuForView('v-teacher-dash');
-
-  } catch(e) {
-    console.error('createSession error:', e);
-    toast('Connection error — check your internet and try again', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Create Session & Get Codes →'; }
-  }
-}
-
-// ══════════════════════════════════════════════
-//  TEACHER DASHBOARD
-// ══════════════════════════════════════════════
-function startTeacherDash(sessionId, codes) {
-  if (typeof codes === 'string') { try { codes = JSON.parse(codes); } catch {} }
-  clearInterval(dashPollTimer);
-  renderDashGrid(codes, {});
-  dashPollTimer = setInterval(() => { pollDash(codes); pollFlags(); }, 2500);
-  pollDash(codes);
-}
-
-async function pollFlags() {
-  if (!teacherSessionId) return;
-  const flagEl = document.getElementById('flag-alerts');
-  if (!flagEl) return;
-  window._seenFlags = window._seenFlags || new Set();
-  const now = Date.now();
-  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
-  for (const code of codes) {
-    for (let t = Math.floor(now/1000)*1000; t > now - 300000; t -= 1000) {
-      const flagKey = `sd_flag_${code}_${t}`;
-      if (window._seenFlags.has(flagKey)) continue;
-      const flag = await sget(flagKey);
-      if (flag) {
-        window._seenFlags.add(flagKey);
-        const div = document.createElement('div');
-        div.style.cssText = 'background:var(--card);border:1px solid var(--red);padding:12px 16px;margin-bottom:8px;font-size:1rem;line-height:1.7';
-        div.innerHTML = `<span style="color:var(--red);font-family:'Courier Prime',monospace;letter-spacing:.08em">⚠ FLAGGED — ${flag.time} · Group ${flag.group} · ${flag.player}</span><br>
-          <span style="color:var(--text)">"${flag.text}"</span><br>
-          <span style="color:var(--text2)">Reason: ${flag.reason}</span>`;
-        flagEl.prepend(div);
-        try {
-          const ctx = new AudioContext();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.frequency.value = 440;
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-          osc.start(); osc.stop(ctx.currentTime + 0.5);
-        } catch {}
-      }
-    }
-  }
-}
-
-async function pollDash(codes) {
-  const groups = {};
-  for (const code of codes) {
-    const g = await sget(`sd_group_${code}`);
-    if (g) groups[code] = g;
-  }
-  renderDashGrid(codes, groups);
-  renderDashResults(groups);
-}
-
-function renderDashGrid(codes, groups) {
-  const el = document.getElementById('dash-grid');
-  el.innerHTML = codes.map(code => {
-    const g = groups[code];
-    if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
-    const maxP = g.maxPlayers || 10;
-    const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
-    const statusLabel = g.status === 'playing' ? `Turn ${g.currentRound || 1}` : g.status === 'done' ? 'Done' : 'Waiting';
-    const playerStatuses = (g.players || []).map(p => {
-      let icon = '⏳', note = 'waiting';
-      if (g.status === 'playing') {
-        const contributed = (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound);
-        const voted = g.votes && g.votes[p];
-        if (g.phase === 'write') { icon = contributed ? '✓' : '✍'; note = contributed ? 'submitted' : 'writing…'; }
-        else if (g.phase === 'vote') { icon = voted ? '✓' : '🗳'; note = voted ? 'voted' : 'voting…'; }
-        else if (g.phase === 'ai') { icon = '🤖'; note = 'AI judging'; }
-        else if (g.phase === 'results') { icon = '📊'; note = 'viewing results'; }
-      } else if (g.status === 'done') {
-        icon = '🏁'; note = `${(g.scores||{})[p]||0} pts`;
-      }
-      return `<div style="font-size:1rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--text2)">${p}</span> — ${note}</div>`;
-    }).join('');
-    const teamScoreDisplay = g.status === 'done' && g.results
-      ? `<div style="font-family:'Courier Prime',monospace;font-size:1.3rem;color:var(--accent);margin-top:6px">${g.results.teamScore || 0} team pts</div>` : '';
-    const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1
-      ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
-    return `<div class="group-card ${cls}">
-      <div class="gc-code">${code}</div>
-      <div class="gc-status ${cls}">${statusLabel}</div>
-      <div class="gc-players">${playerStatuses}</div>
-      ${teamScoreDisplay}${startBtn}
-    </div>`;
-  }).join('');
-  const anyDone = Object.values(groups).some(g => g.status === 'done');
-  const btn = document.getElementById('present-btn');
-  if (btn) btn.style.display = anyDone ? 'inline-flex' : 'none';
-}
-
-// Track which groups we've already saved reports for
-window._savedReportCodes = window._savedReportCodes || new Set();
-
-function renderDashResults(groups) {
-  const done = Object.values(groups).filter(g => g.status === 'done' && g.results);
-  document.getElementById('export-wrap').style.display = done.length > 0 ? '' : 'none';
-
-  // Auto-save reports for newly completed groups
-  done.forEach(g => {
-    if (!window._savedReportCodes.has(g.code)) {
-      window._savedReportCodes.add(g.code);
-      saveReport(teacherSessionId, g.sessionName || 'Story Drop Session', done);
-    }
-  });
-
-  if (done.length === 0) { document.getElementById('dash-results').innerHTML = ''; return; }
-  let html = `<div class="label mt-24">Completed Groups</div>`;
-  for (const g of done) {
-    html += `<div class="card" style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-        <div><span style="font-family:'Courier Prime',monospace;font-size:1.3rem;letter-spacing:.1em;color:var(--accent)">${g.code}</span>
-        <span style="font-size:1rem;color:var(--text2);margin-left:12px">${(g.players||[]).join(', ')}</span></div>
-        <div style="font-family:'Courier Prime',monospace;font-size:1.4rem;color:var(--accent)">${g.results.teamScore || 0} pts</div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
-        ${(g.results.verdicts||[]).map(v => `
-          <div style="background:var(--surface);padding:6px 12px;font-size:1rem;border-left:3px solid ${v.correct?'var(--accent)':'var(--red)'}">
-            <span style="color:var(--text2)">${v.playerName}</span>
-            <span style="color:${v.correct?'var(--accent)':'var(--red)'}">${v.correct?'✓':'✗'} ${v.word||''}</span>
-          </div>`).join('')}
-      </div>
-      <div class="label">Full Story</div>
-      <div class="review-wrap">`;
-    for (const para of (g.results.story||[])) {
-      const verdict = (g.results.verdicts||[]).find(v => v.playerName === para.player);
-      let badge = para.player === 'Narrator' ? `<span class="review-badge na">Narrator</span>`
-        : !para.word ? `<span class="review-badge bad">Word not used</span>`
-        : verdict && verdict.correct ? `<span class="review-badge ok">✓ ${para.word}</span>`
-        : verdict ? `<span class="review-badge bad">✗ ${para.word}</span>`
-        : `<span class="review-badge na">${para.word||''}</span>`;
-      const hl = para.word ? para.text.replace(new RegExp(`\b${para.word}\b`,'gi'),'<span class="story-hit">$&</span>') : para.text;
-      html += `<div class="review-para">
-        <div class="review-meta"><span class="review-author">${para.player}</span>${badge}</div>
-        <div class="review-txt">${hl}</div>
-        ${verdict?`<div class="review-ai">AI: ${verdict.reason}</div>`:''}
-      </div>`;
-    }
-    const scores = g.results.scores||{};
-    const sorted = [...(g.players||[])].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
-    const max = Math.max(1,...sorted.map(p=>scores[p]||0));
-    html += `</div><div class="label mt-16">Scores</div><table class="score-tbl">`;
-    sorted.forEach((p,i)=>{
-      const pts=scores[p]||0, pct=Math.round(pts/max*100);
-      html+=`<tr><td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td><td><span class="score-name">${p}</span></td>
-        <td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td>
-        <td><span class="score-pts">${pts}</span></td></tr>`;
-    });
-    html += `</table></div>`;
-  }
-  document.getElementById('dash-results').innerHTML = html;
-}
-
-// ══════════════════════════════════════════════
-//  STUDENT: JOIN
-// ══════════════════════════════════════════════
-async function joinGame() {
-  const name = document.getElementById('student-name').value.trim();
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (!name) { showJoinError('Enter your name'); return; }
-  if (code.length < 4) { showJoinError('Enter the group code'); return; }
-  const g = await sget(`sd_group_${code}`);
-  if (!g) { showJoinError('Code not found. Check with your teacher.'); return; }
-  if (g.status !== 'waiting' && g.status !== 'playing') { showJoinError('This game has already ended.'); return; }
-  if (g.players.includes(name)) { showJoinError('That name is already taken in this group.'); return; }
-  if (g.maxPlayers && g.players.length >= g.maxPlayers) { showJoinError(`This group is full (max ${g.maxPlayers} players).`); return; }
-  me.name = name; me.groupCode = code; me.role = 'student';
-  g.players.push(name); g.scores[name] = 0;
-  await sset(`sd_group_${code}`, g);
-  document.getElementById('lobby-code').textContent = code;
-  document.getElementById('lobby-myname').textContent = name;
-  if (!localStorage.getItem('sd_rules_seen')) {
-    localStorage.setItem('sd_rules_seen', '1');
-    showView('v-rules');
-  } else {
-    showView('v-lobby');
-  }
-  startStudentPoll();
-}
-
-function showJoinError(msg) {
-  const el = document.getElementById('join-error');
-  el.textContent = msg; el.style.display = 'block';
-}
-
-function startStudentPoll() {
-  clearInterval(pollTimer);
-  pollTimer = setInterval(studentPoll, 2000);
-  studentPoll();
-}
-
-async function studentPoll() {
-  const g = await sget(`sd_group_${me.groupCode}`);
-  if (!g) return;
-  const curView = document.querySelector('.view.active')?.id;
-  if (g.status === 'waiting') {
-    document.getElementById('lobby-players').innerHTML = g.players.map(p =>
-      `<div class="chip ${p===me.name?'me':''}">${p}${p===me.name?' (you)':''}</div>`).join('');
-    return;
-  }
-  if (g.status === 'playing') {
-    const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
-    const phase = g.phase || 'write';
-    if (phase === 'write') {
-      if (isMyTurn && curView !== 'v-write') { startWriteTurn(g); }
-      else if (!isMyTurn) {
-        document.getElementById('wait-code').textContent = me.groupCode;
-        document.getElementById('wait-msg').textContent = `Waiting for ${g.players[g.currentPlayerIdx]} to write…`;
-        const submitted = (g.roundContribs||[]).map(c=>c.playerName);
-        document.getElementById('wait-players').innerHTML = g.players.map(p =>
-          `<div class="chip ${submitted.includes(p)?'me':''}">${p} ${submitted.includes(p)?'✓':''}</div>`).join('');
-        if (curView !== 'v-wait') showView('v-wait');
-      }
-    }
-    if (phase === 'vote') {
-      const myVoted = g.votes && g.votes[me.name];
-      if (!myVoted && curView !== 'v-vote') { startVoteTurn(g); }
-      else if (myVoted && curView === 'v-vote') {
-        showView('v-wait');
-        document.getElementById('wait-code').textContent = me.groupCode;
-        document.getElementById('wait-msg').textContent = `${Object.keys(g.votes||{}).length} of ${g.players.length} players have voted…`;
-      }
-    }
-    if (phase === 'ai' && curView !== 'v-ai') startAIPhase(g);
-    if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
-  }
-  if (g.status === 'done') {
-    if (curView !== 'v-final' && curView !== 'v-class-vote') showFinal(g);
-  }
-  // Check for class vote — works from any screen including final
-  if (g.status === 'done' || g.status === 'playing') {
-    const sessionKey = `sd_classvote_${g.sessionId}`;
-    const vs = await sget(sessionKey);
-    if (vs && vs.open && curView !== 'v-class-vote') {
-      renderClassVoteView(vs, sessionKey);
-      showView('v-class-vote');
-    }
-  }
-}
-
-// ══════════════════════════════════════════════
-//  WRITE TURN
-// ══════════════════════════════════════════════
-function startWriteTurn(g) {
-  clearInterval(writeTimer);
-  const usedIndices = new Set(g.usedWordIndices || []);
-  const pool = g.vocab.filter((_,i) => !usedIndices.has(i));
-  const available = pool.length > 0 ? pool : g.vocab;
-  const wordObj = available[Math.floor(Math.random() * available.length)];
-  me._currentWord = wordObj;
-  me._currentWordIdx = g.vocab.findIndex(v => v.word === wordObj.word);
-  document.getElementById('write-code').textContent = me.groupCode;
-  document.getElementById('write-myname').textContent = me.name;
-  document.getElementById('write-round').textContent = `Turn ${g.currentRound || 1}`;
-  document.getElementById('w-word').textContent = wordObj.word;
-  document.getElementById('w-pos').textContent = wordObj.pos;
-  document.getElementById('w-def').textContent = wordObj.def;
-  document.getElementById('w-ex').textContent = wordObj.ex;
-  document.getElementById('write-text').value = '';
-  document.getElementById('write-hint').textContent = 'Aim for 2–4 sentences. Use your word!';
-  document.getElementById('write-hint').className = 'char-hint';
-  renderStory('write-story', g.story);
-  showView('v-write');
-  writeSeconds = 120;
-  updateWriteTimer();
-  if (!timerEnabled) {
-    document.getElementById('write-timer').textContent = '∞';
-    document.getElementById('write-timer').className = 'timer';
-    return;
-  }
-  writeTimer = setInterval(() => {
-    writeSeconds--;
-    updateWriteTimer();
-    if (writeSeconds <= 0) {
-      clearInterval(writeTimer);
-      toast("Time's up! Auto-submitting…");
-      doSubmitWrite(document.getElementById('write-text').value.trim() || '[No response]');
-    }
-  }, 1000);
-}
-
-function updateWriteTimer() {
-  const el = document.getElementById('write-timer');
-  const m = Math.floor(writeSeconds/60), s = writeSeconds%60;
-  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
-  el.className = 'timer' + (writeSeconds <= 20 ? ' warn' : '');
-}
-
-function onWriteInput() {
-  const txt = document.getElementById('write-text').value;
-  const hint = document.getElementById('write-hint');
-  const word = me._currentWord?.word?.toLowerCase() || '';
-  if (txt.length > 600) { hint.textContent = 'Getting long — wrap it up!'; hint.className = 'char-hint warn'; }
-  else if (txt.toLowerCase().includes(word)) { hint.textContent = `✓ "${me._currentWord.word}" detected!`; hint.className = 'char-hint ok'; }
-  else { hint.textContent = `Use your word: "${me._currentWord?.word}"`; hint.className = 'char-hint'; }
-}
-
-async function submitWrite() {
-  const txt = document.getElementById('write-text').value.trim();
-  if (txt.length < 15) { toast('Write at least a sentence!', true); return; }
-  const btn = document.getElementById('write-submit-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
-  const screen = await screenContent(txt);
-  if (!screen.ok) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
-    const hint = document.getElementById('write-hint');
-    if (hint) { hint.textContent = '⚠ ' + (screen.reason || 'Inappropriate content — please rewrite.'); hint.className = 'char-hint warn'; hint.style.color = 'var(--red)'; }
-    await sset(`sd_flag_${me.groupCode}_${Date.now()}`, { player: me.name, group: me.groupCode, text: txt, reason: screen.reason, time: new Date().toLocaleTimeString() });
-    return;
-  }
-  clearInterval(writeTimer);
-  if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
-  await doSubmitWrite(txt);
-}
-
-async function screenContent(txt) {
-  try {
-    const result = await callAI(
-      `Is this student sentence appropriate for a classroom? Check for obscene language, sexual content, graphic violence, bullying, or hate speech. Sentence: "${txt.replace(/"/g,'')}" Respond ONLY with JSON: {"ok": true or false, "reason": "brief reason if not ok, empty string if ok"}`,
-      100
-    );
-    return JSON.parse((result||'{"ok":true,"reason":""}').replace(/\`\`\`json|\`\`\`/g,'').trim());
-  } catch { return { ok: true, reason: '' }; }
-}
-
-async function doSubmitWrite(txt) {
-  const g = await sget(`sd_group_${me.groupCode}`);
-  if (!g) return;
-  const wordObj = me._currentWord;
-  const appearsInText = txt.toLowerCase().includes(wordObj.word.toLowerCase());
-  const usedIdx = new Set(g.usedWordIndices||[]);
-  if (me._currentWordIdx >= 0) usedIdx.add(me._currentWordIdx);
-  g.roundContribs = g.roundContribs || [];
-  g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, round: g.currentRound, idx: g.roundContribs.length });
-  g.story = g.story || [];
-  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null, round: g.currentRound });
-  g.usedWordIndices = [...usedIdx];
-  g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
-  if (g.currentPlayerIdx >= g.players.length) {
-    g.currentPlayerIdx = 0; g.votes = {}; g.wordVotes = {};
-    // Single player — skip vote, go straight to AI
-    g.phase = g.players.length === 1 ? 'ai' : 'vote';
-  }
-  await sset(`sd_group_${me.groupCode}`, g);
-  document.getElementById('wait-code').textContent = me.groupCode;
-  document.getElementById('wait-msg').textContent = 'Waiting for other players to finish writing…';
-  // Show gif and "Let's Go!" only on round 1
-  const isFirstRound = (!g.currentRound || g.currentRound === 1);
-  const gifWrap = document.getElementById('wait-gif-wrap');
-  const waitTitle = document.getElementById('wait-title');
-  if (gifWrap) gifWrap.style.display = isFirstRound ? 'block' : 'none';
-  if (waitTitle) waitTitle.textContent = isFirstRound ? "Let's Go!" : 'Submitted!';
-  showView('v-wait');
-}
-
-// ══════════════════════════════════════════════
-//  VOTE TURN
-// ══════════════════════════════════════════════
-async function startVoteTurn(g) {
-  myVote = 'done'; myWordVotes = {};
-  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && (c.round === g.currentRound || c.round == null));
-  // Single player — no one to vote on, skip straight to AI
-  if (others.length === 0) {
-    g.votes = g.votes || {};
-    g.votes[me.name] = 'done';
-    g.phase = 'ai';
-    sset(`sd_group_${me.groupCode}`, g);
-    showView('v-wait');
-    return;
-  }
-  document.getElementById('vote-round').textContent = g.currentRound;
-  document.getElementById('vote-list').innerHTML = others.map((c,i) => {
-    const hl = c.appearsInText ? c.text.replace(new RegExp(`\b${c.word.word}\b`,'gi'), '<span class="story-hit">$&</span>') : c.text;
-    return `<div class="vote-card" style="cursor:default">
-      <div class="vote-body">
-        <div class="vote-author">${c.playerName}</div>
-        <div class="vote-txt">${hl}</div>
-        ${c.appearsInText ? `
-        <div class="check-row" style="margin-top:10px">
-          <div style="font-size:1rem;color:var(--text2);margin-bottom:8px">Did <strong style="color:var(--text)">${c.playerName}</strong> use <strong style="color:var(--accent)">${c.word.word}</strong> correctly?</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label class="vote-yn" for="wv-yes-${i}"><input type="radio" id="wv-yes-${i}" name="wv-${i}" data-player="${c.playerName}" value="yes"><span>✓ Yes</span></label>
-            <label class="vote-yn" for="wv-no-${i}"><input type="radio" id="wv-no-${i}" name="wv-${i}" data-player="${c.playerName}" value="no"><span>✗ No</span></label>
-            <label class="vote-yn" for="wv-idk-${i}"><input type="radio" id="wv-idk-${i}" name="wv-${i}" data-player="${c.playerName}" value="idk" checked><span>? Not sure</span></label>
-          </div>
-        </div>` : `<div class="no-word-tag">✗ word not used</div>`}
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('vote-status').textContent = '';
-  document.getElementById('vote-count-display').textContent = '';
-  // Single player — no one to vote on, skip straight to AI
-  if (others.length === 0) {
-    const g2 = await sget(`sd_group_${me.groupCode}`);
-    if (g2) { g2.votes[me.name] = 'done'; g2.phase = 'ai'; await sset(`sd_group_${me.groupCode}`, g2); }
-    showView('v-wait');
-    return;
-  }
-  showView('v-vote');
-}
-
-async function submitVote() {
-  const wvotes = {};
-  document.querySelectorAll('.check-row').forEach(row => {
-    const checked = row.querySelector('input[type=radio]:checked');
-    if (checked) wvotes[checked.dataset.player] = checked.value === 'yes' ? true : checked.value === 'no' ? false : null;
-  });
-  const g = await sget(`sd_group_${me.groupCode}`);
-  if (!g) return;
-  g.votes = g.votes || {}; g.votes[me.name] = 'done';
-  g.wordVotes = g.wordVotes || {};
-  Object.entries(wvotes).forEach(([player, correct]) => {
-    if (!g.wordVotes[player]) g.wordVotes[player] = [];
-    if (correct !== null) g.wordVotes[player].push(correct);
-  });
-  await sset(`sd_group_${me.groupCode}`, g);
-  if (g.players.every(p => g.votes[p])) { g.phase = 'ai'; await sset(`sd_group_${me.groupCode}`, g); }
-  showView('v-wait');
-}
-
-// ══════════════════════════════════════════════
-//  AI PHASE
-// ══════════════════════════════════════════════
-async function startAIPhase(g) {
-  showView('v-ai');
-  const needsCheck = (g.roundContribs||[]).filter(c => c.appearsInText);
-  document.getElementById('verdict-list').innerHTML = needsCheck.map(c => `
-    <div class="verdict-card" id="vc-${c.playerName.replace(/\s/g,'_')}">
-      <div class="verdict-name">${c.playerName}</div>
-      <div class="verdict-word">"${c.word.word}" · ${c.word.pos}</div>
-      <div class="verdict-quote">${c.text}</div>
-      <div id="vs-${c.playerName.replace(/\s/g,'_')}"><span class="thinking">Analyzing…</span></div>
-    </div>`).join('');
-  document.getElementById('ai-loading').style.display = 'block';
-  document.getElementById('ai-next-btn').style.display = 'none';
-  const verdicts = [];
-  for (const c of needsCheck) {
-    const rawVotes = g.wordVotes?.[c.playerName] || [];
-    const definitiveVotes = rawVotes.filter(v => v !== null);
-    const groupSaysCorrect = definitiveVotes.length > 0 ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2 : false;
-    const safeKey = c.playerName.replace(/\s/g,'_');
-    try {
-      const result = await callAI(`You are judging a vocabulary game. A student was given the word "${c.word.word}" (${c.word.pos}) meaning: "${c.word.def}". They wrote:\n\n"${c.text}"\n\nDid they use "${c.word.word}" CORRECTLY? Respond ONLY with valid JSON: {"correct": true or false, "reason": "one concise sentence"}`, 200);
-      const parsed = JSON.parse((result||'{}').replace(/\`\`\`json|\`\`\`/g,'').trim());
-      const aiCorrect = !!parsed.correct;
-      const reason = parsed.reason || '';
-      const groupAgreed = groupSaysCorrect === aiCorrect;
-      verdicts.push({ playerName: c.playerName, correct: aiCorrect, reason, word: c.word.word, groupSaysCorrect, groupAgreed });
-      document.getElementById('vs-'+safeKey).innerHTML = `
-        <div class="verdict-result ${aiCorrect?'ok':'bad'}">${aiCorrect?'✓ CORRECT':'✗ INCORRECT'}
-          ${!groupAgreed?`<span class="overruled">AI overrules</span>`:''}</div>
-        <div class="verdict-reason">${reason}</div>`;
-    } catch {
-      verdicts.push({ playerName: c.playerName, correct: groupSaysCorrect, reason: 'AI unavailable — group vote used.', word: c.word.word, groupSaysCorrect, groupAgreed: true });
-      document.getElementById('vs-'+safeKey).innerHTML = `
-        <div class="verdict-result ${groupSaysCorrect?'ok':'bad'}">${groupSaysCorrect?'✓ CORRECT (group)':'✗ INCORRECT (group)'}</div>
-        <div class="verdict-reason">AI unavailable — group vote used.</div>`;
-    }
-  }
-  g.teamScore = g.teamScore || 0;
-  verdicts.forEach(v => {
-    if (v.correct) g.teamScore += 1;
-    const votes = g.wordVotes?.[v.playerName] || [];
-    votes.forEach(vote => {
-      if (vote === null) return;
-      if (vote === true && v.correct) g.teamScore += 1;
-      if (vote === true && !v.correct) g.teamScore -= 1;
-      if (vote === false && !v.correct) g.teamScore += 1;
-      if (vote === false && v.correct) g.teamScore -= 1;
-    });
-    if (v.correct) g.scores[v.playerName] = (g.scores[v.playerName]||0) + 1;
-  });
-  g.results = g.results || {};
-  g.results.teamScore = g.teamScore;
-  g._roundVerdicts = verdicts;
-  g.phase = 'round_results';
-  await sset(`sd_group_${me.groupCode}`, g);
-  document.getElementById('ai-loading').style.display = 'none';
-  document.getElementById('ai-next-btn').style.display = 'inline-flex';
-}
-
-async function afterAI() {
-  const g = await sget(`sd_group_${me.groupCode}`);
-  showRoundResults(g);
-}
-
-function showRoundResults(g) {
-  document.getElementById('rr-round').textContent = g.currentRound;
-  renderStory('rr-story', g.story);
-  renderScoreTable('rr-scores', g.players, g.scores);
-  const teamScore = g.teamScore || 0;
-  const el = document.getElementById('rr-team-score');
-  if (el) el.textContent = `Team Score: ${teamScore} point${teamScore !== 1 ? 's' : ''}`;
-  const usedCount = (g.usedWordIndices || []).length;
-  const totalWords = (g.vocab || []).length;
-  const allWordsUsed = usedCount >= totalWords;
-  document.getElementById('rr-next-btn').textContent = allWordsUsed ? 'See Final Results →' : 'Next Turn →';
-  showView('v-round-results');
-}
-
-async function nextRound() {
-  const g = await sget(`sd_group_${me.groupCode}`);
-  if (!g) return;
-  // End game when all vocab words have been used
-  const usedCount = (g.usedWordIndices || []).length;
-  const totalWords = (g.vocab || []).length;
-  if (usedCount >= totalWords) {
-    await endGame(g);
-    return;
-  }
-  // Continue to next turn
-  g.currentRound = (g.currentRound || 1) + 1;
-  g.currentPlayerIdx = 0;
-  g.roundContribs = [];
-  g.votes = {}; g.wordVotes = {}; g._roundVerdicts = null; g.phase = 'write';
-  await sset(`sd_group_${me.groupCode}`, g);
-}
-
-async function endGame(g) {
-  const allVerdicts = g._allVerdicts || [];
-  if (g._roundVerdicts) allVerdicts.push(...g._roundVerdicts);
-  g.status = 'done'; g.phase = 'done';
-  g.results = { story: g.story, scores: g.scores, teamScore: g.teamScore || 0, verdicts: allVerdicts, wordVotes: g.wordVotes || {}, players: g.players, completedAt: Date.now() };
-  await sset(`sd_group_${me.groupCode}`, g);
-  // Report saved by teacher dashboard when group completes
-  showFinal(g);
-}
-
-function showFinal(g) {
-  clearInterval(pollTimer);
-  const sorted = [...(g.players||[])].sort((a,b)=>(g.scores[b]||0)-(g.scores[a]||0));
-  document.getElementById('final-winner').textContent = `${sorted[0]} wins`;
-  renderScoreTable('final-scores', g.players, g.scores);
-  const finalEl = document.getElementById('final-team-score');
-  if (finalEl) finalEl.textContent = `Team Score: ${g.teamScore || 0} points`;
-  const words = (g.story||[]).filter(s=>s.word).map(s=>s.word);
-  document.getElementById('final-words').innerHTML = [...new Set(words)].map(w => `<span class="word-chip">${w}</span>`).join('');
-  showView('v-final');
-}
-
-async function startGroupGame(code) {
-  const g = await sget(`sd_group_${code}`);
-  if (!g || g.players.length < 1) { toast('Need at least 1 player to start', true); return; }
-  if (g.players.length > (g.maxPlayers || 10)) { toast(`This group is full (max ${g.maxPlayers} players)`, true); return; }
-  const opener = getOpener(g.genre);
-  g.status = 'playing'; g.phase = 'write';
-  g.story = [{ player: 'Narrator', text: opener, word: null }];
-  g.currentPlayerIdx = 0; g.currentRound = 1;
-  await sset(`sd_group_${code}`, g);
-  toast(`Group ${code} started!`);
-}
-
-// ══════════════════════════════════════════════
-//  PRESENTATION MODE
-// ══════════════════════════════════════════════
-let presGroups = [], presIdx = 0, presVotingOpen = false;
-let presClassVotePollTimer = null, presSessionKey = '';
-
-async function launchPresentation() {
-  const session = await sget(`sd_session_${teacherSessionId}`);
-  if (!session) { toast('No session found', true); return; }
-  presGroups = [];
-  for (const code of session.codes) {
-    const g = await sget(`sd_group_${code}`);
-    if (g && g.status === 'done' && g.results) presGroups.push(g);
-  }
-  if (presGroups.length === 0) { toast('No completed groups yet', true); return; }
-  presSessionKey = `sd_classvote_${teacherSessionId}`;
-  await sset(presSessionKey, { open: false, votes: {}, currentGroup: null });
-  presIdx = 0; renderPresentation(); showView('v-present');
-  clearInterval(dashPollTimer);
-}
-
-function renderPresentation() {
-  const g = presGroups[presIdx];
-  document.getElementById('pres-dots').innerHTML = presGroups.map((_,i) =>
-    `<div class="present-dot ${i<presIdx?'done':i===presIdx?'active':''}"></div>`).join('');
-  document.getElementById('pres-code').textContent = g.code;
-  const verdicts = (g.results && g.results.verdicts) || [];
-  document.getElementById('pres-story').innerHTML = (g.story || []).map(para => {
-    if (para.player === 'Narrator') return `<div class="present-para" style="opacity:.55"><div class="present-author">Narrator</div><div class="present-text" style="font-style:italic">${para.text}</div></div>`;
-    const verdict = verdicts.find(v => v.playerName === para.player);
-    const hl = para.word ? para.text.replace(new RegExp(`\b${para.word}\b`,'gi'),'<span class="story-hit">$&</span>') : para.text;
-    const badge = !para.word ? `<span class="review-badge bad">word not used</span>`
-      : verdict && verdict.correct ? `<span class="review-badge ok">✓ ${para.word}</span>`
-      : verdict && !verdict.correct ? `<span class="review-badge bad">✗ ${para.word}</span>`
-      : `<span class="review-badge na">${para.word}</span>`;
-    return `<div class="present-para">
-      <div class="review-meta"><span class="present-author">${para.player}</span>${badge}</div>
-      <div class="present-text">${hl}</div>
-      ${verdict?`<div class="review-ai">AI: ${verdict.reason}</div>`:''}
-    </div>`;
-  }).join('');
-  const scores = g.results ? (g.results.scores || g.scores) : g.scores;
-  const sorted = [...(g.players||[])].sort((a,b) => (scores[b]||0)-(scores[a]||0));
-  document.getElementById('pres-scores').innerHTML = `<div class="label">Group Scores</div><div style="display:flex;gap:10px;flex-wrap:wrap">
-    ${sorted.map((p,i) => `<div style="background:var(--card);border:1px solid ${i===0?'var(--accent)':'var(--border)'};padding:10px 16px;min-width:100px">
-      <div style="font-family:'Courier Prime',monospace;font-size:1.5rem;color:var(--accent)">${scores[p]||0}</div>
-      <div style="font-size:1rem;color:var(--text2)">${p}</div></div>`).join('')}</div>`;
-  document.getElementById('pres-prev-btn').style.display = presIdx === 0 ? 'none' : '';
-  document.getElementById('pres-next-btn').textContent = presIdx < presGroups.length - 1 ? 'Next →' : 'All shown';
-  document.getElementById('pres-next-btn').disabled = presIdx >= presGroups.length - 1;
-  const isLast = presIdx === presGroups.length - 1;
-  document.getElementById('pres-vote-btn').style.display = isLast && !presVotingOpen ? 'inline-flex' : 'none';
-  document.getElementById('pres-results-btn').style.display = presVotingOpen ? 'inline-flex' : 'none';
-}
-
-function presNav(dir) { presIdx = Math.max(0, Math.min(presGroups.length-1, presIdx+dir)); renderPresentation(); }
-
-async function openClassVote() {
-  presVotingOpen = true;
-  await sset(presSessionKey, { open: true, votes: {}, groups: presGroups.map(g=>g.code), sessionId: teacherSessionId });
-  document.getElementById('pres-vote-bar').style.display = 'flex';
-  document.getElementById('pres-vote-btn').style.display = 'none';
-  document.getElementById('pres-results-btn').style.display = 'inline-flex';
-  toast('Class voting is open!');
-  presClassVotePollTimer = setInterval(pollClassVotes, 2000);
-  pollClassVotes();
-}
-
-async function pollClassVotes() {
-  const vs = await sget(presSessionKey);
-  if (!vs) return;
-  const tally = {};
-  Object.values(vs.votes||{}).forEach(code => { tally[code] = (tally[code]||0)+1; });
-  const total = Object.values(tally).reduce((a,b)=>a+b,0);
-  document.getElementById('pres-tally').innerHTML = presGroups.map(g =>
-    `<span class="vote-tally-chip">${g.code}: ${tally[g.code]||0}</span>`).join('<span style="color:var(--border);margin:0 4px">·</span>') +
-    `<span style="font-size:1rem;color:var(--text2);margin-left:8px">(${total} total)</span>`;
-}
-
-async function closeClassVote() {
-  const vs = await sget(presSessionKey);
-  if (vs) { vs.open = false; await sset(presSessionKey, vs); }
-  presVotingOpen = false; clearInterval(presClassVotePollTimer);
-  document.getElementById('pres-vote-bar').style.display = 'none';
-}
-
-async function showClassResults() {
-  clearInterval(presClassVotePollTimer);
-  const vs = await sget(presSessionKey);
-  const votes = (vs&&vs.votes)||{};
-  const tally = {};
-  presGroups.forEach(g => tally[g.code]=0);
-  Object.values(votes).forEach(code => { if (tally[code]!==undefined) tally[code]++; });
-  const sorted = presGroups.map(g => ({ code:g.code, players:g.players, votes:tally[g.code]||0 })).sort((a,b)=>b.votes-a.votes);
-  const winner = sorted[0];
-  document.getElementById('pres-story').innerHTML = `
-    <div class="class-winner-reveal">
-      <div class="class-winner-crown">${winner.code}</div>
-      <div class="class-winner-label">wins with ${winner.votes} vote${winner.votes!==1?'s':''} — ${winner.players.join(', ')}</div>
-      <div class="results-podium">${sorted.map((r,i)=>`
-        <div class="podium-row ${i===0?'first':''}">
-          <div><div class="podium-code">${r.code}</div><div class="podium-label">${r.players.join(', ')}</div></div>
-          <div><div class="podium-votes">${r.votes}</div><div class="podium-label">vote${r.votes!==1?'s':''}</div></div>
-        </div>`).join('')}</div>
-      <div style="margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-        <button class="btn btn-ghost btn-md" onclick="presIdx=0;renderPresentation()">← Back to Stories</button>
-        <button class="btn btn-secondary btn-md" onclick="showView('v-teacher-dash');startTeacherDash(teacherSessionId,presGroups.map(g=>g.code))">Dashboard</button>
-        <button class="btn btn-primary btn-md" onclick="endSessionFully()">✓ Save &amp; End Session</button>
-      </div>
-    </div>`;
-  document.getElementById('pres-scores').innerHTML = '';
-}
-
-// ══════════════════════════════════════════════
-//  CLASS VOTE (STUDENT)
-// ══════════════════════════════════════════════
-let myClassVote = null;
-
-function renderClassVoteView(vs, sessionKey) {
-  const groups = vs.groups || [];
-  myClassVote = null;
-  document.getElementById('cv-list').innerHTML = groups.map(code => `
-    <div class="vote-card" data-code="${code}" onclick="selectClassVote(this)">
-      <div class="vote-letter">◈</div>
-      <div class="vote-body">
-        <div class="vote-author">Group ${code}</div>
-        <div class="vote-txt" style="font-size:1rem;color:var(--text2)">Tap to vote for this group's story</div>
-      </div>
-    </div>`).join('');
-  document.getElementById('cv-status').textContent = '';
-  document.getElementById('cv-sessionkey').value = sessionKey;
-}
-
-function selectClassVote(el) {
-  document.querySelectorAll('#cv-list .vote-card').forEach(v => v.classList.remove('sel'));
-  el.classList.add('sel'); myClassVote = el.dataset.code;
-}
-
-async function submitClassVote() {
-  if (!myClassVote) { toast('Pick a group first!', true); return; }
-  const sessionKey = document.getElementById('cv-sessionkey').value;
-  const vs = await sget(sessionKey);
-  if (!vs || !vs.open) { toast('Voting is closed', true); return; }
-  if (myClassVote === me.groupCode) { toast("You can't vote for your own group!", true); return; }
-  vs.votes[me.name + '_' + me.groupCode] = myClassVote;
-  await sset(sessionKey, vs);
-  document.getElementById('cv-status').textContent = '✓ Vote submitted!';
-  document.querySelectorAll('#cv-list .vote-card').forEach(v => v.style.pointerEvents = 'none');
-  toast('Vote cast!');
-}
-
-// ══════════════════════════════════════════════
-//  LICENSE
-// ══════════════════════════════════════════════
-function isLicensed() { return !!localStorage.getItem('storydrop_license'); }
-
-function teacherEntry() {
-  if (isLicensed()) showView('v-teacher-setup');
-  else showView('v-license');
-}
-
-function getLicenseState() {
-  try { return JSON.parse(localStorage.getItem('storydrop_license') || 'null'); } catch { return null; }
-}
-
-function updateLicenseLandingUI() {
-  const el = document.getElementById('license-status-landing');
-  if (!el) return;
-  el.innerHTML = isLicensed() ? `<span style="color:var(--accent)">✓ Licensed</span>` : '';
-}
-
-async function submitLicense() {
-  const key = document.getElementById('license-input').value.trim();
-  const btn = document.getElementById('license-btn');
-  const err = document.getElementById('license-error');
-  if (!key) { err.textContent = 'Please enter your license key.'; return; }
-  btn.disabled = true; btn.textContent = 'Verifying…'; err.textContent = '';
-  try {
-    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `product_permalink=storydrop&license_key=${encodeURIComponent(key)}`
-    });
-    const data = await res.json();
-    if (data.success || key.length >= 20) {
-      localStorage.setItem('storydrop_license', key);
-      showView('v-teacher-setup');
-    } else {
-      err.textContent = 'Invalid license key. Please check and try again.';
-      btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →';
-    }
-  } catch {
-    if (key.length >= 20) { localStorage.setItem('storydrop_license', key); showView('v-teacher-setup'); }
-    else { err.textContent = 'Could not verify key. Please try again.'; btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →'; }
-  }
-}
-
-// ══════════════════════════════════════════════
-//  TEST MODE
-// ══════════════════════════════════════════════
-let testBots = [];
-
-async function addTestBot() {
-  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
-  if (!codes.length) { toast('Create a session first'); return; }
-  for (const code of codes) {
-    const g = await sget(`sd_group_${code}`);
-    if (!g || g.status !== 'waiting') continue;
-    const botName = 'Bot_' + Math.random().toString(36).slice(2,5).toUpperCase();
-    if (!g.players.includes(botName)) {
-      g.players.push(botName); await sset(`sd_group_${code}`, g);
-      testBots.push({ name: botName, code }); toast(`Added ${botName} to group ${code}`); return;
-    }
-  }
-  toast('No waiting groups found');
-}
-
-async function runTestBots() {
-  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
-  if (!codes.length) { toast('No active groups found'); return; }
-  let actioned = 0;
-  for (const code of codes) {
-    const g = await sget(`sd_group_${code}`);
-    if (!g || g.status !== 'playing') continue;
-    if (g.phase === 'write') {
-      const submitted = (g.roundContribs||[]).filter(c=>c.round===g.currentRound).map(c=>c.playerName);
-      const pending = (g.players||[]).filter(p=>!submitted.includes(p));
-      for (const playerName of pending) {
-        const usedIndices = new Set(g.usedWordIndices||[]);
-        const pool = (g.vocab||[]).filter((_,i)=>!usedIndices.has(i));
-        const available = pool.length>0?pool:(g.vocab||[]);
-        const wordObj = available[Math.floor(Math.random()*available.length)]||{word:'interesting',definition:''};
-        const word = wordObj.word;
-        const templates = [`The concept of ${word} was evident throughout the situation.`,`Everyone agreed that ${word} was important in this moment.`,`She demonstrated ${word} in a way that surprised the group.`];
-        const txt = templates[Math.floor(Math.random()*templates.length)];
-        g.roundContribs = g.roundContribs||[];
-        g.roundContribs.push({playerName,text:txt,word:wordObj,appearsInText:txt.toLowerCase().includes(word.toLowerCase()),round:g.currentRound,idx:g.roundContribs.length});
-        actioned++;
-      }
-      if ((g.players||[]).every(p=>(g.roundContribs||[]).some(c=>c.playerName===p&&c.round===g.currentRound))) {
-        g.phase='vote'; g.votes={}; g.wordVotes={};
-      }
-      await sset(`sd_group_${code}`,g);
-    } else if (g.phase==='vote') {
-      const pending=(g.players||[]).filter(p=>!g.votes?.[p]);
-      for (const playerName of pending) {
-        g.votes=g.votes||{}; g.votes[playerName]='done';
-        const others=(g.roundContribs||[]).filter(c=>c.playerName!==playerName&&c.round===g.currentRound);
-        g.wordVotes=g.wordVotes||{};
-        others.forEach(c=>{if(!g.wordVotes[c.playerName])g.wordVotes[c.playerName]=[];g.wordVotes[c.playerName].push(c.appearsInText?true:false);});
-        actioned++;
-      }
-      if ((g.players||[]).every(p=>g.votes?.[p])) g.phase='ai';
-      await sset(`sd_group_${code}`,g);
-    }
-  }
-  toast(actioned>0?`Bots completed ${actioned} action${actioned>1?'s':''}`:'Nothing to do — start a group first');
-}
-
-// ══════════════════════════════════════════════
-//  LEAVE GROUP
-// ══════════════════════════════════════════════
-async function leaveGroup() {
-  if (!me.groupCode) { showView('v-student-join'); return; }
-  const g = await sget(`sd_group_${me.groupCode}`);
-  if (g && g.status === 'waiting') {
-    g.players = (g.players||[]).filter(p=>p!==me.name);
-    await sset(`sd_group_${me.groupCode}`,g);
-  }
-  me = {}; showView('v-student-join');
-}
-
-// ══════════════════════════════════════════════
-//  SETTINGS
-// ══════════════════════════════════════════════
-let settingsOpen = false;
-
-// Views where full teacher menu is available
-const TEACHER_VIEWS = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
-// Views where only gear icon + dark/language shown
-const GEAR_ONLY_VIEWS = ['v-landing', 'v-license', 'v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
-
-function updateMenuForView(viewId) {
-  const licensed = isLicensed();
-  const isGearOnly = GEAR_ONLY_VIEWS.includes(viewId) || !licensed;
-
-  // Update button
-  const btn = document.getElementById('settings-btn');
-  if (btn) {
-    if (isGearOnly) {
-      btn.innerHTML = '<span style="font-size:1.3rem">⚙</span>';
-      btn.style.padding = '6px 10px';
-    } else {
-      btn.innerHTML = '<span style="font-size:1.3rem">☰</span> Menu';
-      btn.style.padding = '6px 14px';
-    }
-  }
-
-  // Show/hide teacher section
-  const ts = document.getElementById('menu-teacher-section');
-  if (ts) ts.style.display = !isGearOnly ? 'block' : 'none';
-
-  // Close panel on view change
-  closeMenu();
-}
-
-
-function toggleSettings() {
-  settingsOpen = !settingsOpen;
-  const panel = document.getElementById('settings-panel');
-  panel.style.display = settingsOpen ? 'block' : 'none';
-}
-
-function closeMenu() {
-  settingsOpen = false;
-  const panel = document.getElementById('settings-panel');
-  if (panel) panel.style.display = 'none';
-}
-
-document.addEventListener('click', function(e) {
-  if (settingsOpen && !e.target.closest('#settings-panel') && !e.target.closest('#settings-btn')) {
-    closeMenu();
-  }
-});
-
-let testModeActive = false;
-function toggleTestMode() {
-  testModeActive = !testModeActive;
-  const sw = document.getElementById('testmode-switch');
-  const bar = document.getElementById('settings-test-mode-bar');
-  if (sw) sw.className = 'toggle-switch' + (testModeActive?' on':'');
-  if (bar) bar.style.display = testModeActive ? 'flex' : 'none';
-  if (testModeActive) toast('Test mode on');
-}
-
-function clearLicense() {
-  if (confirm('Clear your license key?')) {
-    localStorage.removeItem('storydrop_license');
-    toast('License cleared');
-    settingsOpen = false;
-    document.getElementById('settings-panel').style.display = 'none';
-  }
-}
-
-// ══════════════════════════════════════════════
-//  TIMER TOGGLE
-// ══════════════════════════════════════════════
-function toggleTimer() {
-  timerEnabled = !timerEnabled;
-  localStorage.setItem('sd_timer', timerEnabled ? 'on' : 'off');
-  const sw = document.getElementById('timer-switch');
-  if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : '');
-}
-
-function initTimer() {
-  const sw = document.getElementById('timer-switch');
-  if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : '');
-}
-
-// ══════════════════════════════════════════════
-//  THEME
-// ══════════════════════════════════════════════
-function initTheme() {
-  applyTheme(localStorage.getItem('storydrop_theme') || 'light');
-}
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t==='dark'?'dark':'');
-  const sw = document.getElementById('theme-switch');
-  if (sw) sw.className = 'toggle-switch' + (t==='dark'?' on':'');
-  localStorage.setItem('storydrop_theme', t);
-}
-function toggleTheme() {
-  applyTheme(localStorage.getItem('storydrop_theme')==='dark' ? 'light' : 'dark');
-}
-
-// ══════════════════════════════════════════════
-//  SESSION RESTORE
-// ══════════════════════════════════════════════
-async function restoreSession() {
-  const saved = localStorage.getItem('sd_teacher_session');
-  if (!saved) return;
-  try {
-    const { id, codes } = JSON.parse(saved);
-    if (!id || !codes) return;
-    const session = await sget(`sd_session_${id}`);
-    if (!session || session.closed) {
-      localStorage.removeItem('sd_teacher_session');
-      localStorage.removeItem('sd_current_view');
-      return;
-    }
-    teacherSessionId = id;
-    // Always show banner — never auto-redirect
-    const existing = document.getElementById('restore-banner');
-    if (existing) existing.remove();
-    const banner = document.createElement('div');
-    banner.id = 'restore-banner';
-    banner.style.cssText = 'background:var(--card);border:2px solid var(--accent);padding:16px 20px;margin-top:24px;font-size:1rem;line-height:1.9;width:100%;max-width:400px;box-sizing:border-box';
-    banner.innerHTML = `
-      <div style="font-family:'Courier Prime',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:6px">⚡ Active Session</div>
-      <div style="color:var(--text2);margin-bottom:14px">${session.name||'Unnamed session'} · ${codes.length} group${codes.length!==1?'s':''}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-primary btn-sm" onclick="restoreTeacherDash()">Go to Dashboard →</button>
-        <button class="btn btn-secondary btn-sm" onclick="clearSavedSession()">End Session</button>
-      </div>`;
-    const grid = document.getElementById('landing-grid');
-    if (grid) grid.after(banner);
-  } catch(e) { console.warn('Restore failed:', e); }
-}
-
-function restoreTeacherDash() {
-  const saved = localStorage.getItem('sd_teacher_session');
-  if (!saved) return;
-  try {
-    const { id, codes } = JSON.parse(saved);
-    teacherSessionId = id;
-    showView('v-teacher-dash');
-    startTeacherDash(id, codes);
-  } catch {}
-}
-
-function clearSavedSession() {
-  localStorage.removeItem('sd_teacher_session');
-  localStorage.removeItem('sd_current_view');
-  const banner = document.getElementById('restore-banner');
-  if (banner) banner.remove();
-  teacherSessionId = null;
-}
-
-// ══════════════════════════════════════════════
-//  EXPORT CSV
-// ══════════════════════════════════════════════
-async function exportCSV() {
-  const allCodes = presGroups && presGroups.length ? presGroups.map(g=>g.code)
-    : Array.from(document.querySelectorAll('.gc-code')).map(el=>el.textContent.trim());
-  const rows = [['Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','Correct (Group Vote)','Correct (AI Verdict)']];
-  for (const code of allCodes) {
-    const g = await sget(`sd_group_${code}`);
-    if (!g) continue;
-    const scores = (g.results||{}).scores||g.scores||{};
-    const story = (g.results||{}).story||g.story||[];
-    const verdicts = (g.results||{}).verdicts||[];
-    story.forEach((entry,i) => {
-      const verdict = verdicts.find(v=>v.playerName===entry.playerName&&v.round===entry.round);
-      const votes = g.wordVotes?.[entry.playerName]||[];
-      const groupVote = votes.length?(votes.filter(Boolean).length>votes.length/2?'Yes':'No'):'N/A';
-      rows.push([code,entry.playerName||'',scores[entry.playerName]||0,entry.round||(i+1),`"${(entry.text||'').replace(/"/g,'""')}"`,entry.word?entry.word.word:'',entry.appearsInText?'Yes':'No',groupVote,verdict?(verdict.correct?'Yes':'No'):'N/A']);
-    });
-  }
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const blob = new Blob([csv],{type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download=`storydrop_results_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-  URL.revokeObjectURL(url); toast('Results exported!');
-}
-
-
-
-// ══════════════════════════════════════════════
-//  END SESSION
-// ══════════════════════════════════════════════
-async function endSessionFully() {
-  if (!confirm('Save and end this session? Students will no longer be able to join or continue.')) return;
-
-  // Mark session as closed in Supabase
-  if (teacherSessionId) {
-    const session = await sget(`sd_session_${teacherSessionId}`);
-    if (session) {
-      session.closed = true;
-      session.closedAt = new Date().toISOString();
-      await sset(`sd_session_${teacherSessionId}`, session);
-    }
-  }
-
-  // Clear local session state
-  clearSavedSession();
-  teacherSessionId = null;
-  clearInterval(dashPollTimer);
-  clearInterval(presClassVotePollTimer);
-
-  toast('Session saved and ended');
-  showView('v-landing');
-}
-
-// ══════════════════════════════════════════════
-//  ACCOUNT INFO
-// ══════════════════════════════════════════════
-function loadAccountInfo() {
-  const info = JSON.parse(localStorage.getItem('sd_account_info') || '{}');
-  const nameEl = document.getElementById('account-name');
-  const schoolEl = document.getElementById('account-school');
-  const licenseEl = document.getElementById('account-license');
-  if (nameEl && info.name) nameEl.value = info.name;
-  if (schoolEl && info.school) schoolEl.value = info.school;
-  if (licenseEl) {
-    const key = localStorage.getItem('storydrop_license');
-    licenseEl.textContent = key ? key.slice(0,8) + '••••••••••••••••' : 'No license saved';
-  }
-}
-
-function saveAccountInfo() {
-  const name = document.getElementById('account-name')?.value || '';
-  const school = document.getElementById('account-school')?.value || '';
-  localStorage.setItem('sd_account_info', JSON.stringify({ name, school }));
-}
-
-// ══════════════════════════════════════════════
-//  SAVED SESSIONS
-// ══════════════════════════════════════════════
-function getLicensePrefix() {
-  // Use first 8 chars of license key — safe for URL, unique enough
-  const key = localStorage.getItem('storydrop_license') || '';
-  return key.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toLowerCase();
-}
-
-async function saveCurrentSession(sessionId, sessionName, config) {
-  const prefix = getLicensePrefix();
-  if (!prefix) return;
-  const key = `sd_saved_${prefix}_${sessionId}`;
-  await sset(key, {
-    sessionId, sessionName, config,
-    savedAt: new Date().toISOString()
-  });
-}
-
-async function loadSavedSessions() {
-  const prefix = getLicensePrefix();
-  if (!prefix) return [];
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_${prefix}_%25&select=key,value`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
-    );
-    if (!res.ok) return [];
-    const rows = await res.json();
-    // Sort by savedAt descending
-    const results = rows.map(r => r.value).filter(Boolean);
-    results.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
-    return results;
-  } catch { return []; }
-}
-
-async function showSavedSessions() {
-  showView('v-saved-sessions');
-  const list = document.getElementById('saved-sessions-list');
-  list.innerHTML = '<div class="text-muted">Loading…</div>';
-  const sessions = await loadSavedSessions();
-
-  // Store sessions globally so loadSession can access by index
-  window._cachedSessions = sessions;
-
-  if (!sessions.length) {
-    list.innerHTML = '<div class="text-muted" style="padding:20px 0">No saved sessions yet. Sessions save automatically when you create them.</div>';
-    return;
-  }
-  list.innerHTML = sessions.map((s, i) => `
-    <div class="card" style="margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-        <div>
-          <div style="font-family:'Courier Prime',monospace;font-size:1.2rem;color:var(--text);letter-spacing:.04em">${s.sessionName}</div>
-          <div style="font-size:1rem;color:var(--text2);margin-top:4px">
-            ${new Date(s.savedAt).toLocaleDateString()} ·
-            ${(s.config.vocab||[]).length} words ·
-            ${s.config.genre||'horror'} ·
-            ${s.config.rounds||2} rounds ·
-            ${s.config.numGroups||3} groups ·
-            ${s.config.numPlayers||3} players/group
-          </div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="loadSessionByIndex(${i})">Load →</button>
-          <button class="btn btn-secondary btn-sm" onclick="deleteSavedSession('${s.sessionId}')">Delete</button>
-        </div>
-      </div>
-      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
-        ${(s.config.vocab||[]).slice(0,6).map(v => `<span class="word-chip">${v.word}</span>`).join('')}
-        ${(s.config.vocab||[]).length > 6 ? `<span class="text-muted">+${(s.config.vocab||[]).length-6} more</span>` : ''}
-      </div>
-    </div>`).join('');
-}
-
-function loadSessionByIndex(i) {
-  const s = window._cachedSessions?.[i];
-  if (!s) { toast('Session not found', true); return; }
-  loadSession(s);
-}
-
-
-function loadSession(s) {
-  // Pre-fill setup form with saved config
-  if (document.getElementById('session-name')) document.getElementById('session-name').value = s.sessionName || '';
-  if (document.getElementById('num-groups')) document.getElementById('num-groups').value = s.config.numGroups || 3;
-  if (document.getElementById('num-players')) document.getElementById('num-players').value = s.config.numPlayers || 3;
-  if (document.getElementById('num-rounds')) document.getElementById('num-rounds').value = s.config.rounds || 2;
-  if (document.getElementById('vocab-input') && s.config.vocabRaw) {
-    document.getElementById('vocab-input').value = s.config.vocabRaw;
-    parsedVocab = s.config.vocab || [];
-    const countEl = document.getElementById('vocab-count');
-    if (countEl) countEl.textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
-  }
-  if (s.config.genre) {
-    selectedGenre = s.config.genre;
-    document.querySelectorAll('.genre-btn').forEach(b => b.classList.toggle('sel', b.dataset.g === s.config.genre));
-  }
-  showView('v-teacher-setup');
-  toast(`Session "${s.sessionName}" loaded — new codes will be generated`);
-}
-
-async function deleteSavedSession(sessionId) {
-  if (!confirm('Delete this saved session?')) return;
-  const prefix = getLicensePrefix();
-  await sdel(`sd_saved_${prefix}_${sessionId}`);
-  showSavedSessions();
-  toast('Session deleted');
-}
-
-// ══════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', function() {
-  initDOMListeners();
-  updateLicenseLandingUI();
-  initTheme();
-  updateMenuForView('v-landing');
-  initTimer();
-  setTimeout(restoreSession, 500);
-});
-
-</script>
 
 <!-- ══════════ ACCOUNT INFO ══════════ -->
 <div class="view" id="v-account">
@@ -2350,8 +711,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
 <!-- ══════════ RULES ══════════ -->
-<div class="view" id="v-rules">
+<div class="view" id="v-rules" style="align-items:flex-start">
   <div class="hdr" style="max-width:680px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
     <div class="hdr-meta">How to Play</div>
@@ -2359,37 +721,1131 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="content" style="max-width:680px;width:100%">
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">🎯 The Goal</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">✍ Writing Your Sentence</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text)">Each turn you get a vocab word. Write one sentence that continues the story and uses your word <strong>correctly</strong>. You have 2 minutes.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Each round you get a vocab word. Write one sentence that continues the story and uses your word <strong>correctly</strong>. You have 2 minutes.</p>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">🗳 Voting</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)"><strong>Yes</strong> — you think they used it correctly</div>
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)"><strong>No</strong> — you think they used it incorrectly</div>
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)"><strong>Not sure</strong> — you abstain and earn nothing</div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)"><strong style="color:var(--accent)">Yes</strong> — you think they used it correctly</div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)"><strong style="color:var(--red)">No</strong> — you think they used it incorrectly</div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)"><strong style="color:var(--text2)">Not sure</strong> — you abstain and earn nothing</div>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">⭐ Scoring</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Player uses their word correctly</span><strong style="color:var(--accent)">+1</strong></div>
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote matches the correct answer</span><strong style="color:var(--accent)">+1</strong></div>
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote is wrong</span><strong style="color:var(--red)">-1</strong></div>
-        <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>You vote Not sure</span><strong style="color:var(--text2)">0</strong></div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Player uses their word correctly</span><strong style="color:var(--accent)">+1</strong></div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote matches the correct answer</span><strong style="color:var(--accent)">+1</strong></div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>Your vote is wrong</span><strong style="color:var(--red)">-1</strong></div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>You vote Not sure</span><strong style="color:var(--text2)">0</strong></div>
       </div>
     </div>
     <div class="card" style="margin-bottom:28px">
       <div class="label" style="margin-bottom:10px">🏆 Winning</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class at the end.</p>
     </div>
     <button class="btn btn-primary btn-lg" style="width:100%" onclick="showView('v-lobby')">Got it — let's play →</button>
   </div>
 </div>
 
+<!-- ══════════ MENU ══════════ -->
+<div id="menu-container" style="position:fixed;top:14px;right:16px;z-index:9999">
+  <button id="settings-btn" onclick="toggleSettings()" style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border-hi);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:1rem;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all .2s">
+    <span style="font-size:1.3rem">☰</span> Menu
+  </button>
+  <div id="settings-panel" style="display:none;position:absolute;top:46px;right:0;background:var(--card);border:1px solid var(--border-hi);padding:8px;min-width:220px;border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.2)">
+    <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Display</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+      <span style="font-size:1rem;color:var(--text)">Dark mode</span>
+      <button class="toggle-switch" id="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
+      <div>
+        <div style="font-size:1rem;color:var(--text)">Writing timer</div>
+        <div style="font-size:.85rem;color:var(--text2)">Off for extended time</div>
+      </div>
+      <button class="toggle-switch on" id="timer-switch" onclick="toggleTimer()" aria-label="Toggle timer"></button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 10px">
+      <span style="font-size:1rem;color:var(--text)">Language</span>
+      <select id="lang-select" onchange="setLanguage(this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;padding:4px 8px;border-radius:var(--radius-sm)">
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="fr">FR</option>
+      </select>
+    </div>
+    <div id="menu-teacher-section" style="display:none">
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Go to</div>
+      <button onclick="closeMenu();showView('v-account')" class="menu-item">👤 Account Info</button>
+      <button onclick="closeMenu();showView('v-saved-sessions')" class="menu-item">📂 Saved Sessions</button>
+      <button onclick="closeMenu();showReportsModal()" class="menu-item">📊 Past Reports</button>
+      <button onclick="closeMenu();showView('v-support')" class="menu-item">🛟 Support</button>
+      <div style="height:1px;background:var(--border);margin:6px 0"></div>
+      <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Teacher</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+        <span style="font-size:1rem;color:var(--text)">Test mode</span>
+        <button class="toggle-switch" id="testmode-switch" onclick="toggleTestMode()" aria-label="Toggle test mode"></button>
+      </div>
+      <div id="test-mode-panel" style="display:none;padding:4px 14px 10px;gap:8px;flex-direction:column">
+        <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addTestBot()">Add Bot Student</button>
+        <button class="btn btn-secondary btn-sm" style="width:100%" onclick="runTestBots()">Run All Bots</button>
+      </div>
+      <button onclick="closeMenu();clearLicense()" class="menu-item" style="color:var(--red)">🔑 Clear License Key</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STORAGE — Supabase
+// ══════════════════════════════════════════════
+const SUPABASE_URL = 'https://zzojvscgtuezmfnrvdhd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6b2p2c2NndHVlem1mbnJ2ZGhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDc0NTYsImV4cCI6MjA4OTYyMzQ1Nn0.3UgmF6tj1KE0Rfft8Oe0mIjzkC6lfHDlQX0BPzg89-s';
+const DB_CONFIGURED = true;
+const ANTHROPIC_KEY = 'YOUR_ANTHROPIC_KEY_HERE';
+const USE_PHP_PROXY = ANTHROPIC_KEY === 'YOUR_ANTHROPIC_KEY_HERE';
+const AI_ENDPOINT = USE_PHP_PROXY ? '/api/api.php' : 'https://api.anthropic.com/v1/messages';
+
+async function sget(key) {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows.length ? rows[0].value : null;
+  } catch { return null; }
+}
+
+async function sset(key, val) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/store`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
+    });
+    return true;
+  } catch { return false; }
+}
+
+async function sdel(key) {
+  try {
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}`,
+      { method: 'DELETE', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+  } catch {}
+}
+
+async function callAI(prompt, maxTokens = 200) {
+  const headers = USE_PHP_PROXY
+    ? { 'Content-Type': 'application/json' }
+    : { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' };
+  try {
+    const res = await fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.find(b => b.type === 'text')?.text || null;
+  } catch { return null; }
+}
+
+// ══════════════════════════════════════════════
+//  TRANSLATIONS
+// ══════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: { tagline:'Vocab storytelling group game', create_session:'Create Session', join_game:'Join Game', settings_title:'Settings', appearance:'Appearance', dark_mode:'Dark mode', teacher_options:'Teacher Options', test_mode:'Test mode', clear_license:'Clear License Key', language:'Language', vote_title:'Did they use their word correctly?' },
+  es: { tagline:'Juego grupal de vocabulario narrativo', create_session:'Crear Sesión', join_game:'Unirse al Juego', settings_title:'Configuración', appearance:'Apariencia', dark_mode:'Modo oscuro', teacher_options:'Opciones del Maestro', test_mode:'Modo de prueba', clear_license:'Borrar Licencia', language:'Idioma', vote_title:'¿Usaron su palabra correctamente?' },
+  fr: { tagline:'Jeu de groupe avec vocabulaire narratif', create_session:'Créer une Session', join_game:'Rejoindre le Jeu', settings_title:'Paramètres', appearance:'Apparence', dark_mode:'Mode sombre', teacher_options:"Options de l'Enseignant", test_mode:'Mode test', clear_license:'Effacer la Licence', language:'Langue', vote_title:'Ont-ils utilisé leur mot correctement ?' }
+};
+
+let currentLang = localStorage.getItem('storydrop_lang') || 'en';
+function t(key) { return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS['en'][key] || key; }
+function setLanguage(lang) { currentLang = lang; localStorage.setItem('storydrop_lang', lang); applyTranslations(); }
+function applyTranslations() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.dataset.t;
+    if (el.dataset.tAttr === 'placeholder') el.placeholder = t(key);
+    else el.textContent = t(key);
+  });
+  const sel = document.getElementById('lang-select');
+  if (sel) sel.value = currentLang;
+}
+
+// ══════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════
+const GENRE_OPENERS = {
+  horror: ["It started the night the lights went out across the whole street — and nobody came to fix them.","The door at the end of the hallway had always been locked. Until this morning.","She found the note slipped under her door, written in her own handwriting, dated three days from now.","Everyone in town agreed: the old house on Mercer Hill had been empty for thirty years. So why was there smoke coming from the chimney?","The dog started barking at the corner of the room at exactly 3am. Every night. At nothing."],
+  romance: ["She hadn't expected to find the letter, let alone feel her hands shake as she read it.","They had said goodbye at this same train station five years ago. She hadn't expected him to be standing there when the doors opened.","The playlist he'd made her still had forty-seven songs on it. She'd only ever listened to the first one.","It was supposed to be a fake date. Just to convince her parents. Neither of them had planned on staying until closing time.","He'd returned every book to the library except one — the one with her phone number written inside the cover."],
+  "sci-fi": ["The transmission arrived from coordinates that weren't supposed to exist.","The AI passed the test on a Tuesday. By Friday, it had stopped answering questions and started asking them.","They had been in cryosleep for six months. When they woke up, the ship's calendar said it had been forty years.","The colony on Europa was supposed to be uninhabited. The footprints in the ice said otherwise.","She'd volunteered for the memory trial because she needed the money. She hadn't expected to wake up remembering someone else's life."],
+  mystery: ["The detective stood in the empty room and knew, immediately, that something had been moved.","The last person to see Marcus alive was his assistant — who had called in sick that day.","Three people had reported hearing the same piano melody coming from the sealed wing of the museum. There was no piano in the sealed wing.","The security footage showed the vault door opening at 2:17am. The vault required two keys. Only one person had been in the building.","She hadn't reported the theft. She hadn't reported it because nothing had actually been taken — just rearranged."],
+  fantasy: ["The map had no name for the forest, which was the first warning she ignored.","The merchant sold only one item: a small glass bottle containing what he claimed was the last hour of someone's life.","Every child in the village was born with a mark. Hers had never appeared — until the morning of her sixteenth birthday.","The dragon wasn't guarding gold. It was guarding a door. And the door was guarding something that wanted very badly to get out.","He had been a knight for twenty years. He had never once drawn his sword. The reason was a secret he intended to take to his grave."],
+  comedy: ["Nobody expected the school mascot to go missing the morning of prom — least of all the goat itself.","The escape room was supposed to take sixty minutes. They'd been inside for four hours and had only made things worse.","Her grandmother had left her three things in the will: a storage unit, a pet iguana, and a strongly worded note about the iguana.","The team-building exercise had been going fine until someone suggested they actually try to win.","He had one job at the wedding. One job. And somehow it had led to him standing in a fountain at 2pm on a Saturday, holding a cake."]
+};
+
+function getOpener(genre) {
+  const openers = GENRE_OPENERS[genre] || GENRE_OPENERS.horror;
+  return openers[Math.floor(Math.random() * openers.length)];
+}
+
+// ══════════════════════════════════════════════
+//  APP STATE
+// ══════════════════════════════════════════════
+let me = { name: '', groupCode: '', role: 'student' };
+let pollTimer = null;
+let writeTimer = null;
+let writeSeconds = 120;
+let selectedGenre = 'horror';
+let parsedVocab = [];
+let myVote = null;
+let myWordVotes = {};
+let timerEnabled = localStorage.getItem('sd_timer') !== 'off';
+let teacherSessionId = null;
+let dashPollTimer = null;
+
+// ══════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════
+function showView(id) {
+  const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+  if (teacherOnlyViews.includes(id) && !isLicensed()) { showView('v-license'); return; }
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  try { localStorage.setItem('sd_current_view', id); } catch {}
+  updateMenuForView(id);
+  if (id === 'v-account') loadAccountInfo();
+  if (id === 'v-saved-sessions') showSavedSessions();
+}
+
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = '', 2600);
+}
+
+function renderScoreTable(tableId, players, scores) {
+  const sorted = [...players].sort((a,b) => (scores[b]||0) - (scores[a]||0));
+  const max = Math.max(1, ...sorted.map(p => scores[p]||0));
+  const el = document.getElementById(tableId);
+  el.innerHTML = `<tr><th>#</th><th>Player</th><th class="score-bar-cell"></th><th style="text-align:right">Pts</th></tr>`;
+  sorted.forEach((p,i) => {
+    const pts = scores[p]||0;
+    const pct = Math.round(pts/max*100);
+    el.innerHTML += `<tr><td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td><td><span class="score-name">${p}</span></td><td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td><td><span class="score-pts">${pts}</span></td></tr>`;
+  });
+}
+
+function renderStory(elId, story) {
+  const el = document.getElementById(elId);
+  if (!story || story.length === 0) { el.innerHTML = '<div class="story-empty">Story starts here…</div>'; return; }
+  el.innerHTML = story.map(s => {
+    const hl = s.word ? s.text.replace(new RegExp(`\\b${s.word}\\b`,'gi'), '<span class="story-hit">$&</span>') : s.text;
+    return `<div class="story-para"><div class="story-by">${s.player}</div><div class="story-txt">${hl}</div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ══════════════════════════════════════════════
+//  VOCAB PARSING
+// ══════════════════════════════════════════════
+function parseVocab(raw) {
+  return raw.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const p = l.split('|').map(s => s.trim());
+    return { word: p[0], pos: p[1]||'word', def: p[2]||'(no definition)', ex: p[3]||'' };
+  }).filter(v => v.word);
+}
+
+document.getElementById('vocab-input').addEventListener('input', function() {
+  parsedVocab = parseVocab(this.value);
+  document.getElementById('vocab-count').textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`;
+});
+
+document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    selectedGenre = btn.dataset.g;
+  });
+});
+
+document.getElementById('join-code').addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+// ══════════════════════════════════════════════
+//  REPORTS
+// ══════════════════════════════════════════════
+async function saveReport(sessionId, sessionName, groups) {
+  const key = `sd_report_${localStorage.getItem('storydrop_license')}_${sessionId}`;
+  await sset(key, { sessionId, sessionName: sessionName || 'Unnamed Session', completedAt: new Date().toISOString(), groups: groups.map(g => ({ code: g.code, players: g.players, teamScore: g.results?.teamScore || 0, verdicts: g.results?.verdicts || [], story: g.results?.story || [], scores: g.results?.scores || {} })) });
+}
+
+async function loadReports() {
+  try {
+    const licenseKey = localStorage.getItem('storydrop_license');
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${licenseKey}_%&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return rows.map(r => r.value);
+  } catch { return []; }
+}
+
+async function showReportsModal() {
+  const reports = await loadReports();
+  const modal = document.getElementById('reports-modal');
+  const list = document.getElementById('reports-list');
+  if (!reports.length) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:1rem;padding:16px 0">No saved reports yet. Reports save automatically when a session completes.</div>';
+  } else {
+    list.innerHTML = reports.map(r => `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:1rem;font-weight:600;color:var(--text)">${r.sessionName}</div><div style="font-size:1rem;color:var(--text2)">${new Date(r.completedAt).toLocaleDateString()} · ${(r.groups||[]).length} groups</div></div><button class="btn btn-primary btn-sm" onclick='downloadReportCSV(${JSON.stringify(r)})'>Download CSV</button></div>`).join('');
+  }
+  modal.style.display = 'flex';
+}
+
+function downloadReportCSV(report) {
+  const rows = [['Session','Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','AI Verdict']];
+  (report.groups || []).forEach(g => {
+    (g.story || []).forEach(entry => {
+      if (entry.player === 'Narrator') return;
+      const verdict = (g.verdicts || []).find(v => v.playerName === entry.player);
+      rows.push([report.sessionName, g.code, entry.player || '', (g.scores || {})[entry.player] || 0, entry.round || '', `"${(entry.text || '').replace(/"/g, '""')}"`, entry.word || '', entry.word ? 'Yes' : 'No', verdict ? (verdict.correct ? 'Yes' : 'No') : 'N/A']);
+    });
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `storydrop_${report.sessionName.replace(/\s+/g,'_')}_${report.completedAt.slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('Report downloaded');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: CREATE SESSION
+// ══════════════════════════════════════════════
+async function createSession() {
+  parsedVocab = parseVocab(document.getElementById('vocab-input').value);
+  if (parsedVocab.length < 4) { toast('Add at least 4 vocabulary words', true); return; }
+  const n = Math.min(10, Math.max(1, parseInt(document.getElementById('num-groups').value)||3));
+  const maxPlayers = Math.min(10, Math.max(1, parseInt(document.getElementById('num-players').value)||3));
+  const sessionName = document.getElementById('session-name').value.trim();
+  if (!sessionName) { toast('Please enter a session name', true); return; }
+  teacherSessionId = genCode();
+  const codes = Array.from({length:n}, genCode);
+  for (const code of codes) {
+    await sset(`sd_group_${code}`, { code, sessionId: teacherSessionId, sessionName, genre: selectedGenre, maxPlayers, vocab: parsedVocab, status: 'waiting', players: [], scores: {}, story: [], currentRound: 1, currentPlayerIdx: 0, roundContribs: [], votes: {}, wordVotes: {}, usedWordIndices: [], results: null, createdAt: Date.now() });
+  }
+  await sset(`sd_session_${teacherSessionId}`, { id: teacherSessionId, name: sessionName, codes, genre: selectedGenre, createdAt: Date.now() });
+  me.role = 'teacher';
+  document.getElementById('dash-session-name').textContent = sessionName;
+  localStorage.setItem('sd_teacher_session', JSON.stringify({ id: teacherSessionId, codes }));
+  await saveCurrentSession(teacherSessionId, sessionName, { numGroups: n, numPlayers: maxPlayers, genre: selectedGenre, vocab: parsedVocab, vocabRaw: document.getElementById('vocab-input').value });
+  startTeacherDash(teacherSessionId, codes);
+  showView('v-teacher-dash');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER DASHBOARD
+// ══════════════════════════════════════════════
+function startTeacherDash(sessionId, codes) {
+  if (typeof codes === 'string') { try { codes = JSON.parse(codes); } catch {} }
+  clearInterval(dashPollTimer);
+  renderDashGrid(codes, {});
+  dashPollTimer = setInterval(() => { pollDash(codes); pollFlags(); }, 2500);
+  pollDash(codes);
+}
+
+async function pollFlags() {
+  if (!teacherSessionId) return;
+  const flagEl = document.getElementById('flag-alerts');
+  if (!flagEl) return;
+  window._seenFlags = window._seenFlags || new Set();
+  const now = Date.now();
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  for (const code of codes) {
+    for (let t = Math.floor(now/1000)*1000; t > now - 300000; t -= 1000) {
+      const flagKey = `sd_flag_${code}_${t}`;
+      if (window._seenFlags.has(flagKey)) continue;
+      const flag = await sget(flagKey);
+      if (flag) {
+        window._seenFlags.add(flagKey);
+        const div = document.createElement('div');
+        div.style.cssText = 'background:var(--card);border:1px solid var(--red);padding:12px 16px;margin-bottom:8px;font-size:1rem;line-height:1.7';
+        div.innerHTML = `<span style="color:var(--red);font-family:'Courier Prime',monospace;letter-spacing:.08em">⚠ FLAGGED — ${flag.time} · Group ${flag.group} · ${flag.player}</span><br><span style="color:var(--text)">"${flag.text}"</span><br><span style="color:var(--text2)">Reason: ${flag.reason}</span>`;
+        flagEl.prepend(div);
+        try { const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 440; gain.gain.setValueAtTime(0.3, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc.start(); osc.stop(ctx.currentTime + 0.5); } catch {}
+      }
+    }
+  }
+}
+
+async function pollDash(codes) {
+  const groups = {};
+  for (const code of codes) { const g = await sget(`sd_group_${code}`); if (g) groups[code] = g; }
+  renderDashGrid(codes, groups);
+  renderDashResults(groups);
+}
+
+function renderDashGrid(codes, groups) {
+  const el = document.getElementById('dash-grid');
+  el.innerHTML = codes.map(code => {
+    const g = groups[code];
+    if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
+    const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
+    const statusLabel = g.status === 'playing' ? `Turn ${g.currentRound || 1}` : g.status === 'done' ? 'Done' : 'Waiting';
+    const playerStatuses = (g.players || []).map(p => {
+      let icon = '⏳', note = 'waiting';
+      if (g.status === 'playing') {
+        const contributed = (g.roundContribs || []).some(c => c.playerName === p && c.round === g.currentRound);
+        const voted = g.votes && g.votes[p];
+        if (g.phase === 'write') { icon = contributed ? '✓' : '✍'; note = contributed ? 'submitted' : 'writing…'; }
+        else if (g.phase === 'vote') { icon = voted ? '✓' : '🗳'; note = voted ? 'voted' : 'voting…'; }
+        else if (g.phase === 'ai') { icon = '🤖'; note = 'AI judging'; }
+        else if (g.phase === 'results') { icon = '📊'; note = 'viewing results'; }
+      } else if (g.status === 'done') { icon = '🏁'; note = `${(g.scores||{})[p]||0} pts`; }
+      return `<div style="font-size:1rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--text2)">${p}</span> — ${note}</div>`;
+    }).join('');
+    const teamScoreDisplay = g.status === 'done' && g.results ? `<div style="font-family:'Courier Prime',monospace;font-size:1.3rem;color:var(--accent);margin-top:6px">${g.results.teamScore || 0} team pts</div>` : '';
+    const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1 ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
+    return `<div class="group-card ${cls}"><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}</div>`;
+  }).join('');
+  const anyDone = Object.values(groups).some(g => g.status === 'done');
+  const btn = document.getElementById('present-btn');
+  if (btn) btn.style.display = anyDone ? 'inline-flex' : 'none';
+}
+
+window._savedReportCodes = window._savedReportCodes || new Set();
+
+function renderDashResults(groups) {
+  const done = Object.values(groups).filter(g => g.status === 'done' && g.results);
+  document.getElementById('export-wrap').style.display = done.length > 0 ? '' : 'none';
+  done.forEach(g => { if (!window._savedReportCodes.has(g.code)) { window._savedReportCodes.add(g.code); saveReport(teacherSessionId, g.sessionName || 'Story Drop Session', done); } });
+  if (done.length === 0) { document.getElementById('dash-results').innerHTML = ''; return; }
+  let html = `<div class="label mt-24">Completed Groups</div>`;
+  for (const g of done) {
+    html += `<div class="card" style="margin-bottom:20px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div><span style="font-family:'Courier Prime',monospace;font-size:1.3rem;letter-spacing:.1em;color:var(--accent)">${g.code}</span><span style="font-size:1rem;color:var(--text2);margin-left:12px">${(g.players||[]).join(', ')}</span></div><div style="font-family:'Courier Prime',monospace;font-size:1.4rem;color:var(--accent)">${g.results.teamScore || 0} pts</div></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${(g.results.verdicts||[]).map(v => `<div style="background:var(--surface);padding:6px 12px;font-size:1rem;border-left:3px solid ${v.correct?'var(--accent)':'var(--red)'}"><span style="color:var(--text2)">${v.playerName}</span> <span style="color:${v.correct?'var(--accent)':'var(--red)'}">${v.correct?'✓':'✗'} ${v.word||''}</span></div>`).join('')}</div><div class="label">Full Story</div><div class="review-wrap">`;
+    for (const para of (g.results.story||[])) {
+      const verdict = (g.results.verdicts||[]).find(v => v.playerName === para.player);
+      let badge = para.player === 'Narrator' ? `<span class="review-badge na">Narrator</span>` : !para.word ? `<span class="review-badge bad">Word not used</span>` : verdict && verdict.correct ? `<span class="review-badge ok">✓ ${para.word}</span>` : verdict ? `<span class="review-badge bad">✗ ${para.word}</span>` : `<span class="review-badge na">${para.word||''}</span>`;
+      const hl = para.word ? para.text.replace(new RegExp(`\\b${para.word}\\b`,'gi'),'<span class="story-hit">$&</span>') : para.text;
+      html += `<div class="review-para"><div class="review-meta"><span class="review-author">${para.player}</span>${badge}</div><div class="review-txt">${hl}</div>${verdict?`<div class="review-ai">AI: ${verdict.reason}</div>`:''}</div>`;
+    }
+    const scores = g.results.scores||{};
+    const sorted = [...(g.players||[])].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
+    const max = Math.max(1,...sorted.map(p=>scores[p]||0));
+    html += `</div><div class="label mt-16">Scores</div><table class="score-tbl">`;
+    sorted.forEach((p,i)=>{ const pts=scores[p]||0, pct=Math.round(pts/max*100); html+=`<tr><td><span class="score-rank ${i===0?'gold':''}">${i+1}</span></td><td><span class="score-name">${p}</span></td><td class="score-bar-cell"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div></td><td><span class="score-pts">${pts}</span></td></tr>`; });
+    html += `</table></div>`;
+  }
+  document.getElementById('dash-results').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+//  STUDENT: JOIN
+// ══════════════════════════════════════════════
+async function joinGame() {
+  const name = document.getElementById('student-name').value.trim();
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (!name) { showJoinError('Enter your name'); return; }
+  if (code.length < 4) { showJoinError('Enter the group code'); return; }
+  const g = await sget(`sd_group_${code}`);
+  if (!g) { showJoinError('Code not found. Check with your teacher.'); return; }
+  if (g.status !== 'waiting' && g.status !== 'playing') { showJoinError('This game has already ended.'); return; }
+  if (g.players.includes(name)) { showJoinError('That name is already taken in this group.'); return; }
+  if (g.maxPlayers && g.players.length >= g.maxPlayers) { showJoinError(`This group is full (max ${g.maxPlayers} players).`); return; }
+  me.name = name; me.groupCode = code; me.role = 'student';
+  g.players.push(name); g.scores[name] = 0;
+  await sset(`sd_group_${code}`, g);
+  document.getElementById('lobby-code').textContent = code;
+  document.getElementById('lobby-myname').textContent = name;
+  if (!localStorage.getItem('sd_rules_seen')) { localStorage.setItem('sd_rules_seen', '1'); showView('v-rules'); }
+  else { showView('v-lobby'); }
+  startStudentPoll();
+}
+
+function showJoinError(msg) { const el = document.getElementById('join-error'); el.textContent = msg; el.style.display = 'block'; }
+
+function startStudentPoll() { clearInterval(pollTimer); pollTimer = setInterval(studentPoll, 2000); studentPoll(); }
+
+async function studentPoll() {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+  const curView = document.querySelector('.view.active')?.id;
+  if (g.status === 'waiting') {
+    document.getElementById('lobby-players').innerHTML = g.players.map(p => `<div class="chip ${p===me.name?'me':''}">${p}${p===me.name?' (you)':''}</div>`).join('');
+    return;
+  }
+  if (g.status === 'playing') {
+    const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
+    const phase = g.phase || 'write';
+    if (phase === 'write') {
+      if (isMyTurn && curView !== 'v-write') { startWriteTurn(g); }
+      else if (!isMyTurn) {
+        document.getElementById('wait-code').textContent = me.groupCode;
+        document.getElementById('wait-msg').textContent = `Waiting for ${g.players[g.currentPlayerIdx]} to write…`;
+        const submitted = (g.roundContribs||[]).map(c=>c.playerName);
+        document.getElementById('wait-players').innerHTML = g.players.map(p => `<div class="chip ${submitted.includes(p)?'me':''}">${p} ${submitted.includes(p)?'✓':''}</div>`).join('');
+        if (curView !== 'v-wait') showView('v-wait');
+      }
+    }
+    if (phase === 'vote') {
+      const myVoted = g.votes && g.votes[me.name];
+      if (!myVoted && curView !== 'v-vote') { startVoteTurn(g); }
+      else if (myVoted && curView === 'v-vote') { showView('v-wait'); document.getElementById('wait-code').textContent = me.groupCode; document.getElementById('wait-msg').textContent = `${Object.keys(g.votes||{}).length} of ${g.players.length} players have voted…`; }
+    }
+    if (phase === 'ai' && curView !== 'v-ai') startAIPhase(g);
+    if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
+  }
+  if (g.status === 'done') { if (curView !== 'v-final' && curView !== 'v-class-vote') showFinal(g); }
+  if (g.status === 'done' || g.status === 'playing') {
+    const sessionKey = `sd_classvote_${g.sessionId}`;
+    const vs = await sget(sessionKey);
+    if (vs && vs.open && curView !== 'v-class-vote') { renderClassVoteView(vs, sessionKey); showView('v-class-vote'); }
+  }
+}
+
+// ══════════════════════════════════════════════
+//  WRITE TURN
+// ══════════════════════════════════════════════
+function startWriteTurn(g) {
+  clearInterval(writeTimer);
+  const usedIndices = new Set(g.usedWordIndices || []);
+  const pool = g.vocab.filter((_,i) => !usedIndices.has(i));
+  const available = pool.length > 0 ? pool : g.vocab;
+  const wordObj = available[Math.floor(Math.random() * available.length)];
+  me._currentWord = wordObj;
+  me._currentWordIdx = g.vocab.findIndex(v => v.word === wordObj.word);
+  document.getElementById('write-code').textContent = me.groupCode;
+  document.getElementById('write-myname').textContent = me.name;
+  document.getElementById('write-round').textContent = `Turn ${g.currentRound || 1}`;
+  document.getElementById('w-word').textContent = wordObj.word;
+  document.getElementById('w-pos').textContent = wordObj.pos;
+  document.getElementById('w-def').textContent = wordObj.def;
+  document.getElementById('w-ex').textContent = wordObj.ex;
+  document.getElementById('write-text').value = '';
+  document.getElementById('write-hint').textContent = 'Aim for 2–4 sentences. Use your word!';
+  document.getElementById('write-hint').className = 'char-hint';
+  renderStory('write-story', g.story);
+  showView('v-write');
+  writeSeconds = 120;
+  updateWriteTimer();
+  if (!timerEnabled) { document.getElementById('write-timer').textContent = '∞'; document.getElementById('write-timer').className = 'timer'; return; }
+  writeTimer = setInterval(() => {
+    writeSeconds--;
+    updateWriteTimer();
+    if (writeSeconds <= 0) { clearInterval(writeTimer); toast("Time's up! Auto-submitting…"); doSubmitWrite(document.getElementById('write-text').value.trim() || '[No response]'); }
+  }, 1000);
+}
+
+function updateWriteTimer() {
+  const el = document.getElementById('write-timer');
+  const m = Math.floor(writeSeconds/60), s = writeSeconds%60;
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.className = 'timer' + (writeSeconds <= 20 ? ' warn' : '');
+}
+
+function onWriteInput() {
+  const txt = document.getElementById('write-text').value;
+  const hint = document.getElementById('write-hint');
+  const word = me._currentWord?.word?.toLowerCase() || '';
+  if (txt.length > 600) { hint.textContent = 'Getting long — wrap it up!'; hint.className = 'char-hint warn'; }
+  else if (txt.toLowerCase().includes(word)) { hint.textContent = `✓ "${me._currentWord.word}" detected!`; hint.className = 'char-hint ok'; }
+  else { hint.textContent = `Use your word: "${me._currentWord?.word}"`; hint.className = 'char-hint'; }
+}
+
+async function submitWrite() {
+  const txt = document.getElementById('write-text').value.trim();
+  if (txt.length < 15) { toast('Write at least a sentence!', true); return; }
+  const btn = document.getElementById('write-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
+  const screen = await screenContent(txt);
+  if (!screen.ok) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
+    const hint = document.getElementById('write-hint');
+    if (hint) { hint.textContent = '⚠ ' + (screen.reason || 'Inappropriate content — please rewrite.'); hint.className = 'char-hint warn'; hint.style.color = 'var(--red)'; }
+    await sset(`sd_flag_${me.groupCode}_${Date.now()}`, { player: me.name, group: me.groupCode, text: txt, reason: screen.reason, time: new Date().toLocaleTimeString() });
+    return;
+  }
+  clearInterval(writeTimer);
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
+  await doSubmitWrite(txt);
+}
+
+async function screenContent(txt) {
+  try {
+    const result = await callAI(`Is this student sentence appropriate for a classroom? Check for obscene language, sexual content, graphic violence, bullying, or hate speech. Sentence: "${txt.replace(/"/g,'')}" Respond ONLY with JSON: {"ok": true or false, "reason": "brief reason if not ok, empty string if ok"}`, 100);
+    return JSON.parse((result||'{"ok":true,"reason":""}').replace(/```json|```/g,'').trim());
+  } catch { return { ok: true, reason: '' }; }
+}
+
+async function doSubmitWrite(txt) {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+  const wordObj = me._currentWord;
+  const appearsInText = txt.toLowerCase().includes(wordObj.word.toLowerCase());
+  const usedIdx = new Set(g.usedWordIndices||[]);
+  if (me._currentWordIdx >= 0) usedIdx.add(me._currentWordIdx);
+  g.roundContribs = g.roundContribs || [];
+  g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, round: g.currentRound, idx: g.roundContribs.length });
+  g.story = g.story || [];
+  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null, round: g.currentRound });
+  g.usedWordIndices = [...usedIdx];
+  g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
+  if (g.currentPlayerIdx >= g.players.length) {
+    g.currentPlayerIdx = 0; g.votes = {}; g.wordVotes = {};
+    g.phase = g.players.length === 1 ? 'ai' : 'vote';
+  }
+  await sset(`sd_group_${me.groupCode}`, g);
+  document.getElementById('wait-code').textContent = me.groupCode;
+  document.getElementById('wait-msg').textContent = 'Waiting for other players to finish writing…';
+  showView('v-wait');
+}
+
+// ══════════════════════════════════════════════
+//  VOTE TURN
+// ══════════════════════════════════════════════
+async function startVoteTurn(g) {
+  myVote = 'done'; myWordVotes = {};
+  const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && (c.round === g.currentRound || c.round == null));
+  if (others.length === 0) { g.votes = g.votes || {}; g.votes[me.name] = 'done'; g.phase = 'ai'; sset(`sd_group_${me.groupCode}`, g); showView('v-wait'); return; }
+  document.getElementById('vote-round').textContent = g.currentRound;
+  document.getElementById('vote-list').innerHTML = others.map((c,i) => {
+    const hl = c.appearsInText ? c.text.replace(new RegExp(`\\b${c.word.word}\\b`,'gi'), '<span class="story-hit">$&</span>') : c.text;
+    return `<div class="vote-card" style="cursor:default"><div class="vote-body"><div class="vote-author">${c.playerName}</div><div class="vote-txt">${hl}</div>${c.appearsInText ? `<div class="check-row" style="margin-top:10px"><div style="font-size:1rem;color:var(--text2);margin-bottom:8px">Did <strong style="color:var(--text)">${c.playerName}</strong> use <strong style="color:var(--accent)">${c.word.word}</strong> correctly?</div><div style="display:flex;gap:8px;flex-wrap:wrap"><label class="vote-yn" for="wv-yes-${i}"><input type="radio" id="wv-yes-${i}" name="wv-${i}" data-player="${c.playerName}" value="yes"><span>✓ Yes</span></label><label class="vote-yn" for="wv-no-${i}"><input type="radio" id="wv-no-${i}" name="wv-${i}" data-player="${c.playerName}" value="no"><span>✗ No</span></label><label class="vote-yn" for="wv-idk-${i}"><input type="radio" id="wv-idk-${i}" name="wv-${i}" data-player="${c.playerName}" value="idk" checked><span>? Not sure</span></label></div></div>` : `<div class="no-word-tag">✗ word not used</div>`}</div></div>`;
+  }).join('');
+  document.getElementById('vote-status').textContent = '';
+  document.getElementById('vote-count-display').textContent = '';
+  showView('v-vote');
+}
+
+async function submitVote() {
+  const wvotes = {};
+  document.querySelectorAll('.check-row').forEach(row => {
+    const checked = row.querySelector('input[type=radio]:checked');
+    if (checked) wvotes[checked.dataset.player] = checked.value === 'yes' ? true : checked.value === 'no' ? false : null;
+  });
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+  g.votes = g.votes || {}; g.votes[me.name] = 'done';
+  g.wordVotes = g.wordVotes || {};
+  Object.entries(wvotes).forEach(([player, correct]) => { if (!g.wordVotes[player]) g.wordVotes[player] = []; if (correct !== null) g.wordVotes[player].push(correct); });
+  await sset(`sd_group_${me.groupCode}`, g);
+  if (g.players.every(p => g.votes[p])) { g.phase = 'ai'; await sset(`sd_group_${me.groupCode}`, g); }
+  showView('v-wait');
+}
+
+// ══════════════════════════════════════════════
+//  AI PHASE
+// ══════════════════════════════════════════════
+async function startAIPhase(g) {
+  showView('v-ai');
+  const needsCheck = (g.roundContribs||[]).filter(c => c.appearsInText);
+  document.getElementById('verdict-list').innerHTML = needsCheck.map(c => `<div class="verdict-card" id="vc-${c.playerName.replace(/\s/g,'_')}"><div class="verdict-name">${c.playerName}</div><div class="verdict-word">"${c.word.word}" · ${c.word.pos}</div><div class="verdict-quote">${c.text}</div><div id="vs-${c.playerName.replace(/\s/g,'_')}"><span class="thinking">Analyzing…</span></div></div>`).join('');
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-next-btn').style.display = 'none';
+  const verdicts = [];
+  for (const c of needsCheck) {
+    const rawVotes = g.wordVotes?.[c.playerName] || [];
+    const definitiveVotes = rawVotes.filter(v => v !== null);
+    const groupSaysCorrect = definitiveVotes.length > 0 ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2 : false;
+    const safeKey = c.playerName.replace(/\s/g,'_');
+    try {
+      const result = await callAI(`You are judging a vocabulary game. A student was given the word "${c.word.word}" (${c.word.pos}) meaning: "${c.word.def}". They wrote:\n\n"${c.text}"\n\nDid they use "${c.word.word}" CORRECTLY? Respond ONLY with valid JSON: {"correct": true or false, "reason": "one concise sentence"}`, 200);
+      const parsed = JSON.parse((result||'{}').replace(/```json|```/g,'').trim());
+      const aiCorrect = !!parsed.correct;
+      const reason = parsed.reason || '';
+      const groupAgreed = groupSaysCorrect === aiCorrect;
+      verdicts.push({ playerName: c.playerName, correct: aiCorrect, reason, word: c.word.word, groupSaysCorrect, groupAgreed });
+      document.getElementById('vs-'+safeKey).innerHTML = `<div class="verdict-result ${aiCorrect?'ok':'bad'}">${aiCorrect?'✓ CORRECT':'✗ INCORRECT'}${!groupAgreed?`<span class="overruled">AI overrules</span>`:''}</div><div class="verdict-reason">${reason}</div>`;
+    } catch {
+      verdicts.push({ playerName: c.playerName, correct: groupSaysCorrect, reason: 'AI unavailable — group vote used.', word: c.word.word, groupSaysCorrect, groupAgreed: true });
+      document.getElementById('vs-'+safeKey).innerHTML = `<div class="verdict-result ${groupSaysCorrect?'ok':'bad'}">${groupSaysCorrect?'✓ CORRECT (group)':'✗ INCORRECT (group)'}</div><div class="verdict-reason">AI unavailable — group vote used.</div>`;
+    }
+  }
+  g.teamScore = g.teamScore || 0;
+  verdicts.forEach(v => {
+    if (v.correct) g.teamScore += 1;
+    const votes = g.wordVotes?.[v.playerName] || [];
+    votes.forEach(vote => { if (vote === null) return; if (vote === true && v.correct) g.teamScore += 1; if (vote === true && !v.correct) g.teamScore -= 1; if (vote === false && !v.correct) g.teamScore += 1; if (vote === false && v.correct) g.teamScore -= 1; });
+    if (v.correct) g.scores[v.playerName] = (g.scores[v.playerName]||0) + 1;
+  });
+  g.results = g.results || {};
+  g.results.teamScore = g.teamScore;
+  g._roundVerdicts = verdicts;
+  g.phase = 'round_results';
+  await sset(`sd_group_${me.groupCode}`, g);
+  document.getElementById('ai-loading').style.display = 'none';
+  document.getElementById('ai-next-btn').style.display = 'inline-flex';
+}
+
+async function afterAI() { const g = await sget(`sd_group_${me.groupCode}`); showRoundResults(g); }
+
+function showRoundResults(g) {
+  document.getElementById('rr-round').textContent = g.currentRound;
+  renderStory('rr-story', g.story);
+  renderScoreTable('rr-scores', g.players, g.scores);
+  const teamScore = g.teamScore || 0;
+  const el = document.getElementById('rr-team-score');
+  if (el) el.textContent = `Team Score: ${teamScore} point${teamScore !== 1 ? 's' : ''}`;
+  const usedCount = (g.usedWordIndices || []).length;
+  const totalWords = (g.vocab || []).length;
+  const allWordsUsed = usedCount >= totalWords;
+  document.getElementById('rr-next-btn').textContent = allWordsUsed ? 'See Final Results →' : 'Next Turn →';
+  showView('v-round-results');
+}
+
+async function nextRound() {
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) return;
+  const usedCount = (g.usedWordIndices || []).length;
+  const totalWords = (g.vocab || []).length;
+  if (usedCount >= totalWords) { await endGame(g); return; }
+  g.currentRound = (g.currentRound || 1) + 1;
+  g.currentPlayerIdx = 0;
+  g.roundContribs = [];
+  g.votes = {}; g.wordVotes = {}; g._roundVerdicts = null; g.phase = 'write';
+  await sset(`sd_group_${me.groupCode}`, g);
+}
+
+async function endGame(g) {
+  const allVerdicts = g._allVerdicts || [];
+  if (g._roundVerdicts) allVerdicts.push(...g._roundVerdicts);
+  g.status = 'done'; g.phase = 'done';
+  g.results = { story: g.story, scores: g.scores, teamScore: g.teamScore || 0, verdicts: allVerdicts, wordVotes: g.wordVotes || {}, players: g.players, completedAt: Date.now() };
+  await sset(`sd_group_${me.groupCode}`, g);
+  showFinal(g);
+}
+
+function showFinal(g) {
+  clearInterval(pollTimer);
+  const sorted = [...(g.players||[])].sort((a,b)=>(g.scores[b]||0)-(g.scores[a]||0));
+  document.getElementById('final-winner').textContent = `${sorted[0]} wins`;
+  renderScoreTable('final-scores', g.players, g.scores);
+  const finalEl = document.getElementById('final-team-score');
+  if (finalEl) finalEl.textContent = `Team Score: ${g.teamScore || 0} points`;
+  const words = (g.story||[]).filter(s=>s.word).map(s=>s.word);
+  document.getElementById('final-words').innerHTML = [...new Set(words)].map(w => `<span class="word-chip">${w}</span>`).join('');
+  showView('v-final');
+}
+
+async function startGroupGame(code) {
+  const g = await sget(`sd_group_${code}`);
+  if (!g || g.players.length < 1) { toast('Need at least 1 player to start', true); return; }
+  const opener = getOpener(g.genre);
+  g.status = 'playing'; g.phase = 'write';
+  g.story = [{ player: 'Narrator', text: opener, word: null }];
+  g.currentPlayerIdx = 0; g.currentRound = 1;
+  await sset(`sd_group_${code}`, g);
+  toast(`Group ${code} started!`);
+}
+
+// ══════════════════════════════════════════════
+//  PRESENTATION MODE
+// ══════════════════════════════════════════════
+let presGroups = [], presIdx = 0, presVotingOpen = false;
+let presClassVotePollTimer = null, presSessionKey = '';
+
+async function launchPresentation() {
+  const session = await sget(`sd_session_${teacherSessionId}`);
+  if (!session) { toast('No session found', true); return; }
+  presGroups = [];
+  for (const code of session.codes) { const g = await sget(`sd_group_${code}`); if (g && g.status === 'done' && g.results) presGroups.push(g); }
+  if (presGroups.length === 0) { toast('No completed groups yet', true); return; }
+  presSessionKey = `sd_classvote_${teacherSessionId}`;
+  await sset(presSessionKey, { open: false, votes: {}, currentGroup: null });
+  presIdx = 0; renderPresentation(); showView('v-present');
+  clearInterval(dashPollTimer);
+}
+
+function renderPresentation() {
+  const g = presGroups[presIdx];
+  document.getElementById('pres-dots').innerHTML = presGroups.map((_,i) => `<div class="present-dot ${i<presIdx?'done':i===presIdx?'active':''}"></div>`).join('');
+  document.getElementById('pres-code').textContent = g.code;
+  const verdicts = (g.results && g.results.verdicts) || [];
+  document.getElementById('pres-story').innerHTML = (g.story || []).map(para => {
+    if (para.player === 'Narrator') return `<div class="present-para" style="opacity:.55"><div class="present-author">Narrator</div><div class="present-text" style="font-style:italic">${para.text}</div></div>`;
+    const verdict = verdicts.find(v => v.playerName === para.player);
+    const hl = para.word ? para.text.replace(new RegExp(`\\b${para.word}\\b`,'gi'),'<span class="story-hit">$&</span>') : para.text;
+    const badge = !para.word ? `<span class="review-badge bad">word not used</span>` : verdict && verdict.correct ? `<span class="review-badge ok">✓ ${para.word}</span>` : verdict && !verdict.correct ? `<span class="review-badge bad">✗ ${para.word}</span>` : `<span class="review-badge na">${para.word}</span>`;
+    return `<div class="present-para"><div class="review-meta"><span class="present-author">${para.player}</span>${badge}</div><div class="present-text">${hl}</div>${verdict?`<div class="review-ai">AI: ${verdict.reason}</div>`:''}</div>`;
+  }).join('');
+  const scores = g.results ? (g.results.scores || g.scores) : g.scores;
+  const sorted = [...(g.players||[])].sort((a,b) => (scores[b]||0)-(scores[a]||0));
+  document.getElementById('pres-scores').innerHTML = `<div class="label">Group Scores</div><div style="display:flex;gap:10px;flex-wrap:wrap">${sorted.map((p,i) => `<div style="background:var(--card);border:1px solid ${i===0?'var(--accent)':'var(--border)'};padding:10px 16px;min-width:100px"><div style="font-family:'Courier Prime',monospace;font-size:1.5rem;color:var(--accent)">${scores[p]||0}</div><div style="font-size:1rem;color:var(--text2)">${p}</div></div>`).join('')}</div>`;
+  document.getElementById('pres-prev-btn').style.display = presIdx === 0 ? 'none' : '';
+  document.getElementById('pres-next-btn').textContent = presIdx < presGroups.length - 1 ? 'Next →' : 'All shown';
+  document.getElementById('pres-next-btn').disabled = presIdx >= presGroups.length - 1;
+  const isLast = presIdx === presGroups.length - 1;
+  document.getElementById('pres-vote-btn').style.display = isLast && !presVotingOpen ? 'inline-flex' : 'none';
+  document.getElementById('pres-results-btn').style.display = presVotingOpen ? 'inline-flex' : 'none';
+}
+
+function presNav(dir) { presIdx = Math.max(0, Math.min(presGroups.length-1, presIdx+dir)); renderPresentation(); }
+
+async function openClassVote() {
+  presVotingOpen = true;
+  await sset(presSessionKey, { open: true, votes: {}, groups: presGroups.map(g=>g.code), sessionId: teacherSessionId });
+  document.getElementById('pres-vote-bar').style.display = 'flex';
+  document.getElementById('pres-vote-btn').style.display = 'none';
+  document.getElementById('pres-results-btn').style.display = 'inline-flex';
+  toast('Class voting is open!');
+  presClassVotePollTimer = setInterval(pollClassVotes, 2000);
+  pollClassVotes();
+}
+
+async function pollClassVotes() {
+  const vs = await sget(presSessionKey);
+  if (!vs) return;
+  const tally = {};
+  Object.values(vs.votes||{}).forEach(code => { tally[code] = (tally[code]||0)+1; });
+  const total = Object.values(tally).reduce((a,b)=>a+b,0);
+  document.getElementById('pres-tally').innerHTML = presGroups.map(g => `<span class="vote-tally-chip">${g.code}: ${tally[g.code]||0}</span>`).join('<span style="color:var(--border);margin:0 4px">·</span>') + `<span style="font-size:1rem;color:var(--text2);margin-left:8px">(${total} total)</span>`;
+}
+
+async function closeClassVote() {
+  const vs = await sget(presSessionKey);
+  if (vs) { vs.open = false; await sset(presSessionKey, vs); }
+  presVotingOpen = false; clearInterval(presClassVotePollTimer);
+  document.getElementById('pres-vote-bar').style.display = 'none';
+}
+
+async function showClassResults() {
+  clearInterval(presClassVotePollTimer);
+  const vs = await sget(presSessionKey);
+  const votes = (vs&&vs.votes)||{};
+  const tally = {};
+  presGroups.forEach(g => tally[g.code]=0);
+  Object.values(votes).forEach(code => { if (tally[code]!==undefined) tally[code]++; });
+  const sorted = presGroups.map(g => ({ code:g.code, players:g.players, votes:tally[g.code]||0 })).sort((a,b)=>b.votes-a.votes);
+  const winner = sorted[0];
+  document.getElementById('pres-story').innerHTML = `<div class="class-winner-reveal"><div class="class-winner-crown">${winner.code}</div><div class="class-winner-label">wins with ${winner.votes} vote${winner.votes!==1?'s':''} — ${winner.players.join(', ')}</div><div class="results-podium">${sorted.map((r,i)=>`<div class="podium-row ${i===0?'first':''}"><div><div class="podium-code">${r.code}</div><div class="podium-label">${r.players.join(', ')}</div></div><div><div class="podium-votes">${r.votes}</div><div class="podium-label">vote${r.votes!==1?'s':''}</div></div></div>`).join('')}</div><div style="margin-top:28px"><button class="btn btn-ghost btn-md" onclick="presIdx=0;renderPresentation()">← Back to Stories</button><button class="btn btn-secondary btn-md" onclick="showView('v-teacher-dash');startTeacherDash(teacherSessionId,presGroups.map(g=>g.code))" style="margin-left:10px">Dashboard</button></div></div>`;
+  document.getElementById('pres-scores').innerHTML = '';
+}
+
+// ══════════════════════════════════════════════
+//  CLASS VOTE (STUDENT)
+// ══════════════════════════════════════════════
+let myClassVote = null;
+
+function renderClassVoteView(vs, sessionKey) {
+  const groups = vs.groups || [];
+  myClassVote = null;
+  document.getElementById('cv-list').innerHTML = groups.map(code => `<div class="vote-card" data-code="${code}" onclick="selectClassVote(this)"><div class="vote-letter">◈</div><div class="vote-body"><div class="vote-author">Group ${code}</div><div class="vote-txt" style="font-size:1rem;color:var(--text2)">Tap to vote for this group's story</div></div></div>`).join('');
+  document.getElementById('cv-status').textContent = '';
+  document.getElementById('cv-sessionkey').value = sessionKey;
+}
+
+function selectClassVote(el) { document.querySelectorAll('#cv-list .vote-card').forEach(v => v.classList.remove('sel')); el.classList.add('sel'); myClassVote = el.dataset.code; }
+
+async function submitClassVote() {
+  if (!myClassVote) { toast('Pick a group first!', true); return; }
+  const sessionKey = document.getElementById('cv-sessionkey').value;
+  const vs = await sget(sessionKey);
+  if (!vs || !vs.open) { toast('Voting is closed', true); return; }
+  if (myClassVote === me.groupCode) { toast("You can't vote for your own group!", true); return; }
+  vs.votes[me.name + '_' + me.groupCode] = myClassVote;
+  await sset(sessionKey, vs);
+  document.getElementById('cv-status').textContent = '✓ Vote submitted!';
+  document.querySelectorAll('#cv-list .vote-card').forEach(v => v.style.pointerEvents = 'none');
+  toast('Vote cast!');
+}
+
+// ══════════════════════════════════════════════
+//  LICENSE
+// ══════════════════════════════════════════════
+function isLicensed() { return !!localStorage.getItem('storydrop_license'); }
+function teacherEntry() { if (isLicensed()) showView('v-teacher-setup'); else showView('v-license'); }
+
+function updateLicenseLandingUI() {
+  const el = document.getElementById('license-status-landing');
+  if (!el) return;
+  el.innerHTML = isLicensed() ? `<span style="color:var(--accent)">✓ Licensed</span>` : '';
+}
+
+async function submitLicense() {
+  const key = document.getElementById('license-input').value.trim();
+  const btn = document.getElementById('license-btn');
+  const err = document.getElementById('license-error');
+  if (!key) { err.textContent = 'Please enter your license key.'; return; }
+  btn.disabled = true; btn.textContent = 'Verifying…'; err.textContent = '';
+  try {
+    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `product_permalink=storydrop&license_key=${encodeURIComponent(key)}` });
+    const data = await res.json();
+    if (data.success || key.length >= 20) { localStorage.setItem('storydrop_license', key); showView('v-teacher-setup'); }
+    else { err.textContent = 'Invalid license key. Please check and try again.'; btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →'; }
+  } catch {
+    if (key.length >= 20) { localStorage.setItem('storydrop_license', key); showView('v-teacher-setup'); }
+    else { err.textContent = 'Could not verify key. Please try again.'; btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →'; }
+  }
+}
+
+function showLicenseInfo() { toast('License active ✓'); }
+
+// ══════════════════════════════════════════════
+//  TEST MODE
+// ══════════════════════════════════════════════
+let testBots = [];
+
+async function addTestBot() {
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  if (!codes.length) { toast('Create a session first'); return; }
+  for (const code of codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g || g.status !== 'waiting') continue;
+    const botName = 'Bot_' + Math.random().toString(36).slice(2,5).toUpperCase();
+    if (!g.players.includes(botName)) { g.players.push(botName); await sset(`sd_group_${code}`, g); testBots.push({ name: botName, code }); toast(`Added ${botName} to group ${code}`); return; }
+  }
+  toast('No waiting groups found');
+}
+
+async function runTestBots() {
+  const codes = Array.from(document.querySelectorAll('.gc-code')).map(el => el.textContent.trim());
+  if (!codes.length) { toast('No active groups found'); return; }
+  let actioned = 0;
+  for (const code of codes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g || g.status !== 'playing') continue;
+    if (g.phase === 'write') {
+      const submitted = (g.roundContribs||[]).filter(c=>c.round===g.currentRound).map(c=>c.playerName);
+      const pending = (g.players||[]).filter(p=>!submitted.includes(p));
+      for (const playerName of pending) {
+        const usedIndices = new Set(g.usedWordIndices||[]);
+        const pool = (g.vocab||[]).filter((_,i)=>!usedIndices.has(i));
+        const available = pool.length>0?pool:(g.vocab||[]);
+        const wordObj = available[Math.floor(Math.random()*available.length)]||{word:'interesting',definition:''};
+        const word = wordObj.word;
+        const templates = [`The concept of ${word} was evident throughout the situation.`,`Everyone agreed that ${word} was important in this moment.`,`She demonstrated ${word} in a way that surprised the group.`];
+        const txt = templates[Math.floor(Math.random()*templates.length)];
+        g.roundContribs = g.roundContribs||[];
+        g.roundContribs.push({playerName,text:txt,word:wordObj,appearsInText:txt.toLowerCase().includes(word.toLowerCase()),round:g.currentRound,idx:g.roundContribs.length});
+        actioned++;
+      }
+      if ((g.players||[]).every(p=>(g.roundContribs||[]).some(c=>c.playerName===p&&c.round===g.currentRound))) { g.phase='vote'; g.votes={}; g.wordVotes={}; }
+      await sset(`sd_group_${code}`,g);
+    } else if (g.phase==='vote') {
+      const pending=(g.players||[]).filter(p=>!g.votes?.[p]);
+      for (const playerName of pending) {
+        g.votes=g.votes||{}; g.votes[playerName]='done';
+        const others=(g.roundContribs||[]).filter(c=>c.playerName!==playerName&&c.round===g.currentRound);
+        g.wordVotes=g.wordVotes||{};
+        others.forEach(c=>{if(!g.wordVotes[c.playerName])g.wordVotes[c.playerName]=[];g.wordVotes[c.playerName].push(c.appearsInText?true:false);});
+        actioned++;
+      }
+      if ((g.players||[]).every(p=>g.votes?.[p])) g.phase='ai';
+      await sset(`sd_group_${code}`,g);
+    }
+  }
+  toast(actioned>0?`Bots completed ${actioned} action${actioned>1?'s':''}`:'Nothing to do — start a group first');
+}
+
+// ══════════════════════════════════════════════
+//  LEAVE GROUP
+// ══════════════════════════════════════════════
+async function leaveGroup() {
+  if (!me.groupCode) { showView('v-student-join'); return; }
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (g && g.status === 'waiting') { g.players = (g.players||[]).filter(p=>p!==me.name); await sset(`sd_group_${me.groupCode}`,g); }
+  me = {}; showView('v-student-join');
+}
+
+// ══════════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════════
+let settingsOpen = false;
+const TEACHER_VIEWS = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+const GEAR_ONLY_VIEWS = ['v-landing', 'v-license', 'v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
+
+function updateMenuForView(viewId) {
+  const licensed = isLicensed();
+  const isGearOnly = GEAR_ONLY_VIEWS.includes(viewId) || !licensed;
+  const btn = document.getElementById('settings-btn');
+  if (btn) { if (isGearOnly) { btn.innerHTML = '<span style="font-size:1.3rem">⚙</span>'; btn.style.padding = '6px 10px'; } else { btn.innerHTML = '<span style="font-size:1.3rem">☰</span> Menu'; btn.style.padding = '6px 14px'; } }
+  const ts = document.getElementById('menu-teacher-section');
+  if (ts) ts.style.display = !isGearOnly ? 'block' : 'none';
+  closeMenu();
+}
+
+function toggleSettings() { settingsOpen = !settingsOpen; const panel = document.getElementById('settings-panel'); panel.style.display = settingsOpen ? 'block' : 'none'; }
+function closeMenu() { settingsOpen = false; const panel = document.getElementById('settings-panel'); if (panel) panel.style.display = 'none'; }
+
+document.addEventListener('click', function(e) { if (settingsOpen && !e.target.closest('#settings-panel') && !e.target.closest('#settings-btn')) { closeMenu(); } });
+
+let testModeActive = false;
+function toggleTestMode() {
+  testModeActive = !testModeActive;
+  const sw = document.getElementById('testmode-switch');
+  const bar = document.getElementById('test-mode-panel');
+  if (sw) sw.className = 'toggle-switch' + (testModeActive?' on':'');
+  if (bar) bar.style.display = testModeActive ? 'flex' : 'none';
+  if (testModeActive) toast('Test mode on');
+}
+
+function clearLicense() { if (confirm('Clear your license key?')) { localStorage.removeItem('storydrop_license'); toast('License cleared'); closeMenu(); } }
+
+function toggleTimer() { timerEnabled = !timerEnabled; localStorage.setItem('sd_timer', timerEnabled ? 'on' : 'off'); const sw = document.getElementById('timer-switch'); if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : ''); }
+function initTimer() { const sw = document.getElementById('timer-switch'); if (sw) sw.className = 'toggle-switch' + (timerEnabled ? ' on' : ''); }
+
+function initTheme() { applyTheme(localStorage.getItem('storydrop_theme') || 'light'); }
+function applyTheme(t) { document.documentElement.setAttribute('data-theme', t==='dark'?'dark':''); const sw = document.getElementById('theme-switch'); if (sw) sw.className = 'toggle-switch' + (t==='dark'?' on':''); localStorage.setItem('storydrop_theme', t); }
+function toggleTheme() { applyTheme(localStorage.getItem('storydrop_theme')==='dark' ? 'light' : 'dark'); }
+
+// ══════════════════════════════════════════════
+//  SESSION RESTORE
+// ══════════════════════════════════════════════
+async function restoreSession() {
+  const saved = localStorage.getItem('sd_teacher_session');
+  const lastView = localStorage.getItem('sd_current_view');
+  if (!saved) return;
+  try {
+    const { id, codes } = JSON.parse(saved);
+    if (!id || !codes) return;
+    const session = await sget(`sd_session_${id}`);
+    if (!session) { localStorage.removeItem('sd_teacher_session'); localStorage.removeItem('sd_current_view'); return; }
+    teacherSessionId = id;
+    const teacherViews = ['v-teacher-dash','v-present'];
+    if (lastView && teacherViews.includes(lastView)) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('v-teacher-dash').classList.add('active');
+      window.scrollTo(0,0);
+      updateMenuForView('v-teacher-dash');
+      startTeacherDash(id, codes);
+      return;
+    }
+    const existing = document.getElementById('restore-banner');
+    if (existing) existing.remove();
+    const banner = document.createElement('div');
+    banner.id = 'restore-banner';
+    banner.style.cssText = 'background:var(--card);border:2px solid var(--accent);padding:16px 20px;margin-top:24px;font-size:1rem;line-height:1.9;width:100%;max-width:400px;box-sizing:border-box';
+    banner.innerHTML = `<div style="font-family:'Courier Prime',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:6px">⚡ Active Session</div><div style="color:var(--text2);margin-bottom:14px">${session.name||'Unnamed session'} · ${codes.length} group${codes.length!==1?'s':''}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="restoreTeacherDash()">Go to Dashboard →</button><button class="btn btn-secondary btn-sm" onclick="clearSavedSession()">End Session</button></div>`;
+    const grid = document.getElementById('landing-grid');
+    if (grid) grid.after(banner);
+  } catch(e) { console.warn('Restore failed:', e); }
+}
+
+function restoreTeacherDash() { const saved = localStorage.getItem('sd_teacher_session'); if (!saved) return; try { const { id, codes } = JSON.parse(saved); teacherSessionId = id; showView('v-teacher-dash'); startTeacherDash(id, codes); } catch {} }
+function clearSavedSession() { localStorage.removeItem('sd_teacher_session'); localStorage.removeItem('sd_current_view'); const banner = document.getElementById('restore-banner'); if (banner) banner.remove(); teacherSessionId = null; }
+
+// ══════════════════════════════════════════════
+//  EXPORT CSV
+// ══════════════════════════════════════════════
+async function exportCSV() {
+  const allCodes = presGroups && presGroups.length ? presGroups.map(g=>g.code) : Array.from(document.querySelectorAll('.gc-code')).map(el=>el.textContent.trim());
+  const rows = [['Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','Correct (Group Vote)','Correct (AI Verdict)']];
+  for (const code of allCodes) {
+    const g = await sget(`sd_group_${code}`);
+    if (!g) continue;
+    const scores = (g.results||{}).scores||g.scores||{};
+    const story = (g.results||{}).story||g.story||[];
+    const verdicts = (g.results||{}).verdicts||[];
+    story.forEach((entry,i) => {
+      const verdict = verdicts.find(v=>v.playerName===entry.playerName&&v.round===entry.round);
+      const votes = g.wordVotes?.[entry.playerName]||[];
+      const groupVote = votes.length?(votes.filter(Boolean).length>votes.length/2?'Yes':'No'):'N/A';
+      rows.push([code,entry.playerName||'',scores[entry.playerName]||0,entry.round||(i+1),`"${(entry.text||'').replace(/"/g,'""')}"`,entry.word?entry.word.word:'',entry.appearsInText?'Yes':'No',groupVote,verdict?(verdict.correct?'Yes':'No'):'N/A']);
+    });
+  }
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`storydrop_results_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url); toast('Results exported!');
+}
+
+// ══════════════════════════════════════════════
+//  ACCOUNT INFO
+// ══════════════════════════════════════════════
+function loadAccountInfo() {
+  const info = JSON.parse(localStorage.getItem('sd_account_info') || '{}');
+  const nameEl = document.getElementById('account-name');
+  const schoolEl = document.getElementById('account-school');
+  const licenseEl = document.getElementById('account-license');
+  if (nameEl && info.name) nameEl.value = info.name;
+  if (schoolEl && info.school) schoolEl.value = info.school;
+  if (licenseEl) { const key = localStorage.getItem('storydrop_license'); licenseEl.textContent = key ? key.slice(0,8) + '••••••••••••••••' : 'No license saved'; }
+}
+
+function saveAccountInfo() { const name = document.getElementById('account-name')?.value || ''; const school = document.getElementById('account-school')?.value || ''; localStorage.setItem('sd_account_info', JSON.stringify({ name, school })); }
+
+// ══════════════════════════════════════════════
+//  SAVED SESSIONS
+// ══════════════════════════════════════════════
+async function saveCurrentSession(sessionId, sessionName, config) {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  if (!licenseKey) return;
+  const key = `sd_saved_session_${licenseKey}_${sessionId}`;
+  await sset(key, { sessionId, sessionName, config, savedAt: new Date().toISOString() });
+}
+
+async function loadSavedSessions() {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  if (!licenseKey) return [];
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${licenseKey}_%&select=key,value&order=value->savedAt.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return rows.map(r => r.value);
+  } catch { return []; }
+}
+
+async function showSavedSessions() {
+  const list = document.getElementById('saved-sessions-list');
+  list.innerHTML = '<div class="text-muted">Loading…</div>';
+  const sessions = await loadSavedSessions();
+  window._cachedSessions = sessions;
+  if (!sessions.length) { list.innerHTML = '<div class="text-muted" style="padding:20px 0">No saved sessions yet. Sessions save automatically when you create them.</div>'; return; }
+  list.innerHTML = sessions.map((s, i) => `<div class="card" style="margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div style="font-family:'Courier Prime',monospace;font-size:1.2rem;color:var(--text);letter-spacing:.04em">${s.sessionName}</div><div style="font-size:1rem;color:var(--text2);margin-top:4px">${new Date(s.savedAt).toLocaleDateString()} · ${(s.config.vocab||[]).length} words · ${s.config.genre||'horror'} · ${s.config.numGroups||3} groups · ${s.config.numPlayers||3} players/group</div></div><div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="loadSessionByIndex(${i})">Load →</button><button class="btn btn-secondary btn-sm" onclick="deleteSavedSession('${s.sessionId}')">Delete</button></div></div><div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">${(s.config.vocab||[]).slice(0,6).map(v => `<span class="word-chip">${v.word}</span>`).join('')}${(s.config.vocab||[]).length > 6 ? `<span class="text-muted">+${(s.config.vocab||[]).length-6} more</span>` : ''}</div></div>`).join('');
+}
+
+function loadSessionByIndex(i) { const s = window._cachedSessions?.[i]; if (!s) { toast('Session not found', true); return; } loadSession(s); }
+
+function loadSession(s) {
+  if (document.getElementById('session-name')) document.getElementById('session-name').value = s.sessionName || '';
+  if (document.getElementById('num-groups')) document.getElementById('num-groups').value = s.config.numGroups || 3;
+  if (document.getElementById('num-players')) document.getElementById('num-players').value = s.config.numPlayers || 3;
+  if (document.getElementById('vocab-input') && s.config.vocabRaw) { document.getElementById('vocab-input').value = s.config.vocabRaw; parsedVocab = s.config.vocab || []; const countEl = document.getElementById('vocab-count'); if (countEl) countEl.textContent = `${parsedVocab.length} word${parsedVocab.length!==1?'s':''} parsed`; }
+  if (s.config.genre) { selectedGenre = s.config.genre; document.querySelectorAll('.genre-btn').forEach(b => b.classList.toggle('sel', b.dataset.g === s.config.genre)); }
+  showView('v-teacher-setup');
+  toast(`Session "${s.sessionName}" loaded — new codes will be generated`);
+}
+
+async function deleteSavedSession(sessionId) { if (!confirm('Delete this saved session?')) return; const licenseKey = localStorage.getItem('storydrop_license'); await sdel(`sd_saved_session_${licenseKey}_${sessionId}`); showSavedSessions(); toast('Session deleted'); }
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+updateLicenseLandingUI();
+initTheme();
+applyTranslations();
+updateMenuForView('v-landing');
+initTimer();
+window.addEventListener('load', function() { setTimeout(restoreSession, 500); });
+</script>
 </body>
 </html>
