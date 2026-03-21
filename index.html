@@ -2378,13 +2378,44 @@ document.addEventListener('DOMContentLoaded', function() {
         <div style="font-size:1rem;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;align-items:center"><span>You vote Not sure</span><strong style="color:var(--text2)">0</strong></div>
       </div>
     </div>
-    <div class="card" style="margin-bottom:28px">
-      <div class="label" style="margin-bottom:10px">🏆 Winning</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will present all the stories to the class.</p>
+   <p style="font-size:1rem;line-height:1.8;color:var(--text)">The team with the most points at the end wins. Your teacher will reveal the winner on the main screen!</p>
     </div>
-    <button class="btn btn-primary btn-lg" style="width:100%" onclick="showView('v-lobby')">Got it — let's play →</button>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="joinGame()">Join Group →</button>
+      <button class="btn btn-secondary btn-md" onclick="showView('v-landing')">← Back</button>
+    </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // BASIC NAVIGATION ENGINE
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const target = document.getElementById(viewId);
+    if (target) target.classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function teacherEntry() {
+    showView('v-teacher-setup');
+  }
+
+  // CONNECTION TO YOUR DATABASE
+  const supabaseUrl = 'https://zzojvscgtuezmfnrvdhd.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6b2p2c2NndHVlem1mbnJ2ZGhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNDc0NTYsImV4cCI6MjA4OTYyMzQ1Nn0.3UgmF6tj1KE0Rfft8Oe0mIjzkC6lfHDlQX0BPzg89-s'; 
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function createSession() {
+    const sName = document.getElementById('session-name').value;
+    if(!sName) return alert("Please name your session.");
+    document.getElementById('dash-session-name').innerText = sName;
+    showView('v-teacher-dash');
+  }
+
+  function joinGame() {
+    alert("System Ready. Please ensure your Supabase Key is pasted in the code.");
+  }
+</script>
 </body>
 </html>
